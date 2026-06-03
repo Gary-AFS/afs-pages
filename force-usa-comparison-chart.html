@@ -393,17 +393,6 @@
       font-weight: 500;
     }
 
-    .footer-brand {
-      height: 20px;
-    }
-
-    .footer-brand img {
-      height: 100%;
-      width: auto;
-      opacity: 0.3;
-      filter: brightness(0);
-    }
-
     .commercial-row td:first-child {
       color: var(--green);
     }
@@ -446,14 +435,6 @@
       td:first-child { min-width: 120px; padding-left: 12px; font-size: 10px; }
       td { padding: 10px 8px; font-size: 12px; }
     }
-    .download-bar {
-      display: flex;
-      justify-content: flex-end;
-      padding: 16px 32px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
     .download-btn {
       display: inline-flex;
       align-items: center;
@@ -466,7 +447,7 @@
       color: var(--white);
       background: var(--force-blue);
       border: none;
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.2s;
@@ -482,59 +463,30 @@
     }
 
     @media print {
-      .download-bar { display: none; }
+      .download-btn { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <div class="download-bar">
-    <button class="download-btn" onclick="downloadAsPNG()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download as PNG
-    </button>
-  </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    async function downloadAsPNG() {
-      const btn = document.querySelector('.download-btn');
+    async function downloadPage(pageEl, filename) {
+      const btn = pageEl.querySelector('.download-btn');
       const original = btn.innerHTML;
       btn.innerHTML = 'Generating...';
       btn.disabled = true;
 
-      const pages = document.querySelectorAll('.page');
-      const scale = 2;
-
-      const canvases = [];
-      for (const page of pages) {
-        const c = await html2canvas(page, {
-          scale: scale,
-          useCORS: true,
-          backgroundColor: '#FFFFFF',
-          logging: false
-        });
-        canvases.push(c);
-      }
-
-      const totalHeight = canvases.reduce((sum, c) => sum + c.height, 0);
-      const maxWidth = Math.max(...canvases.map(c => c.width));
-
-      const final = document.createElement('canvas');
-      final.width = maxWidth;
-      final.height = totalHeight;
-      const ctx = final.getContext('2d');
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, final.width, final.height);
-
-      let y = 0;
-      for (const c of canvases) {
-        ctx.drawImage(c, 0, y);
-        y += c.height;
-      }
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#FFFFFF',
+        logging: false
+      });
 
       const link = document.createElement('a');
-      link.download = 'force-usa-comparison-chart.png';
-      link.href = final.toDataURL('image/png');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
       link.click();
 
       btn.innerHTML = original;
@@ -706,7 +658,10 @@
 
     <div class="footer">
       <div class="footer-note">Specifications subject to change. Visit forceusa.com for the latest information.</div>
-      <div class="footer-brand"><img src="https://www.forceusa.com/cdn/shop/t/19/assets/force-usa-logo.svg?v=15702838478117472841757084722" alt="Force USA"></div>
+      <button class="download-btn" onclick="downloadPage(this.closest('.page'), 'force-usa-current-range.png')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PNG
+      </button>
     </div>
   </div>
 
@@ -900,7 +855,10 @@
 
     <div class="footer">
       <div class="footer-note">Specifications subject to change. Visit forceusa.com for the latest information. M20 and C10-V2 dimensions and attachment counts to be confirmed.</div>
-      <div class="footer-brand"><img src="https://www.forceusa.com/cdn/shop/t/19/assets/force-usa-logo.svg?v=15702838478117472841757084722" alt="Force USA"></div>
+      <button class="download-btn" onclick="downloadPage(this.closest('.page'), 'force-usa-new-range.png')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PNG
+      </button>
     </div>
   </div>
 
