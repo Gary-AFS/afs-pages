@@ -62,7 +62,7 @@
     .logo-img {
       height: 32px;
       width: auto;
-      filter: brightness(0) saturate(100%) invert(26%) sepia(68%) saturate(785%) hue-rotate(174deg) brightness(92%) contrast(95%);
+      filter: brightness(0);
     }
 
     .range-badge {
@@ -407,12 +407,12 @@
 
     @page {
       size: landscape;
-      margin: 12mm;
+      margin: 20mm;
     }
 
     @media print {
       body { font-size: 10px; }
-      .page { padding: 16px 0; max-width: 100%; }
+      .page { padding: 24px 16px; max-width: 100%; }
       .comparison-wrapper { box-shadow: none; border: 1px solid #ddd; overflow: visible; }
       table { font-size: 10px; min-width: 0; width: 100%; }
       td { padding: 8px 6px; font-size: 11px; }
