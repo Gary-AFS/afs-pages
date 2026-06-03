@@ -435,9 +435,54 @@
       td:first-child { min-width: 120px; padding-left: 12px; font-size: 10px; }
       td { padding: 10px 8px; font-size: 12px; }
     }
+    .download-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      background: var(--force-blue);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .download-btn:hover {
+      background: var(--force-black);
+    }
+
+    .download-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    @media print {
+      .download-bar { display: none; }
+    }
   </style>
 </head>
 <body>
+
+  <div class="download-bar">
+    <button class="download-btn" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download as PDF
+    </button>
+  </div>
 
   <!-- PAGE 1: CURRENT RANGE -->
   <div class="page">
@@ -459,7 +504,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G1-V2-full-front-left_9fdcf4a4-9156-482a-8635-5c54c7e33457.jpg?v=1762279027" alt="G1 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/0018_2.jpg?v=1759448420" alt="G1 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">G1</div>
               </div>
@@ -467,7 +512,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G3-V2-02_c7eedc63-4a70-4f74-bb3a-d481a62cf2fb.jpg?v=1757608446" alt="G3 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/products/ForceUSAG3_0001_2.jpg?v=1759448410" alt="G3 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">G3</div>
               </div>
@@ -475,7 +520,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G12-V2-0192.jpg?v=1761863964" alt="G12 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/0004_3.jpg?v=1759448399" alt="G12 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">G12</div>
               </div>
@@ -483,7 +528,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G15-03.jpg?v=1757615925" alt="G15 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/products/3_f19c680a-6458-4aeb-84f5-f7bcb2f64d29.jpg?v=1759448368" alt="G15 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">G15</div>
               </div>
@@ -491,7 +536,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G20-01.jpg?v=1757613181" alt="G20 Pro All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/0017_4_5d87452f-55d7-42ba-9b15-f8069828d19e.jpg?v=1759448433" alt="G20 Pro All-In-One Trainer">
                 </div>
                 <div class="handle-badge">G20</div>
               </div>
@@ -499,7 +544,7 @@
             <th>
               <div class="product-header bestseller">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-C10-03_79b793b3-a26f-4bc2-9cc0-b019f8f705b9.jpg?v=1759618444" alt="C10 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/7_2840a0f7-cef3-4331-a5f6-72392c5e8369.png?v=1759448385" alt="C10 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">C10</div>
               </div>
@@ -627,7 +672,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-C20-02_16422807-2ba6-4663-a5eb-8ee501205777.jpg?v=1757608507" alt="C20 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/02_f4d03508-f759-4ffa-9d00-fed28592c2c4.jpg?v=1759448346" alt="C20 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">C20</div>
               </div>
@@ -651,7 +696,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/M10_plate_efb36294-8795-4224-a9fb-ac34c5e7cbda.webp?v=1779210179" alt="M10 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/01_HERO_F-M10-200-IG_b334f170-f5a3-459e-ad04-c4a6baaa7c51.jpg?v=1780376952" alt="M10 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">M10</div>
               </div>
@@ -659,7 +704,7 @@
             <th>
               <div class="product-header">
                 <div class="product-image">
-                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G4-02.jpg?v=1761177666" alt="G4 All-In-One Trainer">
+                  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/745EF284-A945-4AC9-BB7C-D20495316082.jpg?v=1759448333" alt="G4 All-In-One Trainer">
                 </div>
                 <div class="handle-badge">G4</div>
               </div>
