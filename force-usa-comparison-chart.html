@@ -361,14 +361,26 @@
       color: var(--green);
     }
 
+    @page {
+      size: landscape;
+      margin: 12mm;
+    }
+
     @media print {
-      body { font-size: 11px; }
-      .page { padding: 24px; }
-      .comparison-wrapper { box-shadow: none; border: 1px solid #ddd; }
-      table { font-size: 11px; }
-      td { padding: 10px 8px; }
-      .handle-badge { font-size: 14px; padding: 6px 16px; }
+      body { font-size: 10px; }
+      .page { padding: 16px 0; max-width: 100%; }
+      .comparison-wrapper { box-shadow: none; border: 1px solid #ddd; overflow: visible; }
+      table { font-size: 10px; min-width: 0; width: 100%; }
+      td { padding: 8px 6px; font-size: 11px; }
+      td:first-child { min-width: 120px; font-size: 9px; }
+      .handle-badge { font-size: 13px; padding: 5px 14px; }
       .product-image { height: 90px; width: 80px; }
+      .sku-cell { font-size: 10px; }
+      .dim-cell { font-size: 9px; }
+      .pill { font-size: 9px; padding: 4px 8px; }
+      .attachment-count { font-size: 16px; }
+      .header { margin-bottom: 24px; padding-bottom: 16px; }
+      .footer { margin-top: 16px; }
     }
 
     @media (max-width: 768px) {
