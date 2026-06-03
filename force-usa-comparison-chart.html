@@ -489,11 +489,58 @@
 <body>
 
   <div class="download-bar">
-    <button class="download-btn" onclick="window.print()">
+    <button class="download-btn" onclick="downloadAsPNG()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download as PDF
+      Download as PNG
     </button>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    async function downloadAsPNG() {
+      const btn = document.querySelector('.download-btn');
+      const original = btn.innerHTML;
+      btn.innerHTML = 'Generating...';
+      btn.disabled = true;
+
+      const pages = document.querySelectorAll('.page');
+      const scale = 2;
+
+      const canvases = [];
+      for (const page of pages) {
+        const c = await html2canvas(page, {
+          scale: scale,
+          useCORS: true,
+          backgroundColor: '#FFFFFF',
+          logging: false
+        });
+        canvases.push(c);
+      }
+
+      const totalHeight = canvases.reduce((sum, c) => sum + c.height, 0);
+      const maxWidth = Math.max(...canvases.map(c => c.width));
+
+      const final = document.createElement('canvas');
+      final.width = maxWidth;
+      final.height = totalHeight;
+      const ctx = final.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, final.width, final.height);
+
+      let y = 0;
+      for (const c of canvases) {
+        ctx.drawImage(c, 0, y);
+        y += c.height;
+      }
+
+      const link = document.createElement('a');
+      link.download = 'force-usa-comparison-chart.png';
+      link.href = final.toDataURL('image/png');
+      link.click();
+
+      btn.innerHTML = original;
+      btn.disabled = false;
+    }
+  </script>
 
   <!-- PAGE 1: CURRENT RANGE -->
   <div class="page">
