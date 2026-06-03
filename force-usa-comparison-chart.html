@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Force USA All-In-One Comparison Chart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sofia+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --force-blue: #185787;
+      --force-black: #081C28;
+      --light-blue: #008BCE;
+      --green: #00AC75;
+      --white: #FFFFFF;
+      --n-50: #F6F8FB;
+      --n-100: #E6EAF1;
+      --n-200: #CDD4DD;
+      --n-300: #A5AEB7;
+      --n-400: #7A8690;
+      --n-500: #5A6770;
+      --n-600: #425660;
+      --n-700: #2B3A44;
+      --n-800: #142430;
+      --n-900: #081C28;
+      --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      --font-display: 'Sofia Sans', 'Inter', ui-sans-serif, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--white);
+      color: var(--force-black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 32px;
+      page-break-after: always;
+    }
+
+    .page:last-child { page-break-after: auto; }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 3px solid var(--force-blue);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo-mark {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 42px;
+      text-transform: uppercase;
+      color: var(--force-black);
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+
+    .logo-mark span {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 22px;
+      vertical-align: super;
+      color: var(--force-blue);
+      margin-left: 2px;
+    }
+
+    .range-badge {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--force-blue);
+      background: rgba(24, 87, 135, 0.08);
+      padding: 6px 16px;
+      border-radius: 999px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 28px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: var(--force-black);
+    }
+
+    .comparison-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--n-200);
+      box-shadow: 0 2px 12px rgba(8, 28, 40, 0.06);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 900px;
+    }
+
+    thead th {
+      background: var(--force-black);
+      color: var(--white);
+      padding: 0;
+      vertical-align: bottom;
+    }
+
+    thead th:first-child {
+      border-radius: 11px 0 0 0;
+    }
+
+    thead th:last-child {
+      border-radius: 0 11px 0 0;
+    }
+
+    .product-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 12px 16px;
+      gap: 12px;
+      position: relative;
+    }
+
+    .product-image {
+      width: 100px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.9;
+    }
+
+    .product-image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+
+    .handle-badge {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--force-blue);
+      color: var(--white);
+      padding: 8px 24px;
+      border-radius: 999px;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .bestseller {
+      position: relative;
+    }
+
+    .bestseller::after {
+      content: 'BEST SELLER';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #C9A84C;
+      color: var(--white);
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
+    .feature-header {
+      padding: 20px 16px 16px;
+      vertical-align: bottom;
+    }
+
+    .feature-header .section-label {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--n-100);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--n-50);
+    }
+
+    tbody tr:hover {
+      background: rgba(24, 87, 135, 0.03);
+    }
+
+    td {
+      padding: 14px 12px;
+      text-align: center;
+      font-weight: 500;
+      color: var(--n-700);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    td:first-child {
+      text-align: left;
+      padding-left: 20px;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--force-blue);
+      min-width: 160px;
+      white-space: nowrap;
+    }
+
+    td:first-child .sub {
+      display: block;
+      font-weight: 500;
+      font-size: 10px;
+      text-transform: none;
+      letter-spacing: 0.02em;
+      color: var(--n-400);
+      margin-top: 2px;
+    }
+
+    .sku-cell {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--n-600);
+    }
+
+    .dim-cell {
+      font-size: 11px;
+      color: var(--n-500);
+      font-weight: 500;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--force-blue);
+      color: var(--white);
+    }
+
+    .check svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .empty-cell {
+      color: var(--n-200);
+      font-size: 18px;
+    }
+
+    .pill {
+      display: inline-block;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 5px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .pill-plate {
+      background: rgba(24, 87, 135, 0.08);
+      color: var(--force-blue);
+    }
+
+    .pill-stack {
+      background: var(--force-blue);
+      color: var(--white);
+    }
+
+    .weight-value {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--force-black);
+    }
+
+    .attachment-count {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 20px;
+      color: var(--force-black);
+    }
+
+    .upright-badge {
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--force-black);
+    }
+
+    .upright-3x3 {
+      color: var(--force-blue);
+      font-weight: 800;
+    }
+
+    .ratio-value {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--n-700);
+    }
+
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--n-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: var(--n-400);
+      font-weight: 500;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: var(--n-300);
+      letter-spacing: 0.04em;
+    }
+
+    .commercial-row td:first-child {
+      color: var(--green);
+    }
+
+    @media print {
+      body { font-size: 11px; }
+      .page { padding: 24px; }
+      .comparison-wrapper { box-shadow: none; border: 1px solid #ddd; }
+      table { font-size: 11px; }
+      td { padding: 10px 8px; }
+      .handle-badge { font-size: 14px; padding: 6px 16px; }
+      .product-image { height: 90px; width: 80px; }
+    }
+
+    @media (max-width: 768px) {
+      .page { padding: 24px 16px; }
+      .header { flex-direction: column; gap: 16px; align-items: flex-start; }
+      .logo-mark { font-size: 32px; }
+      td:first-child { min-width: 120px; padding-left: 12px; font-size: 10px; }
+      td { padding: 10px 8px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: CURRENT RANGE -->
+  <div class="page">
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-mark">FORCE<span>USA</span></div>
+        <div class="range-badge">All-In-One Comparison Chart</div>
+      </div>
+      <div class="section-title">Current Range</div>
+    </div>
+
+    <div class="comparison-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th class="feature-header">
+              <div class="section-label">Specifications</div>
+            </th>
+            <th><div class="product-header"><div class="handle-badge">G1</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">G3</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">G6</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">G12</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">G15</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">G20</div></div></th>
+            <th><div class="product-header bestseller"><div class="handle-badge">C10</div></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SKU</td>
+            <td class="sku-cell">F-G1-V2</td>
+            <td class="sku-cell">F-G3-V2</td>
+            <td class="sku-cell">F-G6-B</td>
+            <td class="sku-cell">F-G12-V2</td>
+            <td class="sku-cell">F-G15-BASE</td>
+            <td class="sku-cell">F-G20-V2-BASE</td>
+            <td class="sku-cell">F-C10</td>
+          </tr>
+          <tr>
+            <td>Dimensions<span class="sub">H x W x D (inches)</span></td>
+            <td class="dim-cell">87.01 &times; 55.98 &times; 60.51</td>
+            <td class="dim-cell">87.01 &times; 77.99 &times; 60.51</td>
+            <td class="dim-cell">90.98 &times; 72.01 &times; 64.02</td>
+            <td class="dim-cell">87.99 &times; 75.98 &times; 55.98</td>
+            <td class="dim-cell">87.48 &times; 79.49 &times; 52.99</td>
+            <td class="dim-cell">90.98 &times; 79.02 &times; 67.01</td>
+            <td class="dim-cell">87.01 &times; 76.50 &times; 51.50</td>
+          </tr>
+          <tr class="commercial-row">
+            <td>Commercial</td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td>Upright Size</td>
+            <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge">2" x 2"</td>
+          </tr>
+          <tr>
+            <td>Functional Trainer<span class="sub">Resistance Type</span></td>
+            <td><span class="pill pill-plate">Plate Weight</span></td>
+            <td><span class="pill pill-plate">Plate Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+          </tr>
+          <tr>
+            <td>Weight Stack<span class="sub">(lbs)</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td class="weight-value">2 x 220</td>
+            <td class="weight-value">2 x 220</td>
+            <td class="weight-value">2 x 289</td>
+            <td class="weight-value">2 x 289</td>
+            <td class="weight-value">2 x 220</td>
+          </tr>
+          <tr>
+            <td>Cable Pulley Ratio</td>
+            <td class="ratio-value">2:1</td>
+            <td class="ratio-value">2:1</td>
+            <td class="ratio-value">2:1</td>
+            <td class="ratio-value">1:1</td>
+            <td class="ratio-value">2:1 &amp; 4:1</td>
+            <td class="ratio-value">2:1</td>
+            <td class="ratio-value">2:1</td>
+          </tr>
+          <tr>
+            <td>Smith Machine</td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+          </tr>
+          <tr>
+            <td>Counter Balanced<span class="sub">Smith Machine</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td>Included Attachments</td>
+            <td class="attachment-count">11</td>
+            <td class="attachment-count">12</td>
+            <td class="attachment-count">19</td>
+            <td class="attachment-count">18</td>
+            <td class="attachment-count">17</td>
+            <td class="attachment-count">25</td>
+            <td class="attachment-count">15</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <div class="footer-note">Specifications subject to change. Visit forceusa.com for the latest information.</div>
+      <div class="footer-brand">FORCE<span style="color: var(--force-blue); font-size: 10px; vertical-align: super;">USA</span></div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: NEW RANGE -->
+  <div class="page">
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-mark">FORCE<span>USA</span></div>
+        <div class="range-badge">All-In-One Comparison Chart</div>
+      </div>
+      <div class="section-title">New Range</div>
+    </div>
+
+    <div class="comparison-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th class="feature-header">
+              <div class="section-label">Specifications</div>
+            </th>
+            <th><div class="product-header"><div class="handle-badge">C20</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">TT</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">FTR</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">M10</div></div></th>
+            <th><div class="product-header"><div class="handle-badge">G4</div></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SKU</td>
+            <td class="sku-cell">F-C20</td>
+            <td class="sku-cell">F-TT</td>
+            <td class="sku-cell">F-FTR</td>
+            <td class="sku-cell">F-M10</td>
+            <td class="sku-cell">F-G4</td>
+          </tr>
+          <tr>
+            <td>Dimensions<span class="sub">H x W x D (inches)</span></td>
+            <td class="dim-cell">88.39 &times; 76.22 &times; 78.66</td>
+            <td class="dim-cell">86.77 &times; 52.72 &times; 53.54</td>
+            <td class="dim-cell">86.89 &times; 55.12 &times; 52.32</td>
+            <td class="dim-cell">75.6 &times; 60.6 &times; 86.6</td>
+            <td class="dim-cell">86.89 &times; 55.12 &times; 52.32</td>
+          </tr>
+          <tr class="commercial-row">
+            <td>Commercial</td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+          </tr>
+          <tr>
+            <td>Upright Size</td>
+            <td class="upright-badge upright-3x3">3" x 3"</td>
+            <td class="upright-badge upright-3x3">3" x 3"</td>
+            <td class="upright-badge upright-3x3">3" x 3"</td>
+            <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge">2" x 2"</td>
+          </tr>
+          <tr>
+            <td>Functional Trainer<span class="sub">Resistance Type</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+          </tr>
+          <tr>
+            <td>Weight Stack<span class="sub">(lbs)</span></td>
+            <td class="weight-value">198 / Max 300</td>
+            <td class="weight-value">198 / Max 250</td>
+            <td class="weight-value">198 / Max 300</td>
+            <td class="weight-value">198 / Max 300</td>
+            <td class="weight-value">198 / Max 300</td>
+          </tr>
+          <tr>
+            <td>Cable Pulley Ratio</td>
+            <td class="ratio-value">2:1 &amp; 1:1</td>
+            <td class="ratio-value">2:1 &amp; 1:1</td>
+            <td class="ratio-value">2:1</td>
+            <td class="ratio-value">2:1 &amp; 1:1</td>
+            <td class="ratio-value">2:1</td>
+          </tr>
+          <tr>
+            <td>Smith Machine</td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+          </tr>
+          <tr>
+            <td>Counter Balanced<span class="sub">Smith Machine</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td>Included Attachments</td>
+            <td class="attachment-count">21</td>
+            <td class="attachment-count">10</td>
+            <td class="attachment-count">9</td>
+            <td class="attachment-count">19</td>
+            <td class="attachment-count">19</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <div class="footer-note">Specifications subject to change. Visit forceusa.com for the latest information.</div>
+      <div class="footer-brand">FORCE<span style="color: var(--force-blue); font-size: 10px; vertical-align: super;">USA</span></div>
+    </div>
+  </div>
+
+</body>
+</html>
