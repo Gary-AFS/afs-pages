@@ -59,23 +59,9 @@
       gap: 24px;
     }
 
-    .logo-mark {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 42px;
-      text-transform: uppercase;
-      color: var(--force-black);
-      letter-spacing: 0.02em;
-      line-height: 1;
-    }
-
-    .logo-mark span {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 22px;
-      vertical-align: super;
-      color: var(--force-blue);
-      margin-left: 2px;
+    .logo-img {
+      height: 32px;
+      width: auto;
     }
 
     .range-badge {
@@ -132,8 +118,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 12px 16px;
-      gap: 12px;
+      padding: 16px 8px 14px;
+      gap: 10px;
       position: relative;
     }
 
@@ -143,14 +129,41 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.9;
+      overflow: hidden;
+      border-radius: 6px;
     }
 
     .product-image img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      filter: brightness(0) invert(1);
+    }
+
+    .product-image-placeholder {
+      width: 100px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--n-100);
+      border-radius: 6px;
+      gap: 6px;
+    }
+
+    .product-image-placeholder .placeholder-icon {
+      width: 36px;
+      height: 36px;
+      opacity: 0.5;
+    }
+
+    .product-image-placeholder .placeholder-text {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--force-blue);
     }
 
     .handle-badge {
@@ -182,6 +195,26 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       background: #C9A84C;
+      color: var(--white);
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
+    .new-badge {
+      position: relative;
+    }
+
+    .new-badge::after {
+      content: 'COMING SOON';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--force-blue);
       color: var(--white);
       padding: 3px 8px;
       border-radius: 999px;
@@ -349,16 +382,24 @@
     }
 
     .footer-brand {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 14px;
-      text-transform: uppercase;
-      color: var(--n-300);
-      letter-spacing: 0.04em;
+      height: 20px;
+    }
+
+    .footer-brand img {
+      height: 100%;
+      width: auto;
+      opacity: 0.3;
     }
 
     .commercial-row td:first-child {
       color: var(--green);
+    }
+
+    .tbd-cell {
+      font-size: 11px;
+      color: var(--n-300);
+      font-style: italic;
+      font-weight: 500;
     }
 
     @page {
@@ -374,7 +415,8 @@
       td { padding: 8px 6px; font-size: 11px; }
       td:first-child { min-width: 120px; font-size: 9px; }
       .handle-badge { font-size: 13px; padding: 5px 14px; }
-      .product-image { height: 90px; width: 80px; }
+      .product-image { height: 80px; width: 72px; }
+      .product-image-placeholder { height: 80px; width: 72px; }
       .sku-cell { font-size: 10px; }
       .dim-cell { font-size: 9px; }
       .pill { font-size: 9px; padding: 4px 8px; }
@@ -386,7 +428,7 @@
     @media (max-width: 768px) {
       .page { padding: 24px 16px; }
       .header { flex-direction: column; gap: 16px; align-items: flex-start; }
-      .logo-mark { font-size: 32px; }
+      .logo-img { height: 26px; }
       td:first-child { min-width: 120px; padding-left: 12px; font-size: 10px; }
       td { padding: 10px 8px; font-size: 12px; }
     }
@@ -398,7 +440,7 @@
   <div class="page">
     <div class="header">
       <div class="header-left">
-        <div class="logo-mark">FORCE<span>USA</span></div>
+        <img src="https://www.forceusa.com/cdn/shop/t/19/assets/force-usa-logo.svg?v=15702838478117472841757084722" alt="Force USA" class="logo-img">
         <div class="range-badge">All-In-One Comparison Chart</div>
       </div>
       <div class="section-title">Current Range</div>
@@ -411,13 +453,54 @@
             <th class="feature-header">
               <div class="section-label">Specifications</div>
             </th>
-            <th><div class="product-header"><div class="handle-badge">G1</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">G3</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">G6</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">G12</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">G15</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">G20</div></div></th>
-            <th><div class="product-header bestseller"><div class="handle-badge">C10</div></div></th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G1-V2-full-front-left_9fdcf4a4-9156-482a-8635-5c54c7e33457.jpg?v=1762279027" alt="G1 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">G1</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G3-V2-02_c7eedc63-4a70-4f74-bb3a-d481a62cf2fb.jpg?v=1757608446" alt="G3 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">G3</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G12-V2-0192.jpg?v=1761863964" alt="G12 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">G12</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G15-03.jpg?v=1757615925" alt="G15 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">G15</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G20-01.jpg?v=1757613181" alt="G20 Pro All-In-One Trainer">
+                </div>
+                <div class="handle-badge">G20</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header bestseller">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-C10-03_79b793b3-a26f-4bc2-9cc0-b019f8f705b9.jpg?v=1759618444" alt="C10 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">C10</div>
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -425,7 +508,6 @@
             <td>SKU</td>
             <td class="sku-cell">F-G1-V2</td>
             <td class="sku-cell">F-G3-V2</td>
-            <td class="sku-cell">F-G6-B</td>
             <td class="sku-cell">F-G12-V2</td>
             <td class="sku-cell">F-G15-BASE</td>
             <td class="sku-cell">F-G20-V2-BASE</td>
@@ -435,7 +517,6 @@
             <td>Dimensions<span class="sub">H x W x D (inches)</span></td>
             <td class="dim-cell">87.01 &times; 55.98 &times; 60.51</td>
             <td class="dim-cell">87.01 &times; 77.99 &times; 60.51</td>
-            <td class="dim-cell">90.98 &times; 72.01 &times; 64.02</td>
             <td class="dim-cell">87.99 &times; 75.98 &times; 55.98</td>
             <td class="dim-cell">87.48 &times; 79.49 &times; 52.99</td>
             <td class="dim-cell">90.98 &times; 79.02 &times; 67.01</td>
@@ -443,7 +524,6 @@
           </tr>
           <tr class="commercial-row">
             <td>Commercial</td>
-            <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
@@ -459,13 +539,11 @@
             <td class="upright-badge">2" x 2"</td>
             <td class="upright-badge">2" x 2"</td>
             <td class="upright-badge">2" x 2"</td>
-            <td class="upright-badge">2" x 2"</td>
           </tr>
           <tr>
             <td>Functional Trainer<span class="sub">Resistance Type</span></td>
             <td><span class="pill pill-plate">Plate Weight</span></td>
             <td><span class="pill pill-plate">Plate Weight</span></td>
-            <td><span class="pill pill-stack">Stack Weight</span></td>
             <td><span class="pill pill-stack">Stack Weight</span></td>
             <td><span class="pill pill-stack">Stack Weight</span></td>
             <td><span class="pill pill-stack">Stack Weight</span></td>
@@ -476,14 +554,12 @@
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
             <td class="weight-value">2 x 220</td>
-            <td class="weight-value">2 x 220</td>
             <td class="weight-value">2 x 289</td>
             <td class="weight-value">2 x 289</td>
             <td class="weight-value">2 x 220</td>
           </tr>
           <tr>
             <td>Cable Pulley Ratio</td>
-            <td class="ratio-value">2:1</td>
             <td class="ratio-value">2:1</td>
             <td class="ratio-value">2:1</td>
             <td class="ratio-value">1:1</td>
@@ -499,11 +575,9 @@
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
-            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
           </tr>
           <tr>
             <td>Counter Balanced<span class="sub">Smith Machine</span></td>
-            <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
@@ -515,7 +589,6 @@
             <td>Included Attachments</td>
             <td class="attachment-count">11</td>
             <td class="attachment-count">12</td>
-            <td class="attachment-count">19</td>
             <td class="attachment-count">18</td>
             <td class="attachment-count">17</td>
             <td class="attachment-count">25</td>
@@ -527,7 +600,7 @@
 
     <div class="footer">
       <div class="footer-note">Specifications subject to change. Visit forceusa.com for the latest information.</div>
-      <div class="footer-brand">FORCE<span style="color: var(--force-blue); font-size: 10px; vertical-align: super;">USA</span></div>
+      <div class="footer-brand"><img src="https://www.forceusa.com/cdn/shop/t/19/assets/force-usa-logo.svg?v=15702838478117472841757084722" alt="Force USA"></div>
     </div>
   </div>
 
@@ -535,7 +608,7 @@
   <div class="page">
     <div class="header">
       <div class="header-left">
-        <div class="logo-mark">FORCE<span>USA</span></div>
+        <img src="https://www.forceusa.com/cdn/shop/t/19/assets/force-usa-logo.svg?v=15702838478117472841757084722" alt="Force USA" class="logo-img">
         <div class="range-badge">All-In-One Comparison Chart</div>
       </div>
       <div class="section-title">New Range</div>
@@ -548,11 +621,70 @@
             <th class="feature-header">
               <div class="section-label">Specifications</div>
             </th>
-            <th><div class="product-header"><div class="handle-badge">C20</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">TT</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">FTR</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">M10</div></div></th>
-            <th><div class="product-header"><div class="handle-badge">G4</div></div></th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-C20-02_16422807-2ba6-4663-a5eb-8ee501205777.jpg?v=1757608507" alt="C20 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">C20</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-TT-02.jpg?v=1758058409" alt="Tandem Tower">
+                </div>
+                <div class="handle-badge">TT</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-FTR-01.jpg?v=1761068008" alt="Functional Trainer Rack">
+                </div>
+                <div class="handle-badge">FTR</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/M10_plate_efb36294-8795-4224-a9fb-ac34c5e7cbda.webp?v=1779210179" alt="M10 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">M10</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header">
+                <div class="product-image">
+                  <img src="https://cdn.shopify.com/s/files/1/1963/1339/files/F-G4-02.jpg?v=1761177666" alt="G4 All-In-One Trainer">
+                </div>
+                <div class="handle-badge">G4</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header new-badge">
+                <div class="product-image-placeholder">
+                  <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="#185787" stroke-width="1.5"/>
+                    <path d="M12 8v8M8 12h8" stroke="#185787" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span class="placeholder-text">Coming Soon</span>
+                </div>
+                <div class="handle-badge">M20</div>
+              </div>
+            </th>
+            <th>
+              <div class="product-header new-badge">
+                <div class="product-image-placeholder">
+                  <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="#185787" stroke-width="1.5"/>
+                    <path d="M12 8v8M8 12h8" stroke="#185787" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span class="placeholder-text">Coming Soon</span>
+                </div>
+                <div class="handle-badge">C10-V2</div>
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -563,6 +695,8 @@
             <td class="sku-cell">F-FTR</td>
             <td class="sku-cell">F-M10</td>
             <td class="sku-cell">F-G4</td>
+            <td class="sku-cell">F-M20</td>
+            <td class="sku-cell">F-C10-V2</td>
           </tr>
           <tr>
             <td>Dimensions<span class="sub">H x W x D (inches)</span></td>
@@ -571,6 +705,8 @@
             <td class="dim-cell">86.89 &times; 55.12 &times; 52.32</td>
             <td class="dim-cell">75.6 &times; 60.6 &times; 86.6</td>
             <td class="dim-cell">86.89 &times; 55.12 &times; 52.32</td>
+            <td class="tbd-cell">TBD</td>
+            <td class="tbd-cell">TBD</td>
           </tr>
           <tr class="commercial-row">
             <td>Commercial</td>
@@ -579,6 +715,8 @@
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
           </tr>
           <tr>
             <td>Upright Size</td>
@@ -587,9 +725,13 @@
             <td class="upright-badge upright-3x3">3" x 3"</td>
             <td class="upright-badge">2" x 2"</td>
             <td class="upright-badge">2" x 2"</td>
+            <td class="upright-badge upright-3x3">3" x 3"</td>
+            <td class="upright-badge">2" x 2"</td>
           </tr>
           <tr>
             <td>Functional Trainer<span class="sub">Resistance Type</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
+            <td><span class="pill pill-stack">Stack Weight</span></td>
             <td><span class="pill pill-stack">Stack Weight</span></td>
             <td><span class="pill pill-stack">Stack Weight</span></td>
             <td><span class="pill pill-stack">Stack Weight</span></td>
@@ -603,10 +745,14 @@
             <td class="weight-value">198 / Max 300</td>
             <td class="weight-value">198 / Max 300</td>
             <td class="weight-value">198 / Max 300</td>
+            <td class="weight-value">198 / Max 300</td>
+            <td class="weight-value">2 x 220</td>
           </tr>
           <tr>
             <td>Cable Pulley Ratio</td>
             <td class="ratio-value">2:1 &amp; 1:1</td>
+            <td class="ratio-value">2:1 &amp; 1:1</td>
+            <td class="ratio-value">2:1</td>
             <td class="ratio-value">2:1 &amp; 1:1</td>
             <td class="ratio-value">2:1</td>
             <td class="ratio-value">2:1 &amp; 1:1</td>
@@ -619,9 +765,13 @@
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
             <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
           </tr>
           <tr>
             <td>Counter Balanced<span class="sub">Smith Machine</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
+            <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
             <td><span class="empty-cell">&mdash;</span></td>
@@ -635,14 +785,16 @@
             <td class="attachment-count">9</td>
             <td class="attachment-count">19</td>
             <td class="attachment-count">19</td>
+            <td class="tbd-cell">TBD</td>
+            <td class="tbd-cell">TBD</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div class="footer">
-      <div class="footer-note">Specifications subject to change. Visit forceusa.com for the latest information.</div>
-      <div class="footer-brand">FORCE<span style="color: var(--force-blue); font-size: 10px; vertical-align: super;">USA</span></div>
+      <div class="footer-note">Specifications subject to change. Visit forceusa.com for the latest information. M20 and C10-V2 dimensions and attachment counts to be confirmed.</div>
+      <div class="footer-brand"><img src="https://www.forceusa.com/cdn/shop/t/19/assets/force-usa-logo.svg?v=15702838478117472841757084722" alt="Force USA"></div>
     </div>
   </div>
 
