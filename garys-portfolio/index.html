@@ -995,6 +995,59 @@
     </div>
   </section>
 
+  <!-- ========== SLIDE: CUSTOM MCP ========== -->
+  <section class="slide slide-dark" data-label="Custom MCP">
+    <div class="slide-inner">
+      <span class="eyebrow fade-in">Engineering Capability</span>
+      <h2 class="fade-in stagger-1">Custom MCPs:<br>Our APIs, Our Rules</h2>
+      <p class="subtitle fade-in stagger-2" style="margin-bottom: 36px;">When the team needed Shopify access inside Claude, I didn't hand out API keys or wait on a vendor. I built a custom MCP server that puts our APIs behind our own control layer &mdash; exposing exactly what we choose, to exactly who we choose.</p>
+
+      <!-- Architecture flow -->
+      <div class="fade-in stagger-3" style="display: grid; grid-template-columns: 1fr 36px 1.15fr 36px 1fr; gap: 0; align-items: center; margin-bottom: 14px;">
+        <div style="border-radius: var(--radius-lg); border: 1px solid var(--gaf-grey-700); background: rgba(255,255,255,.03); padding: 18px 20px; text-align: center;">
+          <div style="font: 700 16px/1.2 var(--font-display); color: var(--gaf-white);">Claude</div>
+          <div style="font-size: 12.5px; color: var(--gaf-grey-500); margin-top: 4px;">web &middot; desktop &middot; the whole team</div>
+        </div>
+        <div style="text-align: center;"><span style="font: 800 20px/1 var(--font-display); color: var(--gaf-orange);">&rarr;</span></div>
+        <div style="border-radius: var(--radius-lg); border: 1px solid var(--gaf-orange); background: rgba(242,100,34,.10); padding: 18px 20px; text-align: center;">
+          <div style="font: 700 16px/1.2 var(--font-display); color: var(--gaf-white);">Our Control Layer</div>
+          <div style="font-size: 12.5px; color: var(--gaf-grey-400); margin-top: 4px;">custom MCP server on Cloudflare &mdash; auth, scoping &amp; read-only guardrails</div>
+        </div>
+        <div style="text-align: center;"><span style="font: 800 20px/1 var(--font-display); color: var(--gaf-orange);">&rarr;</span></div>
+        <div style="border-radius: var(--radius-lg); border: 1px solid var(--gaf-grey-700); background: rgba(255,255,255,.03); padding: 18px 20px; text-align: center;">
+          <div style="font: 700 16px/1.2 var(--font-display); color: var(--gaf-white);">Shopify</div>
+          <div style="font-size: 12.5px; color: var(--gaf-grey-500); margin-top: 4px;">Gym and Fitness &middot; Revel</div>
+        </div>
+      </div>
+      <p class="fade-in stagger-3" style="font-size: 13px; color: var(--gaf-grey-500); text-align: center; margin-bottom: 34px;">The API key lives only inside our layer. The user never sees it &mdash; they just get the data they're allowed to.</p>
+
+      <!-- Capability cards -->
+      <div class="grid-3 fade-in stagger-4" style="gap: 20px;">
+        <div style="border-radius: var(--radius-md); border: 1px solid var(--gaf-grey-700); background: rgba(255,255,255,.03); border-top: 3px solid var(--gaf-orange); padding: 20px 22px;">
+          <h3 style="font-size: 17px; color: var(--gaf-white); margin-bottom: 10px;">Controlled Exposure</h3>
+          <p style="font-size: 13.5px; color: var(--gaf-grey-400); line-height: 1.6; margin-bottom: 14px;">We choose which operations are reachable. The full API sits behind the layer; only what we permit is exposed &mdash; and nothing can write or change a thing.</p>
+          <div><span class="pill pill-orange">Read-only</span><span class="pill pill-dark">Scoped</span></div>
+        </div>
+        <div style="border-radius: var(--radius-md); border: 1px solid var(--gaf-grey-700); background: rgba(255,255,255,.03); border-top: 3px solid var(--gaf-orange); padding: 20px 22px;">
+          <h3 style="font-size: 17px; color: var(--gaf-white); margin-bottom: 10px;">Keys Stay Ours</h3>
+          <p style="font-size: 13.5px; color: var(--gaf-grey-400); line-height: 1.6; margin-bottom: 14px;">Credentials live encrypted in our own infrastructure, never on anyone's device. We rotate or revoke them centrally, on our schedule, without disrupting users.</p>
+          <div><span class="pill pill-orange">Server-side</span><span class="pill pill-dark">Encrypted</span></div>
+        </div>
+        <div style="border-radius: var(--radius-md); border: 1px solid var(--gaf-grey-700); background: rgba(255,255,255,.03); border-top: 3px solid var(--gaf-orange); padding: 20px 22px;">
+          <h3 style="font-size: 17px; color: var(--gaf-white); margin-bottom: 10px;">Per-User &amp; Revocable</h3>
+          <p style="font-size: 13.5px; color: var(--gaf-grey-400); line-height: 1.6; margin-bottom: 14px;">Each person gets their own access, scoped to specific stores and killable in seconds &mdash; all without ever touching the underlying system.</p>
+          <div><span class="pill pill-orange">Per-user</span><span class="pill pill-dark">Instant revoke</span></div>
+        </div>
+      </div>
+
+      <div class="fade-in stagger-4" style="margin-top: 28px; padding: 20px 24px; background: rgba(242,100,34,.08); border-radius: var(--radius-md); border-left: 3px solid var(--gaf-orange);">
+        <p style="font-size: 14px; color: var(--gaf-grey-400); line-height: 1.6; margin: 0;">
+          <strong style="color: var(--gaf-white);">Why this matters for a CAO:</strong> This is the pattern for safely giving an entire team AI-native access to any system &mdash; CRM, ERP, analytics, ecommerce &mdash; without surrendering control of the credentials or the permissions. Build once, govern centrally, extend everywhere. <span style="color: var(--gaf-grey-500);">Stack: Cloudflare Workers &middot; Model Context Protocol &middot; Shopify Admin API &middot; Claude Connectors.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== SLIDE 9: GOVERNANCE ========== -->
   <section class="slide slide-alt" data-label="Governance">
     <div class="slide-inner">
