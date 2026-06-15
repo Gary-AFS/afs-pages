@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Shopify Assistant for Claude — Setup Guide</title>
+<style>
+  :root{
+    --ink:#0f1722; --ink-soft:#3b4757; --muted:#6b7787;
+    --line:#e4e8ee; --bg:#f6f8fb; --card:#ffffff;
+    --accent:#1f6feb; --accent-soft:#eaf2ff;
+    --good:#16855c; --good-soft:#e7f6ef; --warn:#9a6a00; --warn-soft:#fff5e0;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:780px;margin:0 auto;padding:0 20px 80px}
+  header.hero{background:linear-gradient(135deg,#0f1722,#1c2c41);color:#fff;
+    padding:54px 0 46px;margin-bottom:-26px}
+  .hero .wrap{padding-bottom:0}
+  .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:700;
+    color:#7fa9e6;margin:0 0 10px}
+  .hero h1{margin:0 0 12px;font-size:30px;line-height:1.2;font-weight:800}
+  .hero p{margin:0;color:#c4cedd;font-size:17px;max-width:60ch}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 28px;margin:22px 0;box-shadow:0 1px 2px rgba(15,23,34,.04)}
+  h2{font-size:20px;margin:0 0 14px;font-weight:750}
+  h3{font-size:15px;margin:22px 0 6px;font-weight:700;color:var(--ink-soft)}
+  p{margin:0 0 12px}
+  .lead{font-size:16px;color:var(--ink-soft)}
+  ul,ol{margin:0 0 6px;padding-left:22px}
+  li{margin:7px 0}
+  code{background:#eef1f6;border:1px solid #e0e5ec;border-radius:6px;padding:1px 6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;color:#22303f}
+  .url{display:block;background:#0f1722;color:#e7eefc;border-radius:10px;padding:14px 16px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;word-break:break-all;
+    margin:8px 0 4px}
+  .url .ph{color:#ffcf6b}
+  .steps{counter-reset:step;list-style:none;padding:0;margin:8px 0 0}
+  .steps li{counter-increment:step;position:relative;padding:0 0 16px 46px;margin:0}
+  .steps li::before{content:counter(step);position:absolute;left:0;top:-2px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;
+    font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .steps li:not(:last-child)::after{content:"";position:absolute;left:15px;top:30px;bottom:0;
+    width:2px;background:var(--line)}
+  .note{border-radius:12px;padding:14px 16px;margin:16px 0;font-size:14.5px;border:1px solid}
+  .note.good{background:var(--good-soft);border-color:#bfe8d4;color:#0d5a3d}
+  .note.warn{background:var(--warn-soft);border-color:#f1dca2;color:#6f4d00}
+  .note.info{background:var(--accent-soft);border-color:#cfe0ff;color:#194e9e}
+  .note strong{font-weight:750}
+  .pill{display:inline-block;background:var(--accent-soft);color:var(--accent);
+    border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;margin-left:6px}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:650;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+  .ex{background:#f3f6fb;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;
+    font-style:italic;color:var(--ink-soft)}
+  details{border:1px solid var(--line);border-radius:10px;padding:4px 16px;margin:12px 0;background:#fbfcfe}
+  summary{cursor:pointer;font-weight:650;padding:10px 0;color:var(--ink-soft)}
+  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}
+  .kbd{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">AFS Group · Internal Tool</p>
+    <h1>Connect the Shopify Assistant in Claude</h1>
+    <p>A read-only assistant that lets you look up products and orders for Gym and Fitness and Revel Saunas, right inside Claude. Takes about two minutes to set up.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>What this is</h2>
+    <p class="lead">Once connected, you can ask Claude things like "find the Revel Aura sauna" or "what's the status of GAF order #138892" and it will pull live answers straight from our Shopify stores.</p>
+    <table>
+      <tr><th>You can</th><th>You can't</th></tr>
+      <tr>
+        <td>Search and view products (price, stock, variants)<br>Look up orders (status, totals, items)</td>
+        <td>Change anything — it is strictly read-only<br>See customer names, emails or addresses</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Before you start</h2>
+    <ul>
+      <li>A <strong>Claude account</strong> (claude.ai or the Claude desktop app). The free plan allows one custom connector; Pro/Team allow more.</li>
+      <li>Your <strong>personal connector link</strong> — Josh will send this to you privately. It looks like the link below, with your own code on the end.</li>
+    </ul>
+    <span class="url">https://shopify-mcp.josh-03c.workers.dev/c/<span class="ph">YOUR-PERSONAL-CODE</span></span>
+    <div class="note warn"><strong>Treat this link like a password.</strong> Anyone who has it can use your access. Don't post it in shared chats or docs. If it ever leaks, tell Josh and he'll issue you a new one in seconds.</div>
+  </div>
+
+  <div class="card">
+    <h2>Set it up <span class="pill">claude.ai — web</span></h2>
+    <ol class="steps">
+      <li>Open <strong>claude.ai</strong> and sign in. Click your name (bottom-left) → <strong>Settings</strong>.</li>
+      <li>Go to <strong>Connectors</strong> (under "Customize"). Click <strong>Add custom connector</strong>.</li>
+      <li>In <strong>Remote MCP server URL</strong>, paste <strong>your personal link</strong>. Leave the OAuth Client ID / Secret boxes <strong>empty</strong>.</li>
+      <li>Click <strong>Add</strong>. You'll see <em>"Shopify"</em> appear in your connector list.</li>
+      <li>Open any chat. Click the <strong>+</strong> (or the connectors/tools icon) → <strong>Connectors</strong> → switch <strong>Shopify</strong> <strong>on</strong>.</li>
+      <li>Ask it something — see the examples below. Done. 🎉</li>
+    </ol>
+    <div class="note info">The connector stays in your account, so you only do this once. Just remember to toggle it on (step 5) in new chats where you want to use it.</div>
+  </div>
+
+  <div class="card">
+    <h2>Set it up <span class="pill">Claude desktop app</span></h2>
+    <p>Exactly the same flow: <strong>Settings → Connectors → Add custom connector</strong>, paste your personal link, leave OAuth blank, click Add. Then toggle <strong>Shopify</strong> on inside a chat.</p>
+  </div>
+
+  <div class="card">
+    <h2>Try these</h2>
+    <div class="ex">"Search Gym and Fitness products for adjustable dumbbells and show the prices."</div>
+    <div class="ex">"Look up Revel order 189122 and tell me what's in it and whether it's been fulfilled."</div>
+    <div class="ex">"List the 5 most recent GAF orders with their totals and status."</div>
+    <div class="ex">"What's the current stock and price on the Revel Aura 2-person sauna?"</div>
+    <p class="kbd">Tip: tell it which store you mean — "Gym and Fitness" (GAF) or "Revel". You can ask about either.</p>
+  </div>
+
+  <div class="card">
+    <h2>If something's not working</h2>
+    <h3>The connector won't add</h3>
+    <p>Double-check the link is pasted in full, and that the OAuth fields are left <strong>blank</strong>. If you're on a free plan and already have a custom connector, you may need to remove the old one or upgrade.</p>
+    <h3>No Shopify tools show up in the chat</h3>
+    <p>Make sure you toggled the connector <strong>on</strong> for that chat (the <strong>+</strong> → Connectors menu).</p>
+    <h3>It says "unauthorized" or stops working</h3>
+    <p>Your link may have been rotated or revoked. Message Josh and he'll sort it.</p>
+    <details>
+      <summary>On a Team or Enterprise plan and can't add a custom connector?</summary>
+      <p>Custom connectors may be locked down at the organisation level. Ask Josh to approve it under <strong>Organization Settings → Connectors</strong> first, then retry the steps above.</p>
+    </details>
+  </div>
+
+  <footer>
+    AFS Group internal tool · Managed by Josh / Gary · Read-only, no customer data exposed.<br>
+    Questions or access requests → Josh.
+  </footer>
+
+</div>
+</body>
+</html>
