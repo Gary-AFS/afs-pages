@@ -995,6 +995,53 @@
     </div>
   </section>
 
+  <!-- ========== SLIDE: VOICE DICTATION TOOL ========== -->
+  <section class="slide slide-alt" data-label="Voice Tool">
+    <div class="slide-inner">
+      <span class="eyebrow fade-in">Build Story</span>
+      <h2 class="fade-in stagger-1">Recreating a Tool That<br>Wouldn't Run on My Laptop</h2>
+      <p class="subtitle fade-in stagger-2" style="margin-bottom: 32px;">
+        I wanted Wispr Flow's voice dictation on my Chromebook, but it isn't supported there. Rather than go without, I spent an evening building my own Chrome extension that does the same job, and arguably does it more cheaply.
+      </p>
+
+      <!-- How it works flow -->
+      <div class="flow fade-in stagger-3" style="margin-bottom: 8px;">
+        <div class="flow-node orange">Speak (Alt+Q)</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node">Browser speech engine &middot; free</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node">Gemini tidies &amp; formats</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node orange">Clean text, any field</div>
+      </div>
+      <p class="fade-in stagger-3" style="font-size: 13px; color: var(--gaf-grey-500); margin-bottom: 32px;">
+        Press the shortcut, talk, and tidy formatted text drops into whatever field you're typing in.
+      </p>
+
+      <!-- Cards -->
+      <div class="grid-3 fade-in stagger-4" style="gap: 20px;">
+        <div class="card" style="border-top: 3px solid var(--gaf-orange);">
+          <h3 style="font-size: 18px;">The Small Insight</h3>
+          <p style="font-size: 14px; color: var(--gaf-grey-600);">The expensive part of dictation is turning audio into text. ChromeOS already does that for free, so I let the browser handle it and only paid for a tiny text-cleanup step. Running cost is a fraction of a cent per use.</p>
+        </div>
+        <div class="card" style="border-top: 3px solid var(--gaf-orange);">
+          <h3 style="font-size: 18px;">Context-Aware</h3>
+          <p style="font-size: 14px; color: var(--gaf-grey-600);">A settings page lets me adjust the formatting in plain English, with per-site rules. WhatsApp stays casual and conversational, while email stays professional, automatically.</p>
+        </div>
+        <div class="card" style="border-top: 3px solid var(--gaf-orange);">
+          <h3 style="font-size: 18px;">Built and Shipped Solo</h3>
+          <p style="font-size: 14px; color: var(--gaf-grey-600);">No development team. Designed, built and deployed from my laptop to a Chromebook in a single sitting, with the API key kept off the device for safety.</p>
+        </div>
+      </div>
+
+      <div class="fade-in stagger-4" style="margin-top: 28px; padding: 20px 24px; background: var(--gaf-white); border-radius: var(--radius-md); border-left: 3px solid var(--gaf-orange); max-width: 720px;">
+        <p style="font-size: 14px; color: var(--gaf-grey-600); line-height: 1.6; margin: 0;">
+          <strong style="color: var(--gaf-grey-800);">Why this matters for a CAO:</strong> I'm not a developer by trade. This is a small example of a bigger shift: when an off-the-shelf tool doesn't fit, building a working replacement is now a realistic option rather than a project. It keeps the team moving and the spend down.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== SLIDE: CUSTOM MCP ========== -->
   <section class="slide slide-dark" data-label="Custom MCP">
     <div class="slide-inner">
