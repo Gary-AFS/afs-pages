@@ -170,6 +170,7 @@
     <section>
       <h2>Built-in checks</h2>
       <ul class="clean">
+        <li><strong>Ready to Send only:</strong> only orders flagged "Ready to Send" in NetSuite are in scope; orders not yet marked ready are left out of the work-list.</li>
         <li><strong>Ship Complete respected:</strong> orders flagged ship-complete are held out of the work-list until every line is available, so they are only entered when the whole order can ship together.</li>
         <li><strong>Duplicate guard:</strong> SAP blocks a sales order whose reference has already been entered, preventing double-keying. If flagged, the order is already in SAP and is skipped.</li>
         <li><strong>System prompts:</strong> expected SAP messages (oversized items, a known time-zone notice, installation question) are handled to a defined rule rather than guessed.</li>
