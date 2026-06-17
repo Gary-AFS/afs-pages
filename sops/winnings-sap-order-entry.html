@@ -170,6 +170,7 @@
     <section>
       <h2>Built-in checks</h2>
       <ul class="clean">
+        <li><strong>Ship Complete respected:</strong> orders flagged ship-complete are held out of the work-list until every line is available, so they are only entered when the whole order can ship together.</li>
         <li><strong>Duplicate guard:</strong> SAP blocks a sales order whose reference has already been entered, preventing double-keying. If flagged, the order is already in SAP and is skipped.</li>
         <li><strong>System prompts:</strong> expected SAP messages (oversized items, a known time-zone notice, installation question) are handled to a defined rule rather than guessed.</li>
         <li><strong>Cross-check:</strong> the weight, volume and warehouse SAP derives are compared back to NetSuite before the order is handed over for review.</li>
