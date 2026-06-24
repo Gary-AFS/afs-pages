@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAF Experimentation Engine | Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #F26422;
+    --orange-soft: #FDE9DD;
+    --orange-hover: #D85418;
+    --black: #000000;
+    --white: #FFFFFF;
+    --grey-50: #FAFAFA;
+    --grey-100: #F0F0F0;
+    --grey-200: #E2E2E2;
+    --grey-300: #C9C9C9;
+    --grey-400: #A0A0A0;
+    --grey-500: #717171;
+    --grey-600: #555555;
+    --grey-700: #424242;
+    --grey-800: #2B2B2B;
+    --grey-900: #1A1A1A;
+    --success: #2E8B4A;
+    --success-soft: #E7F3EB;
+    --warning: #D99100;
+    --warning-soft: #FAF1DA;
+    --danger: #C23B22;
+    --danger-soft: #F8E3DE;
+    --info: #2F6BAF;
+    --info-soft: #E4EEF8;
+    --font-display: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+    --font-sans: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--grey-900);
+    color: var(--white);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: var(--black);
+    border-bottom: 1px solid var(--grey-800);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header h1 {
+    font: 800 20px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .header h1 span { color: var(--orange); }
+  .header-meta {
+    font: 400 13px/1 var(--font-sans);
+    color: var(--grey-500);
+  }
+  .refresh-btn {
+    background: var(--grey-800);
+    border: 1px solid var(--grey-700);
+    color: var(--grey-400);
+    font: 600 12px/1 var(--font-display);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+  .refresh-btn:hover { background: var(--grey-700); color: var(--white); }
+  .refresh-btn.loading { opacity: 0.5; pointer-events: none; }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 32px; }
+
+  /* STATS ROW */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--grey-800);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--grey-700);
+  }
+  .stat-value {
+    font: 900 40px/1 var(--font-display);
+    color: var(--orange);
+    margin-bottom: 6px;
+  }
+  .stat-value.white { color: var(--white); }
+  .stat-label {
+    font: 600 10px/1.3 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey-500);
+  }
+
+  /* TWO COLUMN LAYOUT */
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .grid-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+
+  /* PANELS */
+  .panel {
+    background: var(--grey-800);
+    border-radius: 10px;
+    border: 1px solid var(--grey-700);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--grey-700);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title {
+    font: 700 13px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .panel-body { padding: 20px; }
+
+  /* BOARD COLUMNS */
+  .board-summary {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    background: var(--grey-700);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .board-col {
+    background: var(--grey-800);
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .board-col-label {
+    font: 700 10px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey-500);
+    margin-bottom: 10px;
+  }
+  .board-col-count {
+    font: 900 36px/1 var(--font-display);
+    color: var(--white);
+  }
+  .board-col.active .board-col-label { color: var(--orange); }
+  .board-col.active .board-col-count { color: var(--orange); }
+
+  /* TASK LIST */
+  .task-list { list-style: none; }
+  .task-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--grey-700);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-name {
+    font: 600 14px/1.3 var(--font-display);
+    color: var(--white);
+    flex: 1;
+  }
+  .task-meta {
+    font: 400 12px/1.4 var(--font-sans);
+    color: var(--grey-500);
+    margin-top: 4px;
+  }
+
+  /* PILLS / TAGS */
+  .pill {
+    display: inline-block;
+    font: 700 10px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .pill-orange { background: var(--orange); color: var(--white); }
+  .pill-success { background: var(--success); color: var(--white); }
+  .pill-warning { background: var(--warning); color: var(--white); }
+  .pill-danger { background: var(--danger); color: var(--white); }
+  .pill-info { background: var(--info); color: var(--white); }
+  .pill-grey { background: var(--grey-700); color: var(--grey-300); }
+
+  /* OWNER BARS */
+  .owner-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey-700);
+  }
+  .owner-bar:last-child { border-bottom: none; }
+  .owner-name-tag {
+    font: 700 13px/1 var(--font-display);
+    min-width: 70px;
+  }
+  .owner-progress {
+    flex: 1;
+    height: 8px;
+    background: var(--grey-700);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .owner-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+  .owner-count {
+    font: 700 13px/1 var(--font-display);
+    color: var(--grey-400);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  /* FUNNEL CHART */
+  .funnel-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .funnel-label {
+    font: 600 11px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--grey-400);
+    min-width: 100px;
+  }
+  .funnel-bar {
+    flex: 1;
+    height: 24px;
+    background: var(--grey-700);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .funnel-bar-fill {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+  }
+  .funnel-count {
+    font: 700 11px/1 var(--font-display);
+    color: var(--white);
+  }
+
+  /* CHANNEL GRID */
+  .channel-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .channel-tile {
+    background: var(--grey-700);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .channel-tile-count {
+    font: 900 28px/1 var(--font-display);
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .channel-tile-name {
+    font: 600 10px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--grey-500);
+  }
+  .channel-tile.has-experiments { border: 1px solid var(--orange); }
+  .channel-tile.has-experiments .channel-tile-count { color: var(--orange); }
+
+  /* LEARNINGS */
+  .learning-card {
+    background: var(--grey-900);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--grey-600);
+  }
+  .learning-card.win { border-left-color: var(--success); }
+  .learning-card.loss { border-left-color: var(--danger); }
+  .learning-title {
+    font: 700 14px/1.3 var(--font-display);
+    margin-bottom: 6px;
+  }
+  .learning-body {
+    font: 400 13px/1.5 var(--font-sans);
+    color: var(--grey-400);
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--grey-500);
+  }
+  .empty-state-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+  .empty-state p {
+    font: 400 14px/1.5 var(--font-sans);
+  }
+
+  /* ICE RANKING */
+  .ice-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey-700);
+  }
+  .ice-row:last-child { border-bottom: none; }
+  .ice-score {
+    font: 900 18px/1 var(--font-display);
+    color: var(--orange);
+    min-width: 36px;
+  }
+  .ice-name {
+    font: 600 13px/1.3 var(--font-display);
+    color: var(--white);
+    flex: 1;
+  }
+  .ice-owner {
+    font: 600 11px/1 var(--font-display);
+    color: var(--grey-400);
+  }
+
+  /* LOGO */
+  .gaf-logo { height: 28px; }
+
+  /* LOADING */
+  .loading-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+    color: var(--grey-500);
+    font: 600 14px/1 var(--font-display);
+  }
+
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-equal { grid-template-columns: 1fr; }
+    .board-summary { grid-template-columns: repeat(5, 1fr); }
+    .channel-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/GAF-Icon.png?v=1738497572" class="gaf-logo" alt="GAF">
+    <div>
+      <h1>Experimentation <span>Engine</span></h1>
+      <div class="header-meta" id="lastUpdated">Loading...</div>
+    </div>
+  </div>
+  <button class="refresh-btn" id="refreshBtn" onclick="loadData()">Refresh</button>
+</div>
+
+<div class="container">
+  <div id="dashboard">
+    <div class="loading-overlay">Loading experiment data...</div>
+  </div>
+</div>
+
+<script>
+const API = 'https://asana-api-proxy.josh-03c.workers.dev';
+const PROJECT = '1215988556469556';
+
+const OWNER_COLORS = {
+  'Levi': '#2E8B4A',
+  'Joe': '#E65100',
+  'Lionel': '#1565C0',
+};
+
+const SECTION_ORDER = ['Backlog', 'This Sprint', 'Running', 'Analysing', 'Learnings'];
+
+async function fetchJSON(path) {
+  const r = await fetch(`${API}/${path}`);
+  if (!r.ok) throw new Error(`API error: ${r.status}`);
+  const d = await r.json();
+  return d.data;
+}
+
+function getField(task, fieldName) {
+  const cf = (task.custom_fields || []).find(f => f.name === fieldName);
+  if (!cf) return null;
+  if (cf.enum_value) return cf.enum_value.name;
+  if (cf.number_value !== null && cf.number_value !== undefined) return cf.number_value;
+  return null;
+}
+
+function getSection(task) {
+  const m = (task.memberships || []);
+  if (m.length > 0 && m[0].section) return m[0].section.name;
+  return 'Unknown';
+}
+
+function extractLearning(task) {
+  const notes = task.notes || '';
+  const lines = notes.split('\n');
+  let learning = '';
+  let inLearning = false;
+  for (const line of lines) {
+    if (line.match(/^(Validated )?Learning/i) || line.match(/^Result/i)) {
+      inLearning = true;
+      continue;
+    }
+    if (inLearning && line.match(/^[A-Z][a-z]+ [A-Z]/)) break;
+    if (inLearning && line.trim()) learning += line.trim() + ' ';
+  }
+  return learning.trim();
+}
+
+function render(tasks) {
+  const sections = {};
+  SECTION_ORDER.forEach(s => sections[s] = []);
+
+  tasks.forEach(t => {
+    const s = getSection(t);
+    if (sections[s]) sections[s].push(t);
+    else sections[s] = [t];
+  });
+
+  const total = tasks.length;
+  const backlog = (sections['Backlog'] || []).length;
+  const sprint = (sections['This Sprint'] || []).length;
+  const running = (sections['Running'] || []).length;
+  const analysing = (sections['Analysing'] || []).length;
+  const learnings = (sections['Learnings'] || []).length;
+  const completed = analysing + learnings;
+  const active = sprint + running;
+  const winRate = learnings > 0 ? Math.round((sections['Learnings'].filter(t => t.completed).length / learnings) * 100) : 0;
+
+  // Owner breakdown
+  const ownerCounts = {};
+  tasks.forEach(t => {
+    const owner = getField(t, 'Owner') || 'Unassigned';
+    ownerCounts[owner] = (ownerCounts[owner] || 0) + 1;
+  });
+
+  // Funnel breakdown
+  const funnelCounts = {};
+  const FUNNEL_ORDER = ['Discovery', 'Interest', 'Appraisal', 'Confirmation', 'Conversion', 'Advocacy'];
+  FUNNEL_ORDER.forEach(f => funnelCounts[f] = 0);
+  tasks.forEach(t => {
+    const f = getField(t, 'Funnel Stage');
+    if (f) funnelCounts[f] = (funnelCounts[f] || 0) + 1;
+  });
+
+  // Channel breakdown
+  const channelCounts = {};
+  tasks.forEach(t => {
+    const c = getField(t, 'Channel') || 'Other';
+    channelCounts[c] = (channelCounts[c] || 0) + 1;
+  });
+
+  // ICE sorted backlog
+  const backlogSorted = [...(sections['Backlog'] || [])].sort((a, b) => {
+    const aIce = getField(a, 'ICE Score') || 0;
+    const bIce = getField(b, 'ICE Score') || 0;
+    return bIce - aIce;
+  });
+
+  // Sprint + Running tasks
+  const activeTasks = [...(sections['This Sprint'] || []), ...(sections['Running'] || [])];
+
+  // Learnings
+  const learningTasks = [...(sections['Analysing'] || []), ...(sections['Learnings'] || [])];
+
+  const maxFunnel = Math.max(...Object.values(funnelCounts), 1);
+
+  document.getElementById('dashboard').innerHTML = `
+    <!-- STATS ROW -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value white">${total}</div>
+        <div class="stat-label">Total Experiments</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${active}</div>
+        <div class="stat-label">Active Now</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value white">${backlog}</div>
+        <div class="stat-label">In Backlog</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${completed}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value white">${Object.keys(ownerCounts).length}</div>
+        <div class="stat-label">Team Members</div>
+      </div>
+    </div>
+
+    <!-- BOARD PIPELINE -->
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="panel-header">
+        <div class="panel-title">Pipeline</div>
+        <a href="https://app.asana.com/1/12600476210818/project/${PROJECT}" target="_blank" style="font: 600 11px/1 var(--font-display); color: var(--orange); text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em;">Open in Asana &#8599;</a>
+      </div>
+      <div class="board-summary">
+        ${SECTION_ORDER.map(s => {
+          const count = (sections[s] || []).length;
+          const isActive = s === 'This Sprint' || s === 'Running';
+          return `<div class="board-col ${isActive ? 'active' : ''}">
+            <div class="board-col-label">${s}</div>
+            <div class="board-col-count">${count}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- ACTIVE EXPERIMENTS -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Active Experiments</div>
+          <span class="pill pill-orange">${active} running</span>
+        </div>
+        <div class="panel-body">
+          ${activeTasks.length > 0 ? `<ul class="task-list">
+            ${activeTasks.map(t => {
+              const owner = getField(t, 'Owner') || '?';
+              const channel = getField(t, 'Channel') || '';
+              const funnel = getField(t, 'Funnel Stage') || '';
+              const section = getSection(t);
+              const pillClass = section === 'Running' ? 'pill-success' : 'pill-orange';
+              return `<li class="task-item">
+                <div>
+                  <div class="task-name">${t.name}</div>
+                  <div class="task-meta">
+                    <span class="pill ${pillClass}" style="margin-right: 4px;">${section}</span>
+                    <span class="pill pill-grey" style="margin-right: 4px;">${owner}</span>
+                    <span class="pill pill-grey" style="margin-right: 4px;">${channel}</span>
+                    <span class="pill pill-grey">${funnel}</span>
+                  </div>
+                </div>
+              </li>`;
+            }).join('')}
+          </ul>` : `<div class="empty-state">
+            <div class="empty-state-icon">&#9881;</div>
+            <p>No active experiments yet. Move cards from Backlog to This Sprint to get started.</p>
+          </div>`}
+        </div>
+      </div>
+
+      <!-- OWNER DISTRIBUTION -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">By Owner</div>
+        </div>
+        <div class="panel-body">
+          ${Object.entries(ownerCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => {
+            const pct = Math.round((count / total) * 100);
+            const color = OWNER_COLORS[name] || '#717171';
+            return `<div class="owner-bar">
+              <div class="owner-name-tag" style="color: ${color};">${name}</div>
+              <div class="owner-progress">
+                <div class="owner-progress-fill" style="width: ${pct}%; background: ${color};"></div>
+              </div>
+              <div class="owner-count">${count}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-equal">
+      <!-- FUNNEL COVERAGE -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Funnel Coverage</div>
+        </div>
+        <div class="panel-body">
+          ${FUNNEL_ORDER.map(f => {
+            const count = funnelCounts[f] || 0;
+            const pct = Math.round((count / maxFunnel) * 100);
+            return `<div class="funnel-row">
+              <div class="funnel-label">${f}</div>
+              <div class="funnel-bar">
+                <div class="funnel-bar-fill" style="width: ${count > 0 ? Math.max(pct, 12) : 0}%;">
+                  ${count > 0 ? `<span class="funnel-count">${count}</span>` : ''}
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+          ${Object.values(funnelCounts).some(v => v === 0) ? `
+          <div style="margin-top: 12px; padding: 10px; background: var(--warning-soft); border-radius: 6px;">
+            <span style="font: 600 11px/1.4 var(--font-display); color: var(--warning);">Gap detected:</span>
+            <span style="font: 400 12px/1.4 var(--font-sans); color: var(--grey-700);">
+              ${FUNNEL_ORDER.filter(f => !funnelCounts[f]).join(', ')} ${FUNNEL_ORDER.filter(f => !funnelCounts[f]).length === 1 ? 'has' : 'have'} no experiments.
+            </span>
+          </div>` : ''}
+        </div>
+      </div>
+
+      <!-- CHANNEL SPREAD -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Channel Spread</div>
+        </div>
+        <div class="panel-body">
+          <div class="channel-grid">
+            ${['Website', 'Ads', 'Social', 'Email', 'Blog', 'Video', 'SEO', 'Community'].map(c => {
+              const count = channelCounts[c] || 0;
+              return `<div class="channel-tile ${count > 0 ? 'has-experiments' : ''}">
+                <div class="channel-tile-count">${count}</div>
+                <div class="channel-tile-name">${c}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- ICE RANKED BACKLOG -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Backlog (ICE Ranked)</div>
+          <span class="pill pill-grey">${backlog} queued</span>
+        </div>
+        <div class="panel-body">
+          ${backlogSorted.length > 0 ? backlogSorted.map((t, i) => {
+            const ice = getField(t, 'ICE Score') || 0;
+            const owner = getField(t, 'Owner') || '?';
+            const channel = getField(t, 'Channel') || '';
+            return `<div class="ice-row">
+              <div class="ice-score">${ice}</div>
+              <div class="ice-name">${t.name}</div>
+              <div style="display: flex; gap: 4px;">
+                <span class="pill pill-grey">${owner}</span>
+                <span class="pill pill-grey">${channel}</span>
+              </div>
+            </div>`;
+          }).join('') : `<div class="empty-state"><p>Backlog is empty. Time to brainstorm new experiments.</p></div>`}
+        </div>
+      </div>
+
+      <!-- LEARNINGS -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Learnings</div>
+          <span class="pill pill-grey">${learningTasks.length} recorded</span>
+        </div>
+        <div class="panel-body">
+          ${learningTasks.length > 0 ? learningTasks.map(t => {
+            const owner = getField(t, 'Owner') || '?';
+            const learning = extractLearning(t);
+            return `<div class="learning-card ${t.completed ? 'win' : ''}">
+              <div class="learning-title">${t.name}</div>
+              <div class="learning-body">${learning || 'Awaiting write-up...'}</div>
+              <div style="margin-top: 8px;"><span class="pill pill-grey">${owner}</span></div>
+            </div>`;
+          }).join('') : `<div class="empty-state">
+            <div class="empty-state-icon">&#128218;</div>
+            <p>No learnings yet. Complete your first experiments to start building the knowledge base.</p>
+          </div>`}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function loadData() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('loading');
+  btn.textContent = 'Loading...';
+
+  try {
+    const tasks = await fetchJSON(
+      `projects/${PROJECT}/tasks?opt_fields=name,completed,notes,html_notes,custom_fields,memberships.section.name,created_at,modified_at`
+    );
+    render(tasks);
+    document.getElementById('lastUpdated').textContent =
+      `Last updated: ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Adelaide' })}`;
+  } catch (e) {
+    document.getElementById('dashboard').innerHTML =
+      `<div class="loading-overlay" style="color: var(--danger);">Failed to load: ${e.message}</div>`;
+  }
+
+  btn.classList.remove('loading');
+  btn.textContent = 'Refresh';
+}
+
+loadData();
+</script>
+</body>
+</html>
