@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>AFS Screen Recorder — Chrome Extension | The AFS Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0e2a44; --off-white:#edeae3; --orange:#f26422;
+    --mgrey:#424242; --dgrey:#232323; --white:#fff;
+    --line:#dcd8cf; --muted:#6f6a61;
+    --good-soft:#e7f1ea; --warn-soft:#fdeee4; --info-soft:#e7edf3;
+    --code-bg:#0e2a44; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--off-white);color:var(--dgrey);
+    font-family:'Lato',Tahoma,sans-serif;line-height:1.62;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:'Archivo',Tahoma,sans-serif;color:var(--navy);margin:0}
+  .wrap{max-width:840px;margin:0 auto;padding:0 20px 60px}
+  .topbar{background:var(--white);border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+  .topbar img{height:34px;display:block}
+  .topbar .tag{font-family:'Archivo';font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+  header.hero{position:relative;background:var(--navy);color:#fff;padding:52px 0 44px;overflow:hidden}
+  header.hero::after{content:"";position:absolute;right:-60px;bottom:-70px;width:240px;height:240px;
+    background:var(--orange);opacity:.13;clip-path:polygon(100% 0,0 100%,100% 100%)}
+  .hero .wrap{padding-bottom:0;position:relative;z-index:1}
+  .eyebrow{font-family:'Archivo';text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:700;color:var(--orange);margin:0 0 12px}
+  .hero h1{color:#fff;font-size:31px;line-height:1.18;font-weight:800;margin:0 0 12px}
+  .hero p{margin:0 0 22px;color:#cdd6e0;font-size:16.5px;max-width:62ch}
+  .jump{display:flex;flex-wrap:wrap;gap:10px}
+  .jump a{font-family:'Archivo';font-size:13px;font-weight:700;text-decoration:none;color:#fff;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:7px 15px}
+  .jump a:hover{background:var(--orange);border-color:var(--orange)}
+  .part{margin:40px 0 4px;padding:0}
+  .part .wrap{padding-bottom:0}
+  .part-label{font-family:'Archivo';font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin:0 0 4px}
+  .part h2.part-title{font-size:25px;font-weight:800;margin:0;padding-bottom:10px;border-bottom:3px solid var(--orange);display:inline-block}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px 28px;margin:20px 0;box-shadow:0 1px 3px rgba(14,42,68,.05)}
+  h2{font-size:20px;font-weight:700;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+  h2 .n{width:27px;height:27px;border-radius:7px;background:var(--orange);color:#fff;font-size:14px;
+    display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-family:'Archivo'}
+  h3{font-size:14.5px;margin:20px 0 6px;font-weight:700;color:var(--mgrey)}
+  p{margin:0 0 12px}
+  .lead{font-size:16px;color:var(--mgrey)}
+  ul,ol{margin:0 0 6px;padding-left:22px}
+  li{margin:7px 0}
+  code{background:#f1eee8;border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:var(--navy)}
+  pre{background:var(--code-bg);color:#e7eefc;border-radius:10px;padding:15px 16px;overflow-x:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.8px;line-height:1.55;margin:10px 0}
+  pre .c{color:#8aa0b6}
+  .steps{counter-reset:step;list-style:none;padding:0;margin:8px 0 0}
+  .steps li{counter-increment:step;position:relative;padding:0 0 16px 46px;margin:0}
+  .steps li::before{content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;
+    border-radius:50%;background:var(--orange);color:#fff;font-family:'Archivo';font-weight:700;font-size:14px;
+    display:flex;align-items:center;justify-content:center}
+  .steps li:not(:last-child)::after{content:"";position:absolute;left:15px;top:30px;bottom:0;width:2px;background:var(--line)}
+  .note{border-radius:12px;padding:14px 16px;margin:16px 0;font-size:14.5px;border:1px solid}
+  .note.good{background:var(--good-soft);border-color:#bfddcc;color:#155c40}
+  .note.warn{background:var(--warn-soft);border-color:#f6cbb0;color:#a8430f}
+  .note.info{background:var(--info-soft);border-color:#c5d2df;color:#1d3b59}
+  .note strong{font-weight:700}
+  .pill{display:inline-block;background:var(--info-soft);color:var(--navy);border-radius:999px;
+    padding:2px 11px;font-family:'Archivo';font-size:12px;font-weight:700;margin-left:6px}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:'Archivo';color:var(--muted);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  td code{font-size:12.5px}
+  .ex{background:#f6f4ef;border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:10px 14px;margin:8px 0;font-style:italic;color:var(--mgrey)}
+  details{border:1px solid var(--line);border-radius:10px;padding:4px 16px;margin:12px 0;background:#faf9f5}
+  summary{cursor:pointer;font-weight:700;padding:10px 0;color:var(--mgrey)}
+  .kbd{font-size:13px;color:var(--muted)}
+  .diagram{margin:6px 0 2px}
+  .row{display:flex;align-items:center;gap:14px}
+  .box{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;background:#faf9f5}
+  .box .t{font-family:'Archivo';font-weight:700;font-size:14.5px;margin-bottom:2px;color:var(--navy)}
+  .box .s{font-size:12.5px;color:var(--muted)}
+  .box.client{border-color:#c5d2df;background:var(--info-soft)}
+  .box.worker{border-color:#f6cbb0;background:var(--warn-soft)}
+  .box.shop{border-color:#cfe0d6;background:var(--good-soft)}
+  .arrow{display:flex;flex-direction:column;align-items:center;color:var(--muted);font-size:12px;flex:0 0 auto}
+  .arrow .line{font-size:20px;line-height:1;color:var(--orange)}
+  .tagchip{background:#f1eee8;border:1px solid var(--line);color:var(--navy);border-radius:999px;padding:3px 11px;font-family:'Archivo';font-size:12px;font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+  .dl-btn{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;
+    font-family:'Archivo';font-weight:700;font-size:15px;text-decoration:none;
+    padding:12px 24px;border-radius:10px;margin:12px 0 4px;transition:background .15s}
+  .dl-btn:hover{background:#d9571b}
+  .dl-btn svg{width:20px;height:20px;fill:currentColor}
+  footer{background:var(--navy);color:#c3ccd6;font-size:13px;text-align:center;padding:26px 20px;margin-top:40px;line-height:1.7}
+  footer a{color:#fff}
+  @media(max-width:560px){.row{flex-direction:column}.arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <img src="https://cdn.shopify.com/s/files/1/1950/1891/files/TheAFSGroup.png?v=1766395105" alt="The AFS Group">
+  <span class="tag">Internal Tool</span>
+</div></div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">The AFS Group</p>
+    <h1>AFS Screen Recorder</h1>
+    <p>Loom-style screen recording. Records locally, share via Google Drive.</p>
+    <nav class="jump">
+      <a href="#install">Install &amp; use</a>
+      <a href="#tech">How it works</a>
+      <a href="#download-section">Download</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ PART 1 ============ -->
+<section class="part" id="install"><div class="wrap">
+  <p class="part-label">Part 1</p>
+  <h2 class="part-title">Install &amp; use</h2>
+</div></section>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>What this is</h2>
+    <p class="lead">A Chrome extension for the AFS team that records your screen and webcam and microphone into one video. A draggable webcam bubble and recording toolbar follow you across tabs so you always have control. Recordings are saved locally to your machine. To share a recording, drag the file into Google Drive and copy the link.</p>
+    <table>
+      <tr><th>Feature</th><th>Detail</th></tr>
+      <tr><td>Camera</td><td>Webcam composited into the video as a draggable bubble</td></tr>
+      <tr><td>Audio</td><td>Microphone captured alongside the screen</td></tr>
+      <tr><td>Output</td><td><code>.webm</code> file saved directly to your Downloads folder</td></tr>
+      <tr><td>Sharing</td><td>Drag the file into Google Drive for a shareable link</td></tr>
+      <tr><td>Cost</td><td>Zero. No servers, no accounts, no subscriptions</td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="download-section">
+    <h2>Download</h2>
+    <p>Grab the extension zip below.</p>
+    <a class="dl-btn" href="screen-recorder-extension.zip" download>
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Download AFS Screen Recorder
+    </a>
+    <p class="kbd" style="margin-top:8px">screen-recorder-extension.zip</p>
+  </div>
+
+  <div class="card">
+    <h2>Install on Chrome / Chromebook</h2>
+    <ol class="steps">
+      <li>Download the zip above and unzip it. You should get a folder with <code>manifest.json</code>, a <code>src/</code> folder, and an <code>icons/</code> folder directly inside (no nested subfolder). On ChromeOS, open <strong>Files</strong>, find the zip, right-click and choose <strong>Extract</strong>.</li>
+      <li>Open Chrome and go to <strong><code>chrome://extensions</code></strong>.</li>
+      <li>Turn on <strong>Developer mode</strong> using the toggle in the top-right corner.</li>
+      <li>Click <strong>Load unpacked</strong> (top-left) and select the unzipped folder - the one containing <code>manifest.json</code>. On ChromeOS, you can also drag the folder directly onto the extensions page.</li>
+      <li>The <strong>AFS Screen Recorder</strong> tile appears. Click the puzzle-piece icon in the toolbar and pin it so it's always visible.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>How to record</h2>
+    <ol class="steps">
+      <li>Click the <strong>AFS Screen Recorder</strong> icon in the Chrome toolbar.</li>
+      <li>In the popup, toggle <strong>Camera bubble</strong> and/or <strong>Microphone</strong> on or off as needed. Your choices are remembered.</li>
+      <li>Click <strong>Start Recording</strong>.</li>
+      <li>Chrome will ask what to capture. Choose a <strong>screen</strong>, <strong>window</strong>, or <strong>tab</strong>, then click <strong>Share</strong>.</li>
+      <li>Recording begins. A webcam bubble appears on the page - drag it to any corner to reposition. The recording toolbar gives you <strong>Pause / Resume</strong> and <strong>Stop</strong> buttons. Both follow you as you switch tabs.</li>
+      <li>To finish, click <strong>Stop</strong> in the toolbar, or click Chrome's native <strong>Stop sharing</strong> bar at the bottom of the screen - either will end the recording cleanly.</li>
+      <li>A result page opens automatically. Click <strong>Download</strong> to save the <code>.webm</code> file, or click <strong>Open My Drive</strong> to go to Google Drive and drag the file in for a shareable link.</li>
+    </ol>
+    <div class="note info"><strong>Switching tabs mid-recording.</strong> The bubble and toolbar reappear on each new tab you open. Your recording continues uninterrupted in the background.</div>
+  </div>
+
+  <div class="card">
+    <h2>Troubleshooting</h2>
+    <h3>The bubble and toolbar do not appear on some pages</h3>
+    <p>Chrome does not allow extensions to inject overlays onto <code>chrome://</code> pages, the Chrome Web Store, or the built-in PDF viewer. Recording still works normally and your camera is still composited into the video. The on-page controls simply cannot show on those restricted pages.</p>
+    <h3>My webcam is not in the recording</h3>
+    <p>When you first click Start Recording, Chrome will prompt for camera permission. Click <strong>Allow</strong>. If you previously dismissed or blocked the prompt, click the lock or tune icon in the address bar, find Camera, set it to <strong>Allow</strong>, and reload the page before trying again.</p>
+    <h3>The video will not play in some apps</h3>
+    <p>The recording is saved as a <code>.webm</code> file. It plays natively in Chrome and in Google Drive's built-in player. If another app cannot open it, upload it to Google Drive and play it there, or share the Drive link directly.</p>
+    <details>
+      <summary>Still stuck?</summary>
+      <p>Message Gary or Josh and we will sort it out.</p>
+    </details>
+  </div>
+
+</div>
+
+<!-- ============ PART 2 ============ -->
+<section class="part" id="tech"><div class="wrap">
+  <p class="part-label">Part 2</p>
+  <h2 class="part-title">How it works</h2>
+  <div class="chips">
+    <span class="tagchip">Chrome Extension (MV3)</span>
+    <span class="tagchip">MediaRecorder</span>
+    <span class="tagchip">desktopCapture</span>
+    <span class="tagchip">Canvas Compositing</span>
+  </div>
+</div></section>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2><span class="n">1</span> Architecture</h2>
+    <div class="diagram">
+      <div class="row">
+        <div class="box client"><div class="t">Service Worker</div><div class="s">orchestrates state, routes messages</div></div>
+        <div class="arrow"><span class="line">&rarr;</span><span>drives</span></div>
+        <div class="box worker"><div class="t">Offscreen Document</div><div class="s">camera + screen via desktopCapture, composited on canvas, recorded with MediaRecorder</div></div>
+        <div class="arrow"><span class="line">&rarr;</span><span>paints</span></div>
+        <div class="box shop"><div class="t">Content Script</div><div class="s">bubble + toolbar overlay on each tab</div></div>
+      </div>
+    </div>
+    <p style="margin-top:16px">Manifest V3. The hidden offscreen document runs the recording engine so capture survives tab switches without interruption. The content script paints the draggable bubble and toolbar onto whatever page you are viewing.</p>
+    <table>
+      <tr><th>File</th><th>Role</th></tr>
+      <tr><td><code>manifest.json</code></td><td>Permissions, service worker registration, content script injection</td></tr>
+      <tr><td><code>src/background.js</code></td><td>Service worker - state machine, offscreen document lifecycle, message routing</td></tr>
+      <tr><td><code>src/offscreen.js</code></td><td>Recording engine - camera capture, screen capture, canvas compositor, MediaRecorder</td></tr>
+      <tr><td><code>src/content.js</code></td><td>Injects the draggable bubble and toolbar; relays pause/stop commands to the service worker</td></tr>
+      <tr><td><code>src/popup.html/js</code></td><td>The toolbar popup for toggling camera and mic, and starting a recording</td></tr>
+      <tr><td><code>src/result.html/js</code></td><td>Post-recording page: inline preview, download button, Drive link</td></tr>
+      <tr><td><code>src/lib/</code></td><td>Shared utilities: canvas compositing, MIME detection, filename generation, shared state</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">2</span> Footprint and cost</h2>
+    <p>Zero. The extension is fully local. There are no servers, no accounts, no API keys, and nothing to maintain or pay for. The only network activity is the Google Drive tab that opens when you choose to share a recording - that is your own Drive, not anything run by the extension.</p>
+    <div class="note good"><strong>No ongoing cost.</strong> Unlike Loom or similar tools, there is no monthly fee, no storage limit, and no third-party data handling.</div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">3</span> Privacy and security</h2>
+    <ul>
+      <li>Recordings never leave your machine unless you explicitly upload them.</li>
+      <li>The extension stores nothing remotely and has no backend of any kind.</li>
+      <li>Camera and microphone data is captured and composited entirely in the browser, in the offscreen document, without any external calls.</li>
+      <li>Sharing is a deliberate manual step - drag the file into Drive yourself.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">4</span> Limitations</h2>
+    <ul>
+      <li>The floating bubble overlays web pages only, not native desktop apps. The camera is still baked into the recording everywhere - you just will not see the bubble while you are in a native app.</li>
+      <li>Output format is <code>.webm</code>. It plays in Chrome and Google Drive. For other apps, upload to Drive and use the Drive player or shareable link.</li>
+      <li>Sharing requires a manual drag into Google Drive. There is no one-click "copy link" built in.</li>
+      <li>Internal AFS use only. Not published to the Chrome Web Store.</li>
+    </ul>
+  </div>
+
+</div>
+<footer>
+  The AFS Group &middot; AFS Screen Recorder &middot; Built 24 Jun 2026 &middot; Managed by Josh / Gary<br>
+  Questions &rarr; <a href="mailto:josh@gymandfitness.com.au">josh@gymandfitness.com.au</a>
+</footer>
+</body>
+</html>
