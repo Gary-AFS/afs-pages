@@ -97,6 +97,9 @@
   .dl-btn svg{width:20px;height:20px;fill:currentColor}
   footer{background:var(--navy);color:#c3ccd6;font-size:13px;text-align:center;padding:26px 20px;margin-top:40px;line-height:1.7}
   footer a{color:#fff}
+  .counter-band{background:var(--navy);border-top:1px solid rgba(255,255,255,.08);color:#fff;text-align:center;padding:22px 20px}
+  .counter-band .num{font-family:'Archivo';font-weight:800;font-size:42px;color:var(--orange);line-height:1;display:block}
+  .counter-band .lbl{font-size:14px;color:#cdd6e0;margin-top:6px;display:block;letter-spacing:.02em}
   @media(max-width:560px){.row{flex-direction:column}.arrow{transform:rotate(90deg)}}
 </style>
 </head>
@@ -118,6 +121,11 @@
     </nav>
   </div>
 </header>
+
+<div class="counter-band">
+  <span class="num" id="recCount">0</span>
+  <span class="lbl">recordings and counting by the AFS team</span>
+</div>
 
 <!-- ============ PART 1 ============ -->
 <section class="part" id="install"><div class="wrap">
@@ -234,7 +242,7 @@
 
   <div class="card">
     <h2><span class="n">2</span> Footprint and cost</h2>
-    <p>Zero. The extension is fully local. There are no servers, no accounts, no API keys, and nothing to maintain or pay for. The only network activity is the Google Drive tab that opens when you choose to share a recording - that is your own Drive, not anything run by the extension.</p>
+    <p>Effectively zero. The extension records fully locally with no accounts or API keys and nothing to pay for. Network activity is limited to two things: the Google Drive tab that opens when you choose to share (your own Drive), and a single anonymous <code>+1</code> sent to a tiny usage counter when you save a recording - that is what powers the team tally at the top of this page. No identity, no content, just a number. The counter runs on a small Cloudflare Worker, free tier.</p>
     <div class="note good"><strong>No ongoing cost.</strong> Unlike Loom or similar tools, there is no monthly fee, no storage limit, and no third-party data handling.</div>
   </div>
 
@@ -243,7 +251,8 @@
     <ul>
       <li>Recordings never leave your machine unless you explicitly upload them.</li>
       <li>The extension stores nothing remotely and has no backend of any kind.</li>
-      <li>Camera and microphone are captured and recorded entirely in the browser, with no external calls.</li>
+      <li>Camera and microphone are captured and recorded entirely in the browser.</li>
+      <li>The one thing the extension sends out is an anonymous <code>+1</code> to the team usage counter when you save a recording - no account, no identity, no video, just a tally.</li>
       <li>Sharing is a deliberate manual step - drag the file into Drive yourself.</li>
     </ul>
   </div>
@@ -266,5 +275,27 @@
   The AFS Group &middot; AFS Screen Recorder &middot; Built 24 Jun 2026, updated 25 Jun 2026 &middot; Managed by Josh / Gary<br>
   Questions &rarr; <a href="mailto:josh@gymandfitness.com.au">josh@gymandfitness.com.au</a>
 </footer>
+<script>
+(function () {
+  var el = document.getElementById('recCount');
+  fetch('https://afs-recorder-counter.josh-03c.workers.dev/count')
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var target = d.count || 0, t0 = null, dur = 1200;
+      function step(ts) {
+        if (!t0) t0 = ts;
+        var p = Math.min((ts - t0) / dur, 1);
+        var v = Math.floor(target * (1 - Math.pow(1 - p, 3)));
+        el.textContent = v.toLocaleString();
+        if (p < 1) requestAnimationFrame(step); else el.textContent = target.toLocaleString();
+      }
+      requestAnimationFrame(step);
+    })
+    .catch(function () {
+      var band = el.closest('.counter-band');
+      if (band) band.style.display = 'none';
+    });
+})();
+</script>
 </body>
 </html>
