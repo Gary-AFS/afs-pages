@@ -127,12 +127,13 @@
 
   <div class="card">
     <h2>What this is</h2>
-    <p class="lead">A Chrome extension for the AFS team that records your screen and webcam and microphone into one video. A draggable webcam bubble and recording toolbar follow you across tabs so you always have control. Recordings are saved locally to your machine. To share a recording, drag the file into Google Drive and copy the link.</p>
+    <p class="lead">A Chrome extension for the AFS team that records your screen, webcam, and microphone into one video. A single draggable webcam head sits on the page - drag it wherever you like and that is exactly where it appears in the recording. A slim recorder toolbar, plus the extension icon itself, gives you pause and stop at any time. Recordings are saved locally to your machine. To share, drag the file into Google Drive and copy the link.</p>
     <table>
       <tr><th>Feature</th><th>Detail</th></tr>
-      <tr><td>Camera</td><td>Webcam composited into the video as a draggable bubble</td></tr>
-      <tr><td>Audio</td><td>Microphone captured alongside the screen</td></tr>
-      <tr><td>Output</td><td><code>.webm</code> file saved directly to your Downloads folder</td></tr>
+      <tr><td>Camera</td><td>A live webcam head you drag onto the page; filmed in place. Pick which camera in the popup.</td></tr>
+      <tr><td>Audio</td><td>Microphone captured with the screen. Pick which mic in the popup.</td></tr>
+      <tr><td>Controls</td><td>Pause and stop from the slim toolbar or the extension icon. A 3-2-1 countdown before recording.</td></tr>
+      <tr><td>Output</td><td><code>.webm</code> file saved to your Downloads folder</td></tr>
       <tr><td>Sharing</td><td>Drag the file into Google Drive for a shareable link</td></tr>
       <tr><td>Cost</td><td>Zero. No servers, no accounts, no subscriptions</td></tr>
     </table>
@@ -157,26 +158,28 @@
       <li>Click <strong>Load unpacked</strong> (top-left) and select the unzipped folder - the one containing <code>manifest.json</code>. On ChromeOS, you can also drag the folder directly onto the extensions page.</li>
       <li>The <strong>AFS Screen Recorder</strong> tile appears. Click the puzzle-piece icon in the toolbar and pin it so it's always visible.</li>
     </ol>
+    <div class="note warn"><strong>On a Mac, grant Screen Recording once.</strong> macOS requires it before Chrome can capture. Open <strong>System Settings &rarr; Privacy &amp; Security &rarr; Screen Recording</strong>, tick <strong>Google Chrome</strong>, then relaunch Chrome. Without this, recordings come out blank. Windows needs no such step.</div>
+    <div class="note info"><strong>Reload your tabs once after installing.</strong> The on-page webcam head only appears on pages opened or reloaded after the extension is installed. Open a fresh tab, or reload the page you want to record.</div>
   </div>
 
   <div class="card">
     <h2>How to record</h2>
     <ol class="steps">
       <li>Click the <strong>AFS Screen Recorder</strong> icon in the Chrome toolbar.</li>
-      <li>In the popup, toggle <strong>Camera bubble</strong> and/or <strong>Microphone</strong> on or off as needed. Your choices are remembered.</li>
+      <li>Pick your <strong>Camera</strong> and <strong>Microphone</strong>: toggle each on or off, and choose the device from the dropdowns. If the device names are blank the first time, click <strong>Allow camera &amp; mic to list devices</strong>. Your choices are remembered.</li>
       <li>Click <strong>Start Recording</strong>.</li>
-      <li>Chrome will ask what to capture. Choose a <strong>screen</strong>, <strong>window</strong>, or <strong>tab</strong>, then click <strong>Share</strong>.</li>
-      <li>Recording begins. A webcam bubble appears on the page - drag it to any corner to reposition. The recording toolbar gives you <strong>Pause / Resume</strong> and <strong>Stop</strong> buttons. Both follow you as you switch tabs.</li>
-      <li>To finish, click <strong>Stop</strong> in the toolbar, or click Chrome's native <strong>Stop sharing</strong> bar at the bottom of the screen - either will end the recording cleanly.</li>
+      <li>Chrome asks what to capture. Choose a <strong>screen</strong>, <strong>window</strong>, or <strong>tab</strong>, then click <strong>Share</strong>. Tip: choose a window or tab to keep the little controls toolbar out of the video.</li>
+      <li>A <strong>3-2-1 countdown</strong> plays, then recording begins. Your <strong>webcam head</strong> appears on the page - drag it wherever you want and that is exactly where it sits in the video.</li>
+      <li>Pause or stop from the slim <strong>recorder toolbar</strong>, or from the <strong>extension icon</strong> (handy if the toolbar gets buried behind other windows). Chrome's native <strong>Stop sharing</strong> bar also ends it cleanly.</li>
       <li>A result page opens automatically. Click <strong>Download</strong> to save the <code>.webm</code> file, or click <strong>Open My Drive</strong> to go to Google Drive and drag the file in for a shareable link.</li>
     </ol>
-    <div class="note info"><strong>Switching tabs mid-recording.</strong> The bubble and toolbar reappear on each new tab you open. Your recording continues uninterrupted in the background.</div>
+    <div class="note info"><strong>First time on a website.</strong> Chrome asks for camera permission so the head can show on that page. Click <strong>Allow</strong> once and it is remembered for that site.</div>
   </div>
 
   <div class="card">
     <h2>Troubleshooting</h2>
-    <h3>The bubble and toolbar do not appear on some pages</h3>
-    <p>Chrome does not allow extensions to inject overlays onto <code>chrome://</code> pages, the Chrome Web Store, or the built-in PDF viewer. Recording still works normally and your camera is still composited into the video. The on-page controls simply cannot show on those restricted pages.</p>
+    <h3>The webcam head does not appear on some pages</h3>
+    <p>Chrome does not allow extensions to inject onto <code>chrome://</code> pages, the Chrome Web Store, or the built-in PDF viewer, so the head cannot show there. Also note the head only appears on pages opened or reloaded after the extension was installed - reload the tab if it is missing. Screen recording itself still works regardless; use the recorder toolbar or the extension icon to control it.</p>
     <h3>My webcam is not in the recording</h3>
     <p>When you first click Start Recording, Chrome will prompt for camera permission. Click <strong>Allow</strong>. If you previously dismissed or blocked the prompt, click the lock or tune icon in the address bar, find Camera, set it to <strong>Allow</strong>, and reload the page before trying again.</p>
     <h3>The video will not play in some apps</h3>
@@ -197,7 +200,8 @@
     <span class="tagchip">Chrome Extension (MV3)</span>
     <span class="tagchip">MediaRecorder</span>
     <span class="tagchip">desktopCapture</span>
-    <span class="tagchip">Canvas Compositing</span>
+    <span class="tagchip">Content Script</span>
+    <span class="tagchip">IndexedDB</span>
   </div>
 </div></section>
 
@@ -207,23 +211,22 @@
     <h2><span class="n">1</span> Architecture</h2>
     <div class="diagram">
       <div class="row">
-        <div class="box client"><div class="t">Service Worker</div><div class="s">orchestrates state, routes messages</div></div>
-        <div class="arrow"><span class="line">&rarr;</span><span>drives</span></div>
-        <div class="box worker"><div class="t">Offscreen Document</div><div class="s">camera + screen via desktopCapture, composited on canvas, recorded with MediaRecorder</div></div>
-        <div class="arrow"><span class="line">&rarr;</span><span>paints</span></div>
-        <div class="box shop"><div class="t">Content Script</div><div class="s">bubble + toolbar overlay on each tab</div></div>
+        <div class="box client"><div class="t">Popup (icon)</div><div class="s">device pickers + live pause/stop controls</div></div>
+        <div class="arrow"><span class="line">&rarr;</span><span>opens</span></div>
+        <div class="box worker"><div class="t">Recorder Window</div><div class="s">opens the screen picker, records the chosen surface + mic with MediaRecorder</div></div>
+        <div class="arrow"><span class="line">&rarr;</span><span>flags</span></div>
+        <div class="box shop"><div class="t">Content Script</div><div class="s">draggable webcam head on the page, filmed in place</div></div>
       </div>
     </div>
-    <p style="margin-top:16px">Manifest V3. The hidden offscreen document runs the recording engine so capture survives tab switches without interruption. The content script paints the draggable bubble and toolbar onto whatever page you are viewing.</p>
+    <p style="margin-top:16px">Manifest V3, with no background service worker. A slim recorder window does the actual capture (a normal window is the only context allowed to open the screen picker) and records the chosen surface directly. A content script paints the single draggable webcam head onto the page, which the screen capture films in place. The finished video is handed to the result page through IndexedDB, and pause/stop travel between the popup and the recorder window via a small storage flag.</p>
     <table>
       <tr><th>File</th><th>Role</th></tr>
-      <tr><td><code>manifest.json</code></td><td>Permissions, service worker registration, content script injection</td></tr>
-      <tr><td><code>src/background.js</code></td><td>Service worker - state machine, offscreen document lifecycle, message routing</td></tr>
-      <tr><td><code>src/offscreen.js</code></td><td>Recording engine - camera capture, screen capture, canvas compositor, MediaRecorder</td></tr>
-      <tr><td><code>src/content.js</code></td><td>Injects the draggable bubble and toolbar; relays pause/stop commands to the service worker</td></tr>
-      <tr><td><code>src/popup.html/js</code></td><td>The toolbar popup for toggling camera and mic, and starting a recording</td></tr>
+      <tr><td><code>manifest.json</code></td><td>Permissions (<code>desktopCapture</code>, <code>storage</code>) and content script registration</td></tr>
+      <tr><td><code>src/popup.html/js</code></td><td>Setup (camera/mic device pickers) and live recording controls on the icon</td></tr>
+      <tr><td><code>src/recorder.html/js</code></td><td>Slim toolbar window - opens the screen picker, records screen + mic, saves the video</td></tr>
+      <tr><td><code>src/content.js/css</code></td><td>Injects the single draggable webcam head onto the page</td></tr>
       <tr><td><code>src/result.html/js</code></td><td>Post-recording page: inline preview, download button, Drive link</td></tr>
-      <tr><td><code>src/lib/</code></td><td>Shared utilities: canvas compositing, MIME detection, filename generation, shared state</td></tr>
+      <tr><td><code>src/lib/</code></td><td>Shared utilities: MIME detection, filename generation, IndexedDB recording store</td></tr>
     </table>
   </div>
 
@@ -238,7 +241,7 @@
     <ul>
       <li>Recordings never leave your machine unless you explicitly upload them.</li>
       <li>The extension stores nothing remotely and has no backend of any kind.</li>
-      <li>Camera and microphone data is captured and composited entirely in the browser, in the offscreen document, without any external calls.</li>
+      <li>Camera and microphone are captured and recorded entirely in the browser, with no external calls.</li>
       <li>Sharing is a deliberate manual step - drag the file into Drive yourself.</li>
     </ul>
   </div>
@@ -246,7 +249,10 @@
   <div class="card">
     <h2><span class="n">4</span> Limitations</h2>
     <ul>
-      <li>The floating bubble overlays web pages only, not native desktop apps. The camera is still baked into the recording everywhere - you just will not see the bubble while you are in a native app.</li>
+      <li>The webcam head overlays web pages only, not native desktop apps or <code>chrome://</code> pages. If you record a non-browser app, the head will not appear in that part of the video.</li>
+      <li>Recording the whole screen also films the small controls toolbar. Record a specific tab or window to keep it out of the video.</li>
+      <li>The first time the head appears on a website, Chrome asks for camera permission for that page. Tabs opened before installing the extension need one reload before the head shows.</li>
+      <li>On macOS, Chrome needs Screen Recording permission (System Settings &rarr; Privacy &amp; Security &rarr; Screen Recording) or recordings come out blank.</li>
       <li>Output format is <code>.webm</code>. It plays in Chrome and Google Drive. For other apps, upload to Drive and use the Drive player or shareable link.</li>
       <li>Sharing requires a manual drag into Google Drive. There is no one-click "copy link" built in.</li>
       <li>Internal AFS use only. Not published to the Chrome Web Store.</li>
@@ -255,7 +261,7 @@
 
 </div>
 <footer>
-  The AFS Group &middot; AFS Screen Recorder &middot; Built 24 Jun 2026 &middot; Managed by Josh / Gary<br>
+  The AFS Group &middot; AFS Screen Recorder &middot; Built 24 Jun 2026, updated 25 Jun 2026 &middot; Managed by Josh / Gary<br>
   Questions &rarr; <a href="mailto:josh@gymandfitness.com.au">josh@gymandfitness.com.au</a>
 </footer>
 </body>
