@@ -44589,7 +44589,9 @@ const z_ = {
             [h, d] = O.useState(!0),
             [p, m] = O.useState("All"),
             [g, b] = O.useState("All"),
-            [fy, setFy] = O.useState("FY26"),
+            [fyExport, setFyExport] = O.useState("FY26"),
+            [fyAfs, setFyAfs] = O.useState("FY26"),
+            [fyUsa, setFyUsa] = O.useState("FY26"),
             [fy27Data, setFy27Data] = O.useState(null),
             [fy27Afs, setFy27Afs] = O.useState(null),
             [fy27Usa, setFy27Usa] = O.useState(null);
@@ -44889,7 +44891,7 @@ const z_ = {
             O.useEffect(() => {
                 e && n && l && s && d(!1);
             }, [e, n, l, s]));
-        const activeData = O.useMemo(() => fy === "FY27" ? fy27Data : e, [fy, fy27Data, e]),
+        const activeData = O.useMemo(() => fyExport === "FY27" ? fy27Data : e, [fyExport, fy27Data, e]),
             w = O.useMemo(() => {
                 if (!activeData) return null;
                 let K = activeData.customers;
@@ -44978,8 +44980,8 @@ const z_ = {
                     });
                 return K;
             }, [activeData, w, p, g]),
-            activeAfs = O.useMemo(() => fy === "FY27" ? fy27Afs : l, [fy, fy27Afs, l]),
-            activeUsa = O.useMemo(() => fy === "FY27" ? fy27Usa : s, [fy, fy27Usa, s]),
+            activeAfs = O.useMemo(() => fyAfs === "FY27" ? fy27Afs : l, [fyAfs, fy27Afs, l]),
+            activeUsa = O.useMemo(() => fyUsa === "FY27" ? fy27Usa : s, [fyUsa, fy27Usa, s]),
             A = O.useMemo(() => {
                 if (!activeAfs) return null;
                 const K = {
@@ -45691,10 +45693,10 @@ const z_ = {
                                                 children: [
                                                     j.jsx("h2", {
                                                         className: "text-2xl font-bold text-[#081C28]",
-                                                        children: "Sales Performance (" + fy + ")",
+                                                        children: "Sales Performance (" + fyExport + ")",
                                                     }),
                                                     j.jsx("a", {
-                                                        href: fy === "FY27" ? "https://docs.google.com/spreadsheets/d/1fHUXMDuxFKG3pktlbwFfsmQ4JuEis5GA_Aa-WLQEAEU/edit?gid=1758000461#gid=1758000461" : "https://docs.google.com/spreadsheets/d/1fHUXMDuxFKG3pktlbwFfsmQ4JuEis5GA_Aa-WLQEAEU/edit?pli=1&gid=2093632728#gid=2093632728",
+                                                        href: fyExport === "FY27" ? "https://docs.google.com/spreadsheets/d/1fHUXMDuxFKG3pktlbwFfsmQ4JuEis5GA_Aa-WLQEAEU/edit?gid=1758000461#gid=1758000461" : "https://docs.google.com/spreadsheets/d/1fHUXMDuxFKG3pktlbwFfsmQ4JuEis5GA_Aa-WLQEAEU/edit?pli=1&gid=2093632728#gid=2093632728",
                                                         target: "_blank",
                                                         rel: "noreferrer",
                                                         title: "Source Data",
@@ -45720,13 +45722,13 @@ const z_ = {
                                                         className: "flex rounded-xl overflow-hidden border border-[#A5AEB7] shadow",
                                                         children: [
                                                             j.jsx("button", {
-                                                                onClick: () => { setFy("FY26"); m("All"); b("All"); },
-                                                                className: "px-5 py-3 text-sm font-semibold transition-colors " + (fy === "FY26" ? "bg-[#185787] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
+                                                                onClick: () => { setFyExport("FY26"); m("All"); b("All"); },
+                                                                className: "px-5 py-3 text-sm font-semibold transition-colors " + (fyExport === "FY26" ? "bg-[#185787] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
                                                                 children: "FY26",
                                                             }),
                                                             j.jsx("button", {
-                                                                onClick: () => { setFy("FY27"); m("All"); b("All"); },
-                                                                className: "px-5 py-3 text-sm font-semibold transition-colors " + (fy === "FY27" ? "bg-[#185787] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
+                                                                onClick: () => { setFyExport("FY27"); m("All"); b("All"); },
+                                                                className: "px-5 py-3 text-sm font-semibold transition-colors " + (fyExport === "FY27" ? "bg-[#185787] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
                                                                 children: "FY27",
                                                             }),
                                                         ],
@@ -45857,7 +45859,7 @@ const z_ = {
                                                 children: [
                                                     j.jsx("h2", {
                                                         className: "text-2xl font-bold text-[#081C28]",
-                                                        children: "Sales Performance - AFS (" + fy + ")",
+                                                        children: "Sales Performance - AFS (" + fyAfs + ")",
                                                     }),
                                                     j.jsx("a", {
                                                         href: "https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228",
@@ -45867,6 +45869,21 @@ const z_ = {
                                                         children: j.jsx(Kp, {
                                                             className: "w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help",
                                                         }),
+                                                    }),
+                                                ],
+                                            }),
+                                            j.jsxs("div", {
+                                                className: "flex rounded-xl overflow-hidden border border-[#A5AEB7] shadow ml-auto",
+                                                children: [
+                                                    j.jsx("button", {
+                                                        onClick: () => setFyAfs("FY26"),
+                                                        className: "px-4 py-2 text-sm font-semibold transition-colors " + (fyAfs === "FY26" ? "bg-[#00AC75] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
+                                                        children: "FY26",
+                                                    }),
+                                                    j.jsx("button", {
+                                                        onClick: () => setFyAfs("FY27"),
+                                                        className: "px-4 py-2 text-sm font-semibold transition-colors " + (fyAfs === "FY27" ? "bg-[#00AC75] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
+                                                        children: "FY27",
                                                     }),
                                                 ],
                                             }),
@@ -45911,7 +45928,7 @@ const z_ = {
                                                 children: [
                                                     j.jsx("h2", {
                                                         className: "text-2xl font-bold text-[#081C28]",
-                                                        children: "Sales Performance - USA (" + fy + ")",
+                                                        children: "Sales Performance - USA (" + fyUsa + ")",
                                                     }),
                                                     j.jsx("a", {
                                                         href: "https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228",
@@ -45921,6 +45938,21 @@ const z_ = {
                                                         children: j.jsx(Kp, {
                                                             className: "w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help",
                                                         }),
+                                                    }),
+                                                ],
+                                            }),
+                                            j.jsxs("div", {
+                                                className: "flex rounded-xl overflow-hidden border border-[#A5AEB7] shadow ml-auto",
+                                                children: [
+                                                    j.jsx("button", {
+                                                        onClick: () => setFyUsa("FY26"),
+                                                        className: "px-4 py-2 text-sm font-semibold transition-colors " + (fyUsa === "FY26" ? "bg-[#D92D20] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
+                                                        children: "FY26",
+                                                    }),
+                                                    j.jsx("button", {
+                                                        onClick: () => setFyUsa("FY27"),
+                                                        className: "px-4 py-2 text-sm font-semibold transition-colors " + (fyUsa === "FY27" ? "bg-[#D92D20] text-white" : "bg-white text-[#425660] hover:bg-gray-50"),
+                                                        children: "FY27",
                                                     }),
                                                 ],
                                             }),
