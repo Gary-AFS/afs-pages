@@ -44590,7 +44590,9 @@ const z_ = {
             [p, m] = O.useState("All"),
             [g, b] = O.useState("All"),
             [fy, setFy] = O.useState("FY26"),
-            [fy27Data, setFy27Data] = O.useState(null);
+            [fy27Data, setFy27Data] = O.useState(null),
+            [fy27Afs, setFy27Afs] = O.useState(null),
+            [fy27Usa, setFy27Usa] = O.useState(null);
         (O.useEffect(() => {
                 (async () => {
                     var ae, se;
@@ -44767,19 +44769,41 @@ const z_ = {
                             "May 2026": "MAY",
                             "June 2026": "JUNE",
                         };
+                        const Z27 = {
+                            "July 2026": "JULY",
+                            "August 2026": "AUGUST",
+                            "September 2026": "SEPTEMBER",
+                            "October 2026": "OCTOBER",
+                            "November 2026": "NOVEMBER",
+                            "December 2026": "DECEMBER",
+                            "January 2027": "JANUARY",
+                            "February 2027": "FEBRUARY",
+                            "March 2027": "MARCH",
+                            "April 2027": "APRIL",
+                            "May 2027": "MAY",
+                            "June 2027": "JUNE",
+                        };
+                        const ne27 = {}, te27 = {};
+                        Er.forEach((N) => {
+                            ((ne27[N] = { actual: 0 }), (te27[N] = { actual: 0 }));
+                        });
                         for (let N = 1; N < $.length; N++) {
                             const H = $[N],
                                 X = (H[0] || "").toString().trim(),
                                 ue = Yl(H[1]),
                                 fe = Yl(H[2]),
-                                de = Z[X];
+                                de = Z[X],
+                                de27 = Z27[X];
                             de && ((ne[de].actual = ue), (te[de].actual = fe));
+                            de27 && ((ne27[de27].actual = ue), (te27[de27].actual = fe));
                         }
                         (o({
                             monthlyData: ne
                         }), f({
                             monthlyData: te
                         }));
+                        setFy27Afs({ monthlyData: ne27 });
+                        setFy27Usa({ monthlyData: te27 });
                     } catch (ae) {
                         console.error("AFS/USA data load error:", ae);
                     }
@@ -44954,8 +44978,10 @@ const z_ = {
                     });
                 return K;
             }, [activeData, w, p, g]),
+            activeAfs = O.useMemo(() => fy === "FY27" ? fy27Afs : l, [fy, fy27Afs, l]),
+            activeUsa = O.useMemo(() => fy === "FY27" ? fy27Usa : s, [fy, fy27Usa, s]),
             A = O.useMemo(() => {
-                if (!l) return null;
+                if (!activeAfs) return null;
                 const K = {
                     currentMonth: {
                         b: 0,
@@ -44977,7 +45003,7 @@ const z_ = {
                 };
                 return (
                     Er.forEach((ae, se) => {
-                        const B = l.monthlyData[ae].actual;
+                        const B = activeAfs.monthlyData[ae].actual;
                         (K.monthly.push({
                                 month: ae,
                                 budget: 0,
@@ -44996,9 +45022,9 @@ const z_ = {
                     }),
                     K
                 );
-            }, [l]),
+            }, [activeAfs]),
             E = O.useMemo(() => {
-                if (!s) return null;
+                if (!activeUsa) return null;
                 const K = {
                     currentMonth: {
                         a: 0
@@ -45013,7 +45039,7 @@ const z_ = {
                 };
                 return (
                     Er.forEach((ae, se) => {
-                        const B = s.monthlyData[ae].actual;
+                        const B = activeUsa.monthlyData[ae].actual;
                         (K.monthly.push({
                                 month: ae,
                                 actual: B
@@ -45026,7 +45052,7 @@ const z_ = {
                     }),
                     K
                 );
-            }, [s]),
+            }, [activeUsa]),
             M = O.useMemo(() => {
                 if (!activeData) return null;
                 const K = {},
@@ -45831,7 +45857,7 @@ const z_ = {
                                                 children: [
                                                     j.jsx("h2", {
                                                         className: "text-2xl font-bold text-[#081C28]",
-                                                        children: "Sales Performance - AFS",
+                                                        children: "Sales Performance - AFS (" + fy + ")",
                                                     }),
                                                     j.jsx("a", {
                                                         href: "https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228",
@@ -45885,7 +45911,7 @@ const z_ = {
                                                 children: [
                                                     j.jsx("h2", {
                                                         className: "text-2xl font-bold text-[#081C28]",
-                                                        children: "Sales Performance - USA",
+                                                        children: "Sales Performance - USA (" + fy + ")",
                                                     }),
                                                     j.jsx("a", {
                                                         href: "https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228",
