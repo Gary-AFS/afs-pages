@@ -154,6 +154,11 @@
     <h2>Install on your Chromebook</h2>
     <ol class="steps">
       <li>Open <strong>Files</strong>, find <code>voice-dictation-extension.zip</code>, right-click it and choose <strong>Extract</strong>. You should get a folder with files like <code>manifest.json</code>, <code>background.js</code>, etc. directly inside it (no nested subfolder).</li>
+      <li><strong>Move the unzipped folder somewhere permanent</strong> before loading it into Chrome. Chrome reads the extension files directly from the folder you point it at &mdash; it does not copy them. If that folder gets deleted or cleaned up, the extension breaks.<br><br>
+        <strong>Where to put it:</strong><br>
+        <strong>ChromeOS / Chromebook:</strong> Open <strong>Files</strong>, go to <strong>My Files</strong>, and create a folder called <strong>Extensions</strong>. Move the unzipped folder there so the path is <code>My Files &rsaquo; Extensions &rsaquo; VoiceType</code>. Do not leave it in Downloads &mdash; ChromeOS can clean that folder out automatically.<br>
+        <strong>Mac:</strong> Move it to your home folder, e.g. <code>~/VoiceType</code>.<br>
+        <strong>Windows:</strong> Move it to <code>Documents\VoiceType</code>.</li>
       <li>Open Chrome and go to <strong><code>chrome://extensions</code></strong>.</li>
       <li>Turn on <strong>Developer mode</strong> (top-right toggle).</li>
       <li>Click <strong>Load unpacked</strong> (top-left) and select the extracted folder (the one containing <code>manifest.json</code>).</li>
