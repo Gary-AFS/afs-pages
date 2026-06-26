@@ -164,6 +164,11 @@
     <h2>Install on Chrome / Chromebook</h2>
     <ol class="steps">
       <li>Download the zip above and unzip it. You should get a folder with <code>manifest.json</code>, a <code>src/</code> folder, and an <code>icons/</code> folder directly inside (no nested subfolder). On ChromeOS, open <strong>Files</strong>, find the zip, right-click and choose <strong>Extract</strong>.</li>
+      <li><strong>Move the unzipped folder somewhere permanent</strong> before loading it into Chrome. Chrome reads the extension files directly from the folder you point it at - it does not copy them. If that folder gets deleted or cleaned up, the extension breaks.<br><br>
+        <strong>Where to put it:</strong><br>
+        <strong>ChromeOS / Chromebook:</strong> Open <strong>Files</strong>, go to <strong>My Files</strong>, and create a folder called <strong>Extensions</strong>. Move the unzipped folder there so the path is <code>My Files &rsaquo; Extensions &rsaquo; AFS Screen Recorder</code>. Do not leave it in Downloads - ChromeOS can clean that folder out automatically.<br>
+        <strong>Mac:</strong> Move it to your home folder, e.g. <code>~/AFS Screen Recorder</code>.<br>
+        <strong>Windows:</strong> Move it to <code>Documents\AFS Screen Recorder</code>.</li>
       <li>Open Chrome and go to <strong><code>chrome://extensions</code></strong>.</li>
       <li>Turn on <strong>Developer mode</strong> using the toggle in the top-right corner.</li>
       <li>Click <strong>Load unpacked</strong> (top-left) and select the unzipped folder - the one containing <code>manifest.json</code>. On ChromeOS, you can also drag the folder directly onto the extensions page.</li>
@@ -194,6 +199,8 @@
     <p>Chrome does not allow extensions to inject onto <code>chrome://</code> pages, the Chrome Web Store, or the built-in PDF viewer, so the head cannot show there. Also note the head only appears on pages opened or reloaded after the extension was installed - reload the tab if it is missing. Screen recording itself still works regardless; use the recorder toolbar or the extension icon to control it.</p>
     <h3>My webcam is not in the recording</h3>
     <p>When you first click Start Recording, Chrome will prompt for camera permission. Click <strong>Allow</strong>. If you previously dismissed or blocked the prompt, click the lock or tune icon in the address bar, find Camera, set it to <strong>Allow</strong>, and reload the page before trying again.</p>
+    <h3>"Your file couldn't be accessed" / ERR_FILE_NOT_FOUND</h3>
+    <p>Chrome reads the extension directly from the folder you selected during install. If that folder was moved, renamed, or deleted (common if it was left in Downloads), Chrome can no longer find the files. To fix: go to <strong><code>chrome://extensions</code></strong>, find AFS Screen Recorder, and click the <strong>reload</strong> button (circular arrow). If the folder is gone entirely, re-download the zip, unzip it to a permanent location (see install step 2), remove the broken extension, and load it fresh.</p>
     <h3>The video will not play in some apps</h3>
     <p>The recording is saved as a <code>.webm</code> file. It plays natively in Chrome and in Google Drive's built-in player. If another app cannot open it, upload it to Google Drive and play it there, or share the Drive link directly.</p>
     <details>
