@@ -63,7 +63,7 @@ h1,h2,h3,h4,h5,h6{font-family:'Montserrat',sans-serif}
 <script src="https://esm.sh/react-dom@19.1.0/client" type="module"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="text/babel" data-type="module">
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'https://esm.sh/react@19.1.0';
+import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'https://esm.sh/react@19.1.0';
 import { createRoot } from 'https://esm.sh/react-dom@19.1.0/client';
 
 // ===== THEME =====
@@ -211,6 +211,26 @@ const ProdImg = ({ src, alt, className }) => (
   </div>
 );
 
+// ===== INSTAGRAM EMBED =====
+const InstagramEmbed = ({ permalink }) => {
+  useEffect(() => {
+    const run = () => { if (window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); };
+    let s = document.getElementById('ig-embed-js');
+    if (!s) {
+      s = document.createElement('script');
+      s.id = 'ig-embed-js'; s.async = true; s.src = 'https://www.instagram.com/embed.js';
+      s.onload = run; document.body.appendChild(s);
+    } else { run(); }
+    const tmr = setTimeout(run, 900);
+    return () => clearTimeout(tmr);
+  }, [permalink]);
+  return (
+    <blockquote className="instagram-media" data-instgrm-permalink={permalink} data-instgrm-version="14"
+      style={{ background:'#FFF', border:0, borderRadius:'3px', margin:'0 auto', maxWidth:'340px', minWidth:'260px', width:'100%' }}>
+    </blockquote>
+  );
+};
+
 // ===== DATA =====
 const saleLineup = [
   { name: "Force USA G20 Pro", cat: "All-In-One", price: "$5,999", was: "$8,499", img: IMG.g20, tag: "Sharpest cut" },
@@ -319,15 +339,24 @@ const PlaySlide = ({ n, t }) => {
           <h3 className="font-display text-3xl tracking-wide leading-[0.98] relative z-10">NO HERO AIOs<br/>+ POST-EOFY DIP</h3>
           <p className="text-[14px] font-body opacity-95 leading-snug relative z-10 mt-3">Redirect ad spend to what's in stock and on sale.</p>
         </div>
-        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex-1 flex flex-col min-h-0`}>
-          <p className={`text-[13px] font-heading tracking-[.3em] ${th.sub} uppercase mb-3 shrink-0`}>Homepage Focus</p>
-          <div className="space-y-2.5 stagger">
-            {[["REP Focus","strength load while AIOs are short"],["Evergreen Cardio","keep cardio converting"],["STEPR VPR Banner","Jul 1 homepage hero"]].map(([a,b],i)=>(
-              <div key={i} className={`${th.bg3} rounded-lg p-3`}>
-                <p className={`text-[15px] font-heading font-semibold ${th.text} leading-tight`}>{a}</p>
-                <p className={`text-[13px] ${th.sub} font-body mt-0.5 leading-snug`}>{b}</p>
-              </div>
-            ))}
+        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex-1 flex flex-col min-h-0 gap-3`}>
+          <div className="shrink-0">
+            <p className={`text-[11px] font-heading tracking-[.25em] text-gaf-orange uppercase mb-2`}>Homepage Hero · Jul 1</p>
+            <div className={`${th.bg3} rounded-lg p-3`}>
+              <p className={`text-[15px] font-heading font-semibold ${th.text} leading-tight`}>STEPR VPR Banner</p>
+              <p className={`text-[13px] ${th.sub} font-body mt-0.5 leading-snug`}>The one homepage placement this month</p>
+            </div>
+          </div>
+          <div className="min-h-0">
+            <p className={`text-[11px] font-heading tracking-[.25em] ${th.sub} uppercase mb-2`}>Main Channel Ad Spend</p>
+            <div className="space-y-2 stagger">
+              {[["REP Focus","strength load while AIOs are short"],["Evergreen Cardio","keep cardio converting"]].map(([a,b],i)=>(
+                <div key={i} className={`${th.bg3} rounded-lg p-3`}>
+                  <p className={`text-[15px] font-heading font-semibold ${th.text} leading-tight`}>{a}</p>
+                  <p className={`text-[13px] ${th.sub} font-body mt-0.5 leading-snug`}>{b}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -388,7 +417,6 @@ const QRLSlide = ({ n, t }) => {
             {[
               { d: "Thu 2 Jul", w: "Camp 3 Winner Shoot — Sunshine Coast", note: "Lachy interviews the competition winners. QRL's videographer films (external cameras are restricted), raw footage comes back to Lionel to edit." },
               { d: "Wed 8 Jul", w: "Game III Decider — Suncorp, Brisbane", note: "Home-state final. Peak Maroons sentiment and the window the content and product range are timed to." },
-              { d: "Ongoing", w: "Recovery Collab → runs as Revel", note: "The recovery angle sits with Revel, not GAF — keep the brand lanes clean." },
             ].map((p, i) => (
               <div key={i} className="flex gap-3 items-start">
                 <div className="w-[78px] shrink-0">
@@ -439,17 +467,19 @@ const HyroxSlide = ({ n, t }) => {
   <Slide num={n} total={t}>
     <SectionTitle pre="On the Ground — Race Weekend Fri 3 July" title="HYROX SYDNEY" sub="The finale of our '90 Days to Sub 60' series with athlete Indigo Carthew. We're manning the Centr × Hyrox booth as the Australian distributor." />
     <div className="flex gap-6 flex-1 min-h-0">
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="bg-gaf-orange rounded-lg p-8 text-white relative overflow-hidden flex-1 flex flex-col justify-center">
-          <div className="absolute -right-8 -top-8 opacity-10"><Activity size={240} /></div>
-          <div className="absolute -left-6 -bottom-6 opacity-5"><Flame size={200} /></div>
-          <p className="text-[14px] font-heading tracking-[.4em] uppercase opacity-90 mb-3 relative z-10">The Series Finale</p>
-          <h3 className="font-display text-[5.5rem] tracking-wide leading-[0.85] relative z-10">90 DAYS<br/>TO SUB 60</h3>
-          <div className="w-16 h-[2px] bg-white mt-5 mb-4 relative z-10"></div>
-          <p className="text-[17px] font-body opacity-95 leading-snug relative z-10 max-w-lg">We followed Indigo Carthew's 90-day build to a sub-60 Hyrox. Race day is the payoff — and we're there filming it.</p>
+      <div className="w-[380px] shrink-0 flex flex-col min-h-0">
+        <div className={`bg-white border ${th.cardBorder} rounded-lg p-3 flex-1 min-h-0 overflow-auto flex items-start justify-center`}>
+          <InstagramEmbed permalink={"https://www.instagram.com/reel/DZZas6ExkxP/?utm_source=ig_embed&utm_campaign=loading"} />
         </div>
+        <p className={`text-[12px] ${th.muted} font-body mt-2 text-center`}>@gymandfitness · the series in motion</p>
       </div>
-      <div className="w-[420px] shrink-0 flex flex-col gap-3 min-h-0">
+      <div className="flex-1 flex flex-col gap-3 min-h-0">
+        <div className="bg-gaf-orange rounded-lg p-5 text-white relative overflow-hidden shrink-0">
+          <div className="absolute -right-6 -top-6 opacity-10"><Activity size={150} /></div>
+          <p className="text-[13px] font-heading tracking-[.4em] uppercase opacity-90 mb-2 relative z-10">The Series Finale</p>
+          <h3 className="font-display text-5xl tracking-wide leading-[0.92] relative z-10">90 DAYS TO SUB 60</h3>
+          <p className="text-[15px] font-body opacity-95 leading-snug relative z-10 mt-2 max-w-xl">We followed Indigo Carthew's 90-day build to a sub-60 Hyrox. Race day is the payoff, and we're there filming it.</p>
+        </div>
         <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex flex-col min-h-0 flex-1`}>
           <div className="flex items-center gap-2 mb-3 shrink-0">
             <Film size={16} className="text-gaf-orange" />
@@ -498,7 +528,7 @@ const RepSlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="Homepage Focus" title="REP + CARDIO PUSH" sub="Two of the three homepage pillars. With All-in-Ones short, REP power racks carry the strength load, and the Evergreen Cardio piece keeps cardio front of mind." />
+    <SectionTitle pre="Main Channel Ad Spend" title="REP + CARDIO PUSH" sub="The two main-channel ad-spend priorities for July (the STEPR VPR banner is the homepage piece). With All-in-Ones short, REP power racks carry the strength load and the Evergreen Cardio piece keeps cardio converting." />
     <div className="flex gap-6 flex-1 min-h-0">
       <div className="flex-1 flex flex-col gap-3 min-h-0">
         <div className="flex items-center gap-2 shrink-0">
