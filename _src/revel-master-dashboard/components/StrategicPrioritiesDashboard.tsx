@@ -4,6 +4,13 @@ import { Flag, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 const ASANA_PROJECT_GID = "1213307020658494";
 // Asana PAT is held server-side in the asana-api-proxy Worker; the client never sees it.
 const ASANA_PROXY = "https://asana-api-proxy.josh-03c.workers.dev";
+// The Revel tasks carry two fields both named "Sprint": a Revel-only plain Q1-Q4 field
+// and the company-wide fiscal-year field (Q1FY27 etc.) that GAF/Force also use. Pin to
+// the fiscal-year field by gid so Revel's labels match the other dashboards.
+const SPRINT_FIELD_GID = "1210131615107135";
+const findSprintField = (cf: any[]) =>
+    cf.find((f: any) => f.gid === SPRINT_FIELD_GID) ||
+    cf.find((f: any) => f.name === "Sprint" || f.name.toLowerCase().includes("sprint"));
 
 function getCurrentSprint(): string {
     const now = new Date();
@@ -43,7 +50,7 @@ async function fetchAsanaInitiatives(): Promise<{ tasks: any[]; sprintOptions: s
 
     tasks.forEach((task: any) => {
         const cf = task.custom_fields || [];
-        const sprintField = cf.find((f: any) => f.name === "Sprint" || f.name.toLowerCase().includes("sprint"));
+        const sprintField = findSprintField(cf);
         if (sprintField) {
             if (sprintField.display_value) sprintOptionsSet.add(sprintField.display_value);
             if (sprintField.enum_options && !enumOptions.length) {
@@ -70,7 +77,7 @@ async function fetchAsanaInitiatives(): Promise<{ tasks: any[]; sprintOptions: s
 
         const cf = task.custom_fields || [];
         const priorityStatus = cf.find((f: any) => f.name === "STRATEGIC PRIORITY STATUS" || f.name.toLowerCase().includes("status"))?.display_value || "";
-        const sprint = cf.find((f: any) => f.name === "Sprint" || f.name.toLowerCase().includes("sprint"))?.display_value || "";
+        const sprint = findSprintField(cf)?.display_value || "";
 
         return {
             gid: task.gid,
