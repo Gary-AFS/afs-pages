@@ -49,7 +49,8 @@ const currentQuarterIndex = Math.floor(fyMonthIndex / 3)
 const currentQuarter = ["Q1", "Q2", "Q3", "Q4"][currentQuarterIndex]
 const lastQuarterIndex = (currentQuarterIndex - 1 + 4) % 4
 const lastQuarter = ["Q1", "Q2", "Q3", "Q4"][lastQuarterIndex]
-const fiscalYearLabel = "FY26"
+const fiscalYear = today.getMonth() >= 6 ? today.getFullYear() + 1 : today.getFullYear()
+const fiscalYearLabel = `FY${String(fiscalYear).slice(-2)}`
 
 // Calendar Year Helpers (Jan - Dec) - For USA
 const currentCalMonthIndex = today.getMonth()
@@ -374,11 +375,11 @@ const ShowroomTable = ({ data }: any) => {
 /*  MONTHLY PERFORMANCE CHART (GLOBAL)                                        */
 /* -------------------------------------------------------------------------- */
 
-const MonthlyPerformanceChart = ({ data }: { data: any }) => {
+const MonthlyPerformanceChart = ({ data, fyLabel }: { data: any; fyLabel: string }) => {
   if (!data) return null
 
   const chartData = data.monthly.map((item: any, index: number) => ({
-    month: item.month.substring(0, 3), // JUL, AUG, etc.
+    month: item.month.substring(0, 3),
     actual: item.actual,
     budget: item.budget,
     isCurrent: index === fyMonthIndex,
@@ -393,7 +394,7 @@ const MonthlyPerformanceChart = ({ data }: { data: any }) => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <div className="w-2 h-6 bg-[#185787] rounded-full" />
-          <h3 className="text-xl font-bold text-[#081C28]">Monthly Performance - {fiscalYearLabel}</h3>
+          <h3 className="text-xl font-bold text-[#081C28]">Monthly Performance - {fyLabel}</h3>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
@@ -492,11 +493,11 @@ const MonthlyPerformanceChart = ({ data }: { data: any }) => {
 /*  AFS MONTHLY PERFORMANCE CHART                                             */
 /* -------------------------------------------------------------------------- */
 
-const AFSMonthlyPerformanceChart = ({ data }: { data: any }) => {
+const AFSMonthlyPerformanceChart = ({ data, fyLabel }: { data: any; fyLabel: string }) => {
   if (!data) return null
 
   const chartData = data.monthly.map((item: any, index: number) => ({
-    month: item.month.substring(0, 3), // JUL, AUG, etc.
+    month: item.month.substring(0, 3),
     actual: item.actual,
     isCurrent: index === fyMonthIndex,
     isPast: index < fyMonthIndex,
@@ -508,7 +509,7 @@ const AFSMonthlyPerformanceChart = ({ data }: { data: any }) => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <div className="w-2 h-6 bg-[#00AC75] rounded-full" />
-          <h3 className="text-xl font-bold text-[#081C28]">Monthly Performance (AFS) - {fiscalYearLabel}</h3>
+          <h3 className="text-xl font-bold text-[#081C28]">Monthly Performance (AFS) - {fyLabel}</h3>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
@@ -574,11 +575,11 @@ const AFSMonthlyPerformanceChart = ({ data }: { data: any }) => {
 /*  USA MONTHLY PERFORMANCE CHART                                             */
 /* -------------------------------------------------------------------------- */
 
-const USAMonthlyPerformanceChart = ({ data }: { data: any }) => {
+const USAMonthlyPerformanceChart = ({ data, fyLabel }: { data: any; fyLabel: string }) => {
   if (!data) return null
 
   const chartData = data.monthly.map((item: any, index: number) => ({
-    month: item.month.substring(0, 3), 
+    month: item.month.substring(0, 3),
     actual: item.actual,
     isCurrent: index === fyMonthIndex,
     isPast: index < fyMonthIndex,
@@ -590,7 +591,7 @@ const USAMonthlyPerformanceChart = ({ data }: { data: any }) => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <div className="w-2 h-6 bg-[#D92D20] rounded-full" />
-          <h3 className="text-xl font-bold text-[#081C28]">Monthly Performance (USA) - {fiscalYearLabel}</h3>
+          <h3 className="text-xl font-bold text-[#081C28]">Monthly Performance (USA) - {fyLabel}</h3>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
@@ -662,12 +663,18 @@ const USAMonthlyPerformanceChart = ({ data }: { data: any }) => {
 
 const SalesHealthDashboard = () => {
   const [salesData, setSalesData] = useState<any>(null)
+  const [fy27Data, setFy27Data] = useState<any>(null)
   const [showroomData, setShowroomData] = useState<any>(null)
   const [afsData, setAfsData] = useState<any>(null)
   const [usaData, setUsaData] = useState<any>(null)
+  const [fy27Afs, setFy27Afs] = useState<any>(null)
+  const [fy27Usa, setFy27Usa] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [selectedCustomer, setCustomer] = useState("All")
   const [selectedCountry, setCountry] = useState("All")
+  const [fyExport, setFyExport] = useState(fiscalYearLabel)
+  const [fyAfs, setFyAfs] = useState(fiscalYearLabel)
+  const [fyUsa, setFyUsa] = useState(fiscalYearLabel)
 
   /* ----------- LOAD SALES CSV ---------------------------------- */
   useEffect(() => {
@@ -728,6 +735,63 @@ const SalesHealthDashboard = () => {
     load()
   }, [])
 
+  /* ----------- LOAD FY27 SALES CSV ----------------------------- */
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const url =
+          "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiboUvN6uqddlmcX7SqCwKbgtDrvxffq945XtCYb8qQNhOTZXZZ_phwIZQR3VVjti_CI4EjJDZR-lB/pub?gid=1758000461&single=true&output=csv"
+        const csv = await (await fetch(url + "&t=" + new Date().getTime(), { cache: "no-store" })).text()
+        const rows = Papa.parse(csv, { header: false, skipEmptyLines: true }).data as string[][]
+        const customers: any[] = []
+        let totalRow: any = null
+
+        for (let i = 2; i < rows.length; i++) {
+          const row = rows[i]
+          const nameRaw = row[0]?.toString().trim()
+          if (!nameRaw) continue
+
+          if (/^TOTAL\b/i.test(nameRaw)) {
+            totalRow = row
+            break
+          }
+
+          if (/licen[cs]e fee/i.test(nameRaw)) continue
+          if (/^NEW CUSTOMERS$/i.test(nameRaw)) continue
+
+          const country = row[1]?.toString().trim() || "Unknown"
+          const cust: any = { name: nameRaw, country, monthlyData: {} as any }
+
+          fyMonths.forEach((m) => {
+            const col = monthColumns[m as keyof typeof monthColumns]
+            cust.monthlyData[m] = {
+              budget: cleanCurrency(row[col.budget]),
+              actual: cleanCurrency(row[col.actual]),
+            }
+          })
+          customers.push(cust)
+        }
+
+        let parsedTotalRow: any = null
+        if (totalRow) {
+          parsedTotalRow = { monthlyData: {} }
+          fyMonths.forEach((m) => {
+            const col = monthColumns[m as keyof typeof monthColumns]
+            parsedTotalRow.monthlyData[m] = {
+              budget: cleanCurrency(totalRow[col.budget]),
+              actual: cleanCurrency(totalRow[col.actual]),
+            }
+          })
+        }
+
+        setFy27Data({ customers, totalRow: parsedTotalRow })
+      } catch (e) {
+        console.error("FY27 sales data load error:", e)
+      }
+    }
+    load()
+  }, [])
+
   /* ----------- LOAD AFS & USA CSV ------------------------------ */
   useEffect(() => {
     const load = async () => {
@@ -742,10 +806,14 @@ const SalesHealthDashboard = () => {
 
         const afsMonthly: any = {}
         const usaMonthly: any = {}
-        
+        const afs27Monthly: any = {}
+        const usa27Monthly: any = {}
+
         fyMonths.forEach((m) => {
           afsMonthly[m] = { actual: 0 }
           usaMonthly[m] = { actual: 0 }
+          afs27Monthly[m] = { actual: 0 }
+          usa27Monthly[m] = { actual: 0 }
         })
 
         const monthMapping: { [key: string]: string } = {
@@ -763,22 +831,43 @@ const SalesHealthDashboard = () => {
           "June 2026": "JUNE",
         }
 
-        // Start from row 1 to skip headers
+        const monthMapping27: { [key: string]: string } = {
+          "July 2026": "JULY",
+          "August 2026": "AUGUST",
+          "September 2026": "SEPTEMBER",
+          "October 2026": "OCTOBER",
+          "November 2026": "NOVEMBER",
+          "December 2026": "DECEMBER",
+          "January 2027": "JANUARY",
+          "February 2027": "FEBRUARY",
+          "March 2027": "MARCH",
+          "April 2027": "APRIL",
+          "May 2027": "MAY",
+          "June 2027": "JUNE",
+        }
+
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i]
             const monthRaw = (row[0] || "").toString().trim()
-            const afsVal = cleanCurrency(row[1]) // Column B
-            const usaVal = cleanCurrency(row[2]) // Column C
-            
+            const afsVal = cleanCurrency(row[1])
+            const usaVal = cleanCurrency(row[2])
+
             const fyMonth = monthMapping[monthRaw]
             if (fyMonth) {
                 afsMonthly[fyMonth].actual = afsVal
                 usaMonthly[fyMonth].actual = usaVal
             }
+            const fy27Month = monthMapping27[monthRaw]
+            if (fy27Month) {
+                afs27Monthly[fy27Month].actual = afsVal
+                usa27Monthly[fy27Month].actual = usaVal
+            }
         }
-        
+
         setAfsData({ monthlyData: afsMonthly })
         setUsaData({ monthlyData: usaMonthly })
+        setFy27Afs({ monthlyData: afs27Monthly })
+        setFy27Usa({ monthlyData: usa27Monthly })
       } catch (e) {
         console.error("AFS/USA data load error:", e)
       }
@@ -859,17 +948,21 @@ const SalesHealthDashboard = () => {
     if (salesData && showroomData && afsData && usaData) setLoading(false)
   }, [salesData, showroomData, afsData, usaData])
 
+  const activeData = useMemo(() => fyExport === "FY27" ? fy27Data : salesData, [fyExport, fy27Data, salesData])
+  const activeAfs = useMemo(() => fyAfs === "FY27" ? fy27Afs : afsData, [fyAfs, fy27Afs, afsData])
+  const activeUsa = useMemo(() => fyUsa === "FY27" ? fy27Usa : usaData, [fyUsa, fy27Usa, usaData])
+
   /* ---------------- SALES FILTERS & METRICS -------------------- */
   const filtered = useMemo(() => {
-    if (!salesData) return null
-    let arr = salesData.customers
+    if (!activeData) return null
+    let arr = activeData.customers
     if (selectedCustomer !== "All") arr = arr.filter((c: any) => c.name === selectedCustomer)
     if (selectedCountry !== "All") arr = arr.filter((c: any) => c.country === selectedCountry)
     return arr
-  }, [salesData, selectedCustomer, selectedCountry])
+  }, [activeData, selectedCustomer, selectedCountry])
 
   const summary = useMemo(() => {
-    if (!salesData) return null
+    if (!activeData) return null
     const out: any = {
       currentMonth: { b: 0, a: 0 },
       nextMonth: { b: 0, a: 0 },
@@ -879,10 +972,10 @@ const SalesHealthDashboard = () => {
       monthly: [] as any[],
     }
 
-    const useTotalRow = selectedCustomer === "All" && selectedCountry === "All" && salesData.totalRow;
+    const useTotalRow = selectedCustomer === "All" && selectedCountry === "All" && activeData.totalRow;
 
     if (useTotalRow) {
-         const t = salesData.totalRow;
+         const t = activeData.totalRow;
          fyMonths.forEach((m, idx) => {
             const mb = t.monthlyData[m].budget;
             const ma = t.monthlyData[m].actual;
@@ -932,11 +1025,11 @@ const SalesHealthDashboard = () => {
     }
     
     return out
-  }, [salesData, filtered, selectedCustomer, selectedCountry])
+  }, [activeData, filtered, selectedCustomer, selectedCountry])
 
   /* ---------------- AFS METRICS -------------------------------- */
   const afsSummary = useMemo(() => {
-    if (!afsData) return null
+    if (!activeAfs) return null
     const out: any = {
       currentMonth: { b: 0, a: 0 },
       nextMonth: { b: 0, a: 0 },
@@ -946,7 +1039,7 @@ const SalesHealthDashboard = () => {
     }
 
     fyMonths.forEach((m, idx) => {
-      const ma = afsData.monthlyData[m].actual
+      const ma = activeAfs.monthlyData[m].actual
       out.monthly.push({ month: m, budget: 0, actual: ma })
       if (m === currentMonth) out.currentMonth = { b: 0, a: ma }
       if (m === nextMonth) out.nextMonth = { b: 0, a: ma }
@@ -958,11 +1051,11 @@ const SalesHealthDashboard = () => {
       }
     })
     return out
-  }, [afsData])
+  }, [activeAfs])
 
   /* ---------------- USA METRICS -------------------------------- */
   const usaSummary = useMemo(() => {
-    if (!usaData) return null
+    if (!activeUsa) return null
     const out: any = {
       currentMonth: { a: 0 },
       currentQuarter: { a: 0 },
@@ -971,7 +1064,7 @@ const SalesHealthDashboard = () => {
     }
 
     fyMonths.forEach((m, idx) => {
-      const ma = usaData.monthlyData[m].actual
+      const ma = activeUsa.monthlyData[m].actual
       out.monthly.push({ month: m, actual: ma })
       
       if (m === currentMonth) out.currentMonth = { a: ma }
@@ -983,10 +1076,10 @@ const SalesHealthDashboard = () => {
       }
     })
     return out
-  }, [usaData])
+  }, [activeUsa])
 
   const revenueGroups: RevenueGroups | null = useMemo(() => {
-    if (!salesData) return null
+    if (!activeData) return null
     const groups: any = {}
     const push = (g: string, c: any, act: number, bud: number) => {
       if (!groups[g]) groups[g] = { customers: [], countries: new Set<string>(), totalActual: 0, totalBudget: 0 }
@@ -999,7 +1092,7 @@ const SalesHealthDashboard = () => {
     let grandActual = 0
     let grandBudget = 0
 
-    salesData.customers.forEach((c: any) => {
+    activeData.customers.forEach((c: any) => {
       let ytdA = 0
       let ytdB = 0
       fyMonths.forEach((m, idx) => {
@@ -1020,15 +1113,15 @@ const SalesHealthDashboard = () => {
 
     Object.values(groups).forEach((g: any) => (g.countries = [...g.countries].sort()))
     return { groups, grandActual, grandBudget }
-  }, [salesData])
+  }, [activeData])
 
   const uniqueCustomers = useMemo<string[]>(
-    () => (salesData ? ([...new Set(salesData.customers.map((c: any) => c.name))] as string[]).sort() : []),
-    [salesData],
+    () => (activeData ? ([...new Set(activeData.customers.map((c: any) => c.name))] as string[]).sort() : []),
+    [activeData],
   )
   const uniqueCountries = useMemo<string[]>(
-    () => (salesData ? ([...new Set(salesData.customers.map((c: any) => c.country))] as string[]).sort() : []),
-    [salesData],
+    () => (activeData ? ([...new Set(activeData.customers.map((c: any) => c.country))] as string[]).sort() : []),
+    [activeData],
   )
 
   /* ---------------------- Helpers for BHAG --------------------- */
@@ -1303,13 +1396,25 @@ const SalesHealthDashboard = () => {
 
         {/* Sales Performance Section */}
         <div className="pt-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-3 h-8 bg-[#185787] rounded-full" />
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold text-[#081C28]">Sales Performance</h2>
-              <a href="https://docs.google.com/spreadsheets/d/1fHUXMDuxFKG3pktlbwFfsmQ4JuEis5GA_Aa-WLQEAEU/edit?pli=1&gid=2093632728#gid=2093632728" target="_blank" rel="noreferrer" title="Source Data">
-                <Info className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
-              </a>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-8 bg-[#185787] rounded-full" />
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-[#081C28]">Sales Performance</h2>
+                <a href={fyExport === "FY27" ? "https://docs.google.com/spreadsheets/d/1fHUXMDuxFKG3pktlbwFfsmQ4JuEis5GA_Aa-WLQEAEU/edit?gid=1758000461#gid=1758000461" : "https://docs.google.com/spreadsheets/d/1fHUXMDuxFKG3pktlbwFfsmQ4JuEis5GA_Aa-WLQEAEU/edit?pli=1&gid=2093632728#gid=2093632728"} target="_blank" rel="noreferrer" title="Source Data">
+                  <Info className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
+                </a>
+              </div>
+            </div>
+            <div className="flex rounded-xl overflow-hidden border border-[#A5AEB7] shadow-sm">
+              <button
+                onClick={() => { setFyExport("FY26"); setCustomer("All"); setCountry("All"); }}
+                className={`px-5 py-3 text-sm font-semibold transition-colors ${fyExport === "FY26" ? "bg-[#185787] text-white" : "bg-white text-[#425660] hover:bg-gray-50"}`}
+              >FY26</button>
+              <button
+                onClick={() => { setFyExport("FY27"); setCustomer("All"); setCountry("All"); }}
+                className={`px-5 py-3 text-sm font-semibold transition-colors ${fyExport === "FY27" ? "bg-[#185787] text-white" : "bg-white text-[#425660] hover:bg-gray-50"}`}
+              >FY27</button>
             </div>
           </div>
 
@@ -1367,7 +1472,7 @@ const SalesHealthDashboard = () => {
         </div>
 
         {/* Monthly Performance Chart */}
-        <MonthlyPerformanceChart data={summary} />
+        <MonthlyPerformanceChart data={summary} fyLabel={fyExport} />
 
         {/* Revenue by Market Group */}
         <div className="bg-white border border-[#A5AEB7] rounded-2xl p-6 mb-8">
@@ -1383,13 +1488,25 @@ const SalesHealthDashboard = () => {
 
         {/* AFS AUSTRALIA SECTION */}
         <div className="pt-12 border-t-4 border-[#00AC75] mt-12">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-3 h-8 bg-[#00AC75] rounded-full" />
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold text-[#081C28]">Sales Performance - AFS</h2>
-              <a href="https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228" target="_blank" rel="noreferrer" title="Source Data">
-                <Info className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
-              </a>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-8 bg-[#00AC75] rounded-full" />
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-[#081C28]">Sales Performance - AFS</h2>
+                <a href="https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228" target="_blank" rel="noreferrer" title="Source Data">
+                  <Info className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
+                </a>
+              </div>
+            </div>
+            <div className="flex rounded-xl overflow-hidden border border-[#00AC75] shadow-sm">
+              <button
+                onClick={() => setFyAfs("FY26")}
+                className={`px-4 py-2 text-sm font-semibold transition-colors ${fyAfs === "FY26" ? "bg-[#00AC75] text-white" : "bg-white text-[#425660] hover:bg-gray-50"}`}
+              >FY26</button>
+              <button
+                onClick={() => setFyAfs("FY27")}
+                className={`px-4 py-2 text-sm font-semibold transition-colors ${fyAfs === "FY27" ? "bg-[#00AC75] text-white" : "bg-white text-[#425660] hover:bg-gray-50"}`}
+              >FY27</button>
             </div>
           </div>
 
@@ -1401,18 +1518,30 @@ const SalesHealthDashboard = () => {
           </div>
 
           {/* AFS Monthly Performance Chart */}
-          <AFSMonthlyPerformanceChart data={afsSummary} />
+          <AFSMonthlyPerformanceChart data={afsSummary} fyLabel={fyAfs} />
         </div>
 
         {/* USA SECTION */}
         <div className="pt-12 border-t-4 border-[#D92D20] mt-12">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-3 h-8 bg-[#D92D20] rounded-full" />
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold text-[#081C28]">Sales Performance - USA</h2>
-              <a href="https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228" target="_blank" rel="noreferrer" title="Source Data">
-                <Info className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
-              </a>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-8 bg-[#D92D20] rounded-full" />
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-[#081C28]">Sales Performance - USA</h2>
+                <a href="https://docs.google.com/spreadsheets/d/1W0qacynbijOaoksvt9QLAYS0M-aOV2ot0_wTvmDacqk/edit?gid=2041734228#gid=2041734228" target="_blank" rel="noreferrer" title="Source Data">
+                  <Info className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
+                </a>
+              </div>
+            </div>
+            <div className="flex rounded-xl overflow-hidden border border-[#D92D20] shadow-sm">
+              <button
+                onClick={() => setFyUsa("FY26")}
+                className={`px-4 py-2 text-sm font-semibold transition-colors ${fyUsa === "FY26" ? "bg-[#D92D20] text-white" : "bg-white text-[#425660] hover:bg-gray-50"}`}
+              >FY26</button>
+              <button
+                onClick={() => setFyUsa("FY27")}
+                className={`px-4 py-2 text-sm font-semibold transition-colors ${fyUsa === "FY27" ? "bg-[#D92D20] text-white" : "bg-white text-[#425660] hover:bg-gray-50"}`}
+              >FY27</button>
             </div>
           </div>
 
@@ -1424,7 +1553,7 @@ const SalesHealthDashboard = () => {
           </div>
 
           {/* USA Monthly Performance Chart */}
-          <USAMonthlyPerformanceChart data={usaSummary} />
+          <USAMonthlyPerformanceChart data={usaSummary} fyLabel={fyUsa} />
         </div>
       </section>
 
