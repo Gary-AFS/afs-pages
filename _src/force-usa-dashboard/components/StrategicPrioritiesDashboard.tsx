@@ -261,7 +261,7 @@ export default function StrategicPrioritiesDashboard() {
                                             </div>
 
                                             <div className="w-8 h-8 rounded-full bg-[#c5ddf7] text-[#185787] flex items-center justify-center text-xs font-bold shrink-0 mt-1 md:mt-0" title={task.assigneeName}>
-                                                {task.assigneeName ? task.assigneeName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : '??'}
+                                                {task.assigneeName ? (task.assigneeName.includes(' ') ? task.assigneeName.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : task.assigneeName.substring(0, 2)).toUpperCase() : '??'}
                                             </div>
 
                                             <div className="flex-1 pr-0 md:pr-6 flex flex-col justify-center min-w-0">
