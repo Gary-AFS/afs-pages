@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import Papa from 'papaparse';
 import { Target, Flag, Star, Heart, Mountain, Compass, MapPin, Rocket, TrendingUp, Loader2, Shield, AlertTriangle, Lightbulb, Users, Crosshair, Calendar } from 'lucide-react';
 
 const FORCE_USA_DOC_URL = "https://docs.google.com/document/d/e/2PACX-1vQPEzXwMibBUTbQ8CzisOeZmHNUypfxF-vQtJvCdv32pa6PN5gnQYlMZTzYiJFPd0OVg8OJFkr9mgxe/pub";
@@ -8,9 +9,81 @@ const PROXIES = [
   (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
 ];
 
+const fyMonths = ["JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER","JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE"];
+const today = new Date();
+const fyMonthIndex = (today.getMonth() + 6) % 12;
+const monthColumns: Record<string, { budget: number; actual: number }> = {
+  JULY: { budget: 2, actual: 3 }, AUGUST: { budget: 4, actual: 5 },
+  SEPTEMBER: { budget: 6, actual: 7 }, OCTOBER: { budget: 8, actual: 9 },
+  NOVEMBER: { budget: 10, actual: 11 }, DECEMBER: { budget: 12, actual: 13 },
+  JANUARY: { budget: 16, actual: 17 }, FEBRUARY: { budget: 18, actual: 19 },
+  MARCH: { budget: 20, actual: 21 }, APRIL: { budget: 22, actual: 23 },
+  MAY: { budget: 24, actual: 25 }, JUNE: { budget: 26, actual: 27 },
+};
+
+const europeCountries = ["Austria","Belgium","Bulgaria","Croatia","Cyprus","Czechia","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Ireland","Italy","Latvia","Lithuania","Luxembourg","Malta","Netherlands","Poland","Portugal","Romania","Slovakia","Slovenia","Spain","Sweden","United Kingdom","UK","Norway","Switzerland","Ukraine"];
+const euCountryCodes = ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","GB","UK","NO","CH","UA"];
+
+const cleanCurrency = (v: any) => {
+  if (!v) return 0;
+  const n = Number.parseFloat(v.toString().replace(/[$,\s]/g, ""));
+  return Number.isNaN(n) ? 0 : n;
+};
+const formatCompactCurrency = (v: number) =>
+  v >= 1_000_000 ? `$${(v / 1_000_000).toFixed(2)}M` : v >= 1_000 ? `$${(v / 1_000).toFixed(2)}K` : new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+
+const ShowroomTable = ({ data }: any) => {
+  const [open, setOpen] = useState<Set<string>>(new Set());
+  if (!data) return null;
+  const { byCountry } = data;
+  const toggle = (c: string) => { const n = new Set(open); n.has(c) ? n.delete(c) : n.add(c); setOpen(n); };
+
+  return (
+    <div className="overflow-auto max-h-96">
+      <table className="w-full">
+        <thead className="sticky top-0 bg-gray-50 z-10">
+          <tr className="border-b-2 border-gray-200 text-left text-sm font-semibold text-gray-500">
+            <th className="py-3 px-3 bg-gray-50">Country</th>
+            <th className="py-3 px-3 bg-gray-50">Store</th>
+            <th className="py-3 px-3 text-right bg-gray-50">Unit Count</th>
+            <th className="py-3 px-3 bg-gray-50">Models</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(byCountry).map(([country, d]: any) => (
+            <React.Fragment key={country}>
+              <tr onClick={() => toggle(country)} className={`cursor-pointer border-b transition-colors hover:bg-gray-50 ${open.has(country) ? "bg-gray-50" : ""}`}>
+                <td className="py-3 px-3">
+                  <div className="flex items-center gap-3">
+                    <div className="font-bold text-[#185787]">{country}</div>
+                    <div className="ml-auto"><span className="text-lg text-gray-400">{open.has(country) ? "▼" : "▶"}</span></div>
+                  </div>
+                </td>
+                <td className="py-3 px-3 text-sm text-gray-500">{d.stores.length} stores</td>
+                <td className="py-3 px-3 text-right font-bold text-lg text-[#185787]">{d.totalUnits}</td>
+                <td className="py-3 px-3" />
+              </tr>
+              {open.has(country) && d.stores.map((s: any, i: number) => (
+                <tr key={s.id} className="border-b hover:bg-gray-50" style={{ backgroundColor: i % 2 ? "#FFFFFF" : "#FAFBFC" }}>
+                  <td className="py-3 pl-8" />
+                  <td className="py-3 px-3"><div className="font-medium text-sm text-gray-800">{s.store}</div></td>
+                  <td className="py-3 px-3 text-right text-sm text-gray-800">{s.unitCount}</td>
+                  <td className="py-3 px-3 text-sm text-gray-500 font-medium">{s.models.length > 0 ? s.models.join(", ") : "-"}</td>
+                </tr>
+              ))}
+            </React.Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 export default function OPSPDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [opspData, setOpspData] = useState<any>(null);
+  const [showroomData, setShowroomData] = useState<any>(null);
+  const [revenueYtd, setRevenueYtd] = useState<number>(0);
 
   const fallbackData = {
     coreValues: ["PEOPLE", "NIMBAGILITY", "CONTINUOUS IMPROVEMENT", "COLLABORATION", "EMPATHY", "INCLUSIVITY"],
@@ -95,7 +168,6 @@ export default function OPSPDashboard() {
     const fetchData = async () => {
       try {
         const docUrl = `${FORCE_USA_DOC_URL}?_t=${Date.now()}`;
-
         let htmlContent: string | null = null;
         for (const proxyFn of PROXIES) {
           try {
@@ -122,11 +194,8 @@ export default function OPSPDashboard() {
         const lines = (doc.body.textContent || '').split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0);
 
         const parsed = { ...fallbackData };
-
-        const looksLikeCode = (s: string) =>
-          /[{};]|=>|\bfunction\b|prototype|\bvar\b|typeof/.test(s);
+        const looksLikeCode = (s: string) => /[{};]|=>|\bfunction\b|prototype|\bvar\b|typeof/.test(s);
         const clean = (s: string | null) => (s && !looksLikeCode(s) ? s : null);
-
         const findValueAfter = (header: string, offset = 1) => {
           const idx = lines.findIndex((l: string) => l.toUpperCase().includes(header.toUpperCase()));
           if (idx !== -1 && lines[idx + offset]) return lines[idx + offset];
@@ -135,10 +204,8 @@ export default function OPSPDashboard() {
 
         const purpose = clean(findValueAfter("Purpose (Why)"));
         if (purpose) parsed.purpose = purpose;
-
         const bhag = clean(findValueAfter("BHAG (Big Hairy Audacious Goal)"));
         if (bhag) parsed.bhag = bhag;
-
         const fy30Rev = clean(findValueAfter("FY30", 1));
         if (fy30Rev && fy30Rev.includes("$")) parsed.fy30Revenue = fy30Rev;
 
@@ -152,6 +219,86 @@ export default function OPSPDashboard() {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiboUvN6uqddlmcX7SqCwKbgtDrvxffq945XtCYb8qQNhOTZXZZ_phwIZQR3VVjti_CI4EjJDZR-lB/pub?gid=2093632728&single=true&output=csv";
+        const csv = await (await fetch(url + "&t=" + new Date().getTime(), { cache: "no-store" })).text();
+        const rows = Papa.parse(csv, { header: false, skipEmptyLines: true }).data as string[][];
+        for (let i = 2; i < rows.length; i++) {
+          const nameRaw = rows[i][0]?.toString().trim();
+          if (nameRaw && /^TOTAL\b/i.test(nameRaw)) {
+            let ytdActual = 0;
+            fyMonths.forEach((m, idx) => {
+              if (idx <= fyMonthIndex) {
+                ytdActual += cleanCurrency(rows[i][monthColumns[m].actual]);
+              }
+            });
+            setRevenueYtd(ytdActual);
+            break;
+          }
+        }
+      } catch (e) {
+        console.error("Revenue data load error:", e);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiboUvN6uqddlmcX7SqCwKbgtDrvxffq945XtCYb8qQNhOTZXZZ_phwIZQR3VVjti_CI4EjJDZR-lB/pub?gid=2034170474&single=true&output=csv";
+        const csv = await (await fetch(url + "&t=" + new Date().getTime(), { cache: "no-store" })).text();
+        const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
+        const rows = parsed.data as any[];
+        const allColumns = Object.keys(rows[0] || {});
+        const modelColumns = allColumns.filter(col => col !== "Store" && col !== "Country" && col !== "Comments" && col.trim() !== "");
+
+        const byCountry: any = {};
+        let totalStoresWithUnits = 0;
+        let euStoresWithUnits = 0;
+        const countriesSet = new Set<string>();
+
+        rows.forEach((row, idx) => {
+          const store = row["Store"]?.trim() || "";
+          const country = row["Country"]?.trim() || "Unknown";
+          if (!store) return;
+          const models: string[] = [];
+          let unitCount = 0;
+          modelColumns.forEach(modelCol => {
+            const value = row[modelCol]?.toString().trim();
+            if (value && value !== "0" && value !== "") {
+              models.push(modelCol);
+              const count = Number.parseInt(value, 10);
+              unitCount += Number.isNaN(count) ? 1 : count;
+            }
+          });
+
+          if (models.length > 0) {
+            totalStoresWithUnits++;
+            countriesSet.add(country);
+            const isEU = europeCountries.some(eu => eu.toLowerCase() === country.toLowerCase()) ||
+                         euCountryCodes.some(eu => eu.toLowerCase() === country.toLowerCase());
+            if (isEU) euStoresWithUnits++;
+            if (!byCountry[country]) byCountry[country] = { stores: [], totalUnits: 0 };
+            byCountry[country].stores.push({ id: idx, store, models, unitCount });
+            byCountry[country].totalUnits += unitCount;
+          }
+        });
+
+        setShowroomData({ byCountry, totalStoresWithUnits, euStoresWithUnits, countryCount: countriesSet.size, euTarget: 100 });
+      } catch (e) {
+        console.error("Showroom data load error:", e);
+      }
+    })();
+  }, []);
+
+  const monthsPassed = fyMonthIndex + 1;
+  const revenueRunRate = revenueYtd > 0 ? (revenueYtd / monthsPassed) * 12 : 0;
+  const revenueTarget = 30_000_000;
+  const currentEuStores = showroomData?.euStoresWithUnits || 0;
+  const storeTarget = 100;
 
   if (isLoading || !opspData) {
     return (
@@ -207,7 +354,6 @@ export default function OPSPDashboard() {
                 {opspData.purpose}
               </h2>
             </div>
-
             <div className="md:border-l border-white/10 md:pl-8 flex flex-col justify-center">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold uppercase tracking-widest w-max mb-4">
                 <Mountain size={12} className="text-[#185787]" />
@@ -216,6 +362,111 @@ export default function OPSPDashboard() {
               <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200">
                 {opspData.bhag}
               </h2>
+            </div>
+          </div>
+        </div>
+
+        {/* STRATEGIC GOALS (BHAGs) */}
+        <div>
+          <div className="flex items-center gap-2 mb-5">
+            <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><TrendingUp size={18} /></div>
+            <h3 className="font-bold text-gray-900 text-lg">Strategic Goals (BHAGs)</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-2xl bg-[#081C28] text-white p-8 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[280px]">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="bg-[#185787] px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">FY30 Revenue BHAG</span>
+                </div>
+                <div className="text-4xl md:text-5xl font-black mb-2 tracking-tight">$30.00M USD</div>
+                <div className="text-gray-400 font-medium text-lg mb-6">in a financial year (32% YOY growth)</div>
+              </div>
+              <div className="relative z-10 pt-6 border-t border-white/10">
+                <div className="flex justify-between items-end mb-2">
+                  <div>
+                    <div className="text-sm text-gray-400 font-medium mb-1">Current Run Rate</div>
+                    <div className="text-2xl font-bold">{formatCompactCurrency(revenueRunRate)}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-[#00AC75]">{revenueTarget ? ((revenueRunRate / revenueTarget) * 100).toFixed(1) : 0}%</div>
+                    <div className="text-sm text-gray-400">to target</div>
+                  </div>
+                </div>
+                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#00AC75] rounded-full transition-all duration-1000" style={{ width: `${Math.min((revenueRunRate / revenueTarget) * 100, 100)}%` }} />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white border border-gray-200 p-8 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[280px]">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="bg-blue-50 text-[#185787] px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">FY27 Showroom BHAG</span>
+                </div>
+                <div className="text-4xl md:text-5xl font-black text-[#081C28] mb-2 tracking-tight">100 Stores</div>
+                <div className="text-gray-500 font-medium text-lg mb-6">in the EU + UK with an Ai1 Unit</div>
+              </div>
+              <div className="relative z-10 pt-6 border-t border-gray-100">
+                <div className="flex justify-between items-end mb-2">
+                  <div>
+                    <div className="text-sm text-gray-500 font-medium mb-1">Current Status</div>
+                    <div className="text-2xl font-bold text-[#081C28]">{currentEuStores} Stores</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-[#185787]">{((currentEuStores / storeTarget) * 100).toFixed(0)}%</div>
+                    <div className="text-sm text-gray-500">to target</div>
+                  </div>
+                </div>
+                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#185787] rounded-full transition-all duration-1000" style={{ width: `${Math.min((currentEuStores / storeTarget) * 100, 100)}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CRITICAL NUMBER */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><Target size={18} /></div>
+            <div>
+              <h3 className="font-bold text-gray-900 text-lg">Critical Number</h3>
+              <p className="text-xs text-gray-500">All-In-One Showroom Presence</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <div className="pb-6 border-b-2 border-[#185787]">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-base font-bold text-[#185787]"># Stores in EU + UK with an Ai1 Unit</p>
+                  <span className="text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">Target: 100 Stores</span>
+                </div>
+                <div className="flex items-end gap-4">
+                  <p className="text-6xl font-extrabold text-[#185787]">{showroomData?.euStoresWithUnits || 0}</p>
+                  <div className="pb-2">
+                    <span className={`px-3 py-1 rounded-md text-sm font-medium ${(showroomData?.euStoresWithUnits || 0) >= (showroomData?.euTarget || 100) ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+                      {showroomData?.euTarget ? `${(((showroomData?.euStoresWithUnits || 0) / showroomData.euTarget) * 100).toFixed(0)}%` : "N/A"}
+                    </span>
+                  </div>
+                </div>
+                {showroomData && showroomData.euStoresWithUnits < showroomData.euTarget && (
+                  <p className="text-sm text-orange-600 mt-2">{showroomData.euTarget - showroomData.euStoresWithUnits} more stores needed to reach target</p>
+                )}
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1"># Stores with an Ai1 Unit</p>
+                  <p className="text-3xl font-bold text-[#081C28]">{showroomData?.totalStoresWithUnits || 0}</p>
+                </div>
+                <p className="text-sm text-gray-500">Across {showroomData?.countryCount || 0} {showroomData?.countryCount === 1 ? "country" : "countries"}</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl border border-gray-100 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-5 bg-[#185787] rounded-full" />
+                <h4 className="text-base font-bold text-gray-800">Store Breakdown</h4>
+              </div>
+              <ShowroomTable data={showroomData} />
             </div>
           </div>
         </div>
@@ -293,7 +544,6 @@ export default function OPSPDashboard() {
         {/* QUARTERLY SECTION */}
         <div className="bg-[#081C28] rounded-2xl shadow-md p-6 md:p-8 text-white relative overflow-hidden">
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#185787] to-gray-500"></div>
-
           <div className="flex items-center gap-2 mb-6">
             <div className="p-2 bg-white/10 text-white rounded-lg"><Calendar size={20} /></div>
             <div>
@@ -301,7 +551,6 @@ export default function OPSPDashboard() {
               <p className="text-xs text-gray-400">Jul - Sep 2026</p>
             </div>
           </div>
-
           <div className="space-y-3">
             {opspData.quarterlyActions.map((action: string, i: number) => (
               <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm flex gap-3">
@@ -353,10 +602,7 @@ export default function OPSPDashboard() {
             </div>
             <div className="space-y-2">
               {opspData.strengths.map((s: string, i: number) => (
-                <div key={i} className="flex gap-2 text-sm text-gray-700">
-                  <span className="text-green-500 shrink-0 mt-0.5">+</span>
-                  <span>{s}</span>
-                </div>
+                <div key={i} className="flex gap-2 text-sm text-gray-700"><span className="text-green-500 shrink-0 mt-0.5">+</span><span>{s}</span></div>
               ))}
             </div>
           </div>
@@ -368,10 +614,7 @@ export default function OPSPDashboard() {
             </div>
             <div className="space-y-2">
               {opspData.weaknesses.map((w: string, i: number) => (
-                <div key={i} className="flex gap-2 text-sm text-gray-700">
-                  <span className="text-yellow-500 shrink-0 mt-0.5">-</span>
-                  <span>{w}</span>
-                </div>
+                <div key={i} className="flex gap-2 text-sm text-gray-700"><span className="text-yellow-500 shrink-0 mt-0.5">-</span><span>{w}</span></div>
               ))}
             </div>
           </div>
@@ -383,10 +626,7 @@ export default function OPSPDashboard() {
             </div>
             <div className="space-y-2">
               {opspData.opportunities.map((o: string, i: number) => (
-                <div key={i} className="flex gap-2 text-sm text-gray-700">
-                  <span className="text-blue-500 shrink-0 mt-0.5">{i + 1}.</span>
-                  <span>{o}</span>
-                </div>
+                <div key={i} className="flex gap-2 text-sm text-gray-700"><span className="text-blue-500 shrink-0 mt-0.5">{i + 1}.</span><span>{o}</span></div>
               ))}
             </div>
           </div>
@@ -398,10 +638,7 @@ export default function OPSPDashboard() {
             </div>
             <div className="space-y-2">
               {opspData.threats.map((t: string, i: number) => (
-                <div key={i} className="flex gap-2 text-sm text-gray-700">
-                  <span className="text-red-500 shrink-0 mt-0.5">!</span>
-                  <span>{t}</span>
-                </div>
+                <div key={i} className="flex gap-2 text-sm text-gray-700"><span className="text-red-500 shrink-0 mt-0.5">!</span><span>{t}</span></div>
               ))}
             </div>
           </div>

@@ -113,41 +113,6 @@ const europeCountries = [
   "Ukraine",
 ]
 
-const euCountryCodes = [
-  "AT",
-  "BE",
-  "BG",
-  "HR",
-  "CY",
-  "CZ",
-  "DK",
-  "EE",
-  "FI",
-  "FR",
-  "DE",
-  "GR",
-  "HU",
-  "IE",
-  "IT",
-  "LV",
-  "LT",
-  "LU",
-  "MT",
-  "NL",
-  "PL",
-  "PT",
-  "RO",
-  "SK",
-  "SI",
-  "ES",
-  "SE",
-  "GB",
-  "UK",
-  "NO",
-  "CH",
-  "UA",
-]
-
 const cleanCurrency = (v: any) => {
   if (!v) return 0
   const n = Number.parseFloat(v.toString().replace(/[$,\s]/g, ""))
@@ -292,79 +257,6 @@ const RevenueByMarketTable = ({ data }: { data: RevenueGroups | null }) => {
               </React.Fragment>
             )
           })}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/*  SHOWROOM TABLE                                                            */
-/* -------------------------------------------------------------------------- */
-
-const ShowroomTable = ({ data }: any) => {
-  const [open, setOpen] = useState<Set<string>>(new Set())
-  if (!data) return null
-
-  const { byCountry } = data
-  const toggle = (c: string) => {
-    const n = new Set(open)
-    n.has(c) ? n.delete(c) : n.add(c)
-    setOpen(n)
-  }
-
-  return (
-    <div className="overflow-auto max-h-96">
-      <table className="w-full">
-        <thead className="sticky top-0 bg-[#E6EAF1] z-10">
-          <tr className="border-b-2 border-[#A5AEB7] text-left text-sm font-semibold text-[#425660]">
-            <th className="py-4 px-3 bg-[#E6EAF1]">Country</th>
-            <th className="py-4 px-3 bg-[#E6EAF1]">Store</th>
-            <th className="py-4 px-3 text-right bg-[#E6EAF1]">Unit Count</th>
-            <th className="py-4 px-3 bg-[#E6EAF1]">Models</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(byCountry).map(([country, d]: any) => (
-            <React.Fragment key={country}>
-              <tr
-                onClick={() => toggle(country)}
-                className={`cursor-pointer border-b transition-colors hover:bg-[#E6EAF1] ${
-                  open.has(country) ? "bg-[#E6EAF1]" : ""
-                }`}
-                style={{ borderColor: "#A5AEB7" }}
-              >
-                <td className="py-3 px-3">
-                  <div className="flex items-center gap-3">
-                    <div className="font-bold text-[#185787]">{country}</div>
-                    <div className="ml-auto">
-                      <span className="text-lg text-[#425660]">{open.has(country) ? "▼" : "▶"}</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="py-3 px-3 text-sm text-[#425660]">{d.stores.length} stores</td>
-                <td className="py-3 px-3 text-right font-bold text-lg text-[#185787]">{d.totalUnits}</td>
-                <td className="py-3 px-3" />
-              </tr>
-              {open.has(country) &&
-                d.stores.map((s: any, i: number) => (
-                  <tr
-                    key={s.id}
-                    className="border-b hover:bg-[#E6EAF1]"
-                    style={{ borderColor: "#E6EAF1", backgroundColor: i % 2 ? "#FFFFFF" : "#FAFBFC" }}
-                  >
-                    <td className="py-3 pl-8" />
-                    <td className="py-3 px-3">
-                      <div className="font-medium text-sm text-[#081C28]">{s.store}</div>
-                    </td>
-                    <td className="py-3 px-3 text-right text-sm text-[#081C28]">{s.unitCount}</td>
-                    <td className="py-3 px-3 text-sm text-[#425660] font-medium">
-                      {s.models.length > 0 ? s.models.join(", ") : "-"}
-                    </td>
-                  </tr>
-                ))}
-            </React.Fragment>
-          ))}
         </tbody>
       </table>
     </div>
@@ -664,7 +556,6 @@ const USAMonthlyPerformanceChart = ({ data, fyLabel }: { data: any; fyLabel: str
 const SalesHealthDashboard = () => {
   const [salesData, setSalesData] = useState<any>(null)
   const [fy27Data, setFy27Data] = useState<any>(null)
-  const [showroomData, setShowroomData] = useState<any>(null)
   const [afsData, setAfsData] = useState<any>(null)
   const [usaData, setUsaData] = useState<any>(null)
   const [fy27Afs, setFy27Afs] = useState<any>(null)
@@ -875,78 +766,9 @@ const SalesHealthDashboard = () => {
     load()
   }, [])
 
-  /* ----------- LOAD SHOWROOM CSV ------------------------------- */
   useEffect(() => {
-    const load = async () => {
-      try {
-        const url =
-          "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiboUvN6uqddlmcX7SqCwKbgtDrvxffq945XtCYb8qQNhOTZXZZ_phwIZQR3VVjti_CI4EjJDZR-lB/pub?gid=2034170474&single=true&output=csv"
-        const csv = await (await fetch(url + "&t=" + new Date().getTime(), { cache: "no-store" })).text()
-        const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true })
-        const rows = parsed.data as any[]
-
-        const allColumns = Object.keys(rows[0] || {})
-        const modelColumns = allColumns.filter(
-          (col) => col !== "Store" && col !== "Country" && col !== "Comments" && col.trim() !== "",
-        )
-
-        const byCountry: any = {}
-        let totalStoresWithUnits = 0
-        let euStoresWithUnits = 0
-        const countriesSet = new Set<string>()
-
-        rows.forEach((row, idx) => {
-          const store = row["Store"]?.trim() || ""
-          const country = row["Country"]?.trim() || "Unknown"
-          if (!store) return
-          const models: string[] = []
-          let unitCount = 0
-
-          modelColumns.forEach((modelCol) => {
-            const value = row[modelCol]?.toString().trim()
-            if (value && value !== "0" && value !== "") {
-              models.push(modelCol)
-              const count = Number.parseInt(value, 10)
-              unitCount += Number.isNaN(count) ? 1 : count
-            }
-          })
-
-          if (models.length > 0) {
-            totalStoresWithUnits++
-            countriesSet.add(country)
-            const isEU = europeCountries.some(eu => eu.toLowerCase() === country.toLowerCase()) || 
-                         euCountryCodes.some(eu => eu.toLowerCase() === country.toLowerCase())
-            
-            if (isEU) {
-              euStoresWithUnits++
-            } else {
-              console.log("Not counted as EU/UK:", country)
-            }
-            if (!byCountry[country]) {
-              byCountry[country] = { stores: [], totalUnits: 0 }
-            }
-            byCountry[country].stores.push({ id: idx, store, models, unitCount })
-            byCountry[country].totalUnits += unitCount
-          }
-        })
-
-        setShowroomData({
-          byCountry,
-          totalStoresWithUnits,
-          euStoresWithUnits,
-          countryCount: countriesSet.size,
-          euTarget: 100,
-        })
-      } catch (e) {
-        console.error("Showroom data load error:", e)
-      }
-    }
-    load()
-  }, [])
-
-  useEffect(() => {
-    if (salesData && showroomData && afsData && usaData) setLoading(false)
-  }, [salesData, showroomData, afsData, usaData])
+    if (salesData && afsData && usaData) setLoading(false)
+  }, [salesData, afsData, usaData])
 
   const activeData = useMemo(() => fyExport === "FY27" ? fy27Data : salesData, [fyExport, fy27Data, salesData])
   const activeAfs = useMemo(() => fyAfs === "FY27" ? fy27Afs : afsData, [fyAfs, fy27Afs, afsData])
@@ -1124,16 +946,6 @@ const SalesHealthDashboard = () => {
     [activeData],
   )
 
-  /* ---------------------- Helpers for BHAG --------------------- */
-  // Run Rate calculation
-  const monthsPassed = fyMonthIndex + 1
-  // Calculate annualized run rate based on YTD
-  const revenueRunRate = summary ? (summary.ytd.a / monthsPassed) * 12 : 0
-  const revenueTarget = 30_000_000 // 30M
-  
-  const currentEuStores = showroomData?.euStoresWithUnits || 0
-  const storeTarget = 100
-
   /* ---------------------- UI helpers --------------------------- */
   const Card = ({ title, badge, value, target }: { title: string; badge: string; value: number; target: number }) => {
     const variance = target ? ((value - target) / target) * 100 : 0
@@ -1260,139 +1072,6 @@ const SalesHealthDashboard = () => {
       </header>
 
       <section className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        
-        {/* BHAGs Section */}
-        <div className="pb-8 border-b-2 border-[#A5AEB7]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-3 h-8 bg-[#185787] rounded-full" />
-            <h2 className="text-2xl font-bold text-[#081C28]">Strategic Goals (BHAGs)</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="rounded-2xl bg-[#081C28] text-white p-8 shadow-lg relative overflow-hidden flex flex-col justify-between group hover:scale-[1.01] transition-transform min-h-[280px]">
-                <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="bg-[#185787] px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">FY30 Revenue BHAG</span>
-                        <span className="text-2xl">🚀</span>
-                    </div>
-                    <div className="text-4xl md:text-5xl font-black mb-2 tracking-tight">$30.00M USD</div>
-                    <div className="text-gray-400 font-medium text-lg mb-6">in a financial year (32% YOY growth)</div>
-                </div>
-                
-                <div className="relative z-10 pt-6 border-t border-white/10">
-                    <div className="flex justify-between items-end mb-2">
-                        <div>
-                            <div className="text-sm text-gray-400 font-medium mb-1">Current Run Rate</div>
-                            <div className="text-2xl font-bold">{formatCompactCurrency(revenueRunRate)}</div>
-                        </div>
-                        <div className="text-right">
-                            <div className="text-2xl font-bold text-[#00AC75]">{((revenueRunRate / revenueTarget) * 100).toFixed(1)}%</div>
-                            <div className="text-sm text-gray-400">to target</div>
-                        </div>
-                    </div>
-                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-[#00AC75] rounded-full transition-all duration-1000" 
-                            style={{ width: `${Math.min((revenueRunRate / revenueTarget) * 100, 100)}%` }}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="rounded-2xl bg-white border border-[#A5AEB7] p-8 shadow relative overflow-hidden flex flex-col justify-between group hover:scale-[1.01] transition-transform min-h-[280px]">
-                 <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="bg-[#E6EAF1] text-[#185787] px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">FY27 Showroom BHAG</span>
-                        <span className="text-2xl">🌍</span>
-                    </div>
-                    <div className="text-4xl md:text-5xl font-black text-[#081C28] mb-2 tracking-tight">100 Stores</div>
-                    <div className="text-[#425660] font-medium text-lg mb-6">in the EU + UK with an Ai1 Unit</div>
-                </div>
-
-                <div className="relative z-10 pt-6 border-t border-[#E6EAF1]">
-                    <div className="flex justify-between items-end mb-2">
-                        <div>
-                            <div className="text-sm text-[#425660] font-medium mb-1">Current Status</div>
-                            <div className="text-2xl font-bold text-[#081C28]">{currentEuStores} Stores</div>
-                        </div>
-                        <div className="text-right">
-                            <div className="text-2xl font-bold text-[#185787]">{((currentEuStores / storeTarget) * 100).toFixed(0)}%</div>
-                            <div className="text-sm text-[#425660]">to target</div>
-                        </div>
-                    </div>
-                    <div className="h-2 w-full bg-[#E6EAF1] rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-[#185787] rounded-full transition-all duration-1000" 
-                            style={{ width: `${Math.min((currentEuStores / storeTarget) * 100, 100)}%` }}
-                        />
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-
-        {/* All-In-One Showroom Presence */}
-        <div className="pb-8 border-b-2 border-[#A5AEB7]">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-3 h-8 bg-[#185787] rounded-full" />
-            <h2 className="text-2xl font-bold text-[#081C28]">Critical Number</h2>
-          </div>
-          <p className="text-sm text-[#425660] mb-8 ml-7">All-In-One Showroom Presence</p>
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <div className="rounded-2xl bg-white border border-[#A5AEB7] shadow p-8">
-              <div className="space-y-6">
-                {/* Primary Metric: EU Stores */}
-                <div className="pb-6 border-b-2 border-[#185787]">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-lg font-bold text-[#185787]"># Stores in EU + UK with an Ai1 Unit</p>
-                    <span className="text-sm font-medium text-[#425660] bg-[#E6EAF1] px-3 py-1 rounded-full">
-                      Target: 100 Stores
-                    </span>
-                  </div>
-                  <div className="flex items-end gap-4">
-                    <p className="text-6xl font-extrabold text-[#185787]">{showroomData?.euStoresWithUnits || 0}</p>
-                    <div className="pb-2">
-                      <span
-                        className={`px-3 py-1 rounded-md text-sm font-medium ${
-                          (showroomData?.euStoresWithUnits || 0) >= (showroomData?.euTarget || 100)
-                            ? "bg-green-100 text-green-700"
-                            : "bg-orange-100 text-orange-700"
-                        }`}
-                      >
-                        {showroomData?.euTarget
-                          ? `${(((showroomData?.euStoresWithUnits || 0) / showroomData.euTarget) * 100).toFixed(0)}%`
-                          : "N/A"}
-                      </span>
-                    </div>
-                  </div>
-                  {showroomData?.euStoresWithUnits < showroomData?.euTarget && (
-                    <p className="text-sm text-orange-600 mt-2">
-                      {showroomData.euTarget - showroomData.euStoresWithUnits} more stores needed to reach target
-                    </p>
-                  )}
-                </div>
-
-                {/* Secondary Metrics */}
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-[#425660] mb-1"># Stores with an Ai1 Unit</p>
-                    <p className="text-3xl font-bold text-[#081C28]">{showroomData?.totalStoresWithUnits || 0}</p>
-                  </div>
-                  <p className="text-sm text-[#425660]">
-                    Across {showroomData?.countryCount || 0}{" "}
-                    {showroomData?.countryCount === 1 ? "country" : "countries"}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-2xl bg-white border border-[#A5AEB7] p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-2 h-6 bg-[#185787] rounded-full" />
-                <h3 className="text-lg font-bold text-[#081C28]">Store Breakdown</h3>
-              </div>
-              <ShowroomTable data={showroomData} />
-            </div>
-          </div>
-        </div>
 
         {/* Sales Performance Section */}
         <div className="pt-8">
