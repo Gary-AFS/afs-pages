@@ -1,21 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { Flag, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Flag, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ASANA_PROJECT_GID = "1213307020658494";
 // Asana PAT is held server-side in the asana-api-proxy Worker; the client never sees it.
 const ASANA_PROXY = "https://asana-api-proxy.josh-03c.workers.dev";
 
-async function fetchAsanaInitiatives(): Promise<any[]> {
+function getCurrentSprint(): string {
+    const now = new Date();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    const fy = month >= 6 ? year + 1 : year;
+    let qNum: number;
+    if (month >= 6 && month <= 8) qNum = 1;
+    else if (month >= 9 && month <= 11) qNum = 2;
+    else if (month >= 0 && month <= 2) qNum = 3;
+    else qNum = 4;
+    return `Q${qNum}FY${String(fy).slice(-2)}`;
+}
+
+// Revel's Sprint field uses plain "Q1".."Q4"; GAF/Force use "Q1FY27". Handle both,
+// newest-first (Q4 = Apr-Jun is the latest quarter of a fiscal year).
+function sprintSortKey(sprint: string): number {
+    const full = sprint.match(/Q(\d)FY(\d{2})/);
+    if (full) return parseInt(full[2]) * 10 + parseInt(full[1]);
+    const q = sprint.match(/^Q(\d)$/);
+    if (q) return parseInt(q[1]);
+    return 0;
+}
+
+async function fetchAsanaInitiatives(): Promise<{ tasks: any[]; sprintOptions: string[] }> {
     const secRes = await fetch(`${ASANA_PROXY}/projects/${ASANA_PROJECT_GID}/sections`);
     if (!secRes.ok) throw new Error("Failed to fetch sections");
     const revelSection = (await secRes.json()).data.find((s: any) => s.name.toUpperCase().includes("REVEL"));
     if (!revelSection) throw new Error("REVEL section not found");
 
-    const tasksRes = await fetch(`${ASANA_PROXY}/sections/${revelSection.gid}/tasks?opt_fields=name,completed,due_on,assignee.name,permalink_url,custom_fields,parent,parent.name`);
+    const tasksRes = await fetch(`${ASANA_PROXY}/sections/${revelSection.gid}/tasks?opt_fields=name,completed,due_on,assignee.name,permalink_url,custom_fields,custom_fields.name,custom_fields.display_value,custom_fields.enum_options,parent,parent.name`);
     if (!tasksRes.ok) throw new Error("Failed to fetch tasks");
     const tasks = (await tasksRes.json()).data;
 
-    return Promise.all(tasks.map(async (task: any) => {
+    const sprintOptionsSet = new Set<string>();
+    let enumOptions: string[] = [];
+
+    tasks.forEach((task: any) => {
+        const cf = task.custom_fields || [];
+        const sprintField = cf.find((f: any) => f.name === "Sprint" || f.name.toLowerCase().includes("sprint"));
+        if (sprintField) {
+            if (sprintField.display_value) sprintOptionsSet.add(sprintField.display_value);
+            if (sprintField.enum_options && !enumOptions.length) {
+                enumOptions = sprintField.enum_options
+                    .filter((o: any) => o.enabled)
+                    .map((o: any) => o.name);
+            }
+        }
+    });
+
+    const allSprints = enumOptions.length > 0 ? enumOptions : Array.from(sprintOptionsSet);
+    allSprints.sort((a, b) => sprintSortKey(b) - sprintSortKey(a));
+
+    const enrichedTasks = await Promise.all(tasks.map(async (task: any) => {
         const subRes = await fetch(`${ASANA_PROXY}/tasks/${task.gid}/subtasks?opt_fields=name,completed,due_on,due_at`);
         const subtasks = subRes.ok ? (await subRes.json()).data : [];
 
@@ -44,16 +86,39 @@ async function fetchAsanaInitiatives(): Promise<any[]> {
             hasOverdueSubtask,
         };
     }));
+
+    return { tasks: enrichedTasks, sprintOptions: allSprints };
 }
 
 export default function StrategicPrioritiesDashboard() {
     const [asanaTasks, setAsanaTasks] = useState<any[]>([]);
+    const [sprintOptions, setSprintOptions] = useState<string[]>([]);
+    const [selectedSprint, setSelectedSprint] = useState<string>("");
     const [isAsanaLoading, setIsAsanaLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
             try {
-                setAsanaTasks(await fetchAsanaInitiatives());
+                const { tasks, sprintOptions: sprints } = await fetchAsanaInitiatives();
+                setAsanaTasks(tasks);
+                setSprintOptions(sprints);
+
+                // Default to the current quarter; if it has no priorities yet, fall back to
+                // the most recent quarter that does (Revel's live data currently sits in Q4).
+                const current = getCurrentSprint();
+                const currentPlain = `Q${current.match(/Q(\d)/)?.[1] || ''}`;
+                const isCur = (s: string) => s === current || s === currentPlain;
+                const withTasks = sprints.filter(s => tasks.some(t => t.sprint === s));
+
+                if (sprints.some(isCur) && withTasks.some(isCur)) {
+                    setSelectedSprint(sprints.find(isCur)!);
+                } else if (withTasks.length > 0) {
+                    setSelectedSprint(withTasks[0]);
+                } else if (sprints.some(isCur)) {
+                    setSelectedSprint(sprints.find(isCur)!);
+                } else if (sprints.length > 0) {
+                    setSelectedSprint(sprints[0]);
+                }
             } catch (err) {
                 console.error("Asana fetch failed", err);
             } finally {
@@ -62,6 +127,25 @@ export default function StrategicPrioritiesDashboard() {
         })();
     }, []);
 
+    const filteredTasks = useMemo(() => {
+        if (!selectedSprint) return asanaTasks;
+        return asanaTasks.filter(t => t.sprint === selectedSprint);
+    }, [asanaTasks, selectedSprint]);
+
+    const currentSprintIndex = sprintOptions.indexOf(selectedSprint);
+
+    const goToPreviousSprint = () => {
+        if (currentSprintIndex < sprintOptions.length - 1) {
+            setSelectedSprint(sprintOptions[currentSprintIndex + 1]);
+        }
+    };
+
+    const goToNextSprint = () => {
+        if (currentSprintIndex > 0) {
+            setSelectedSprint(sprintOptions[currentSprintIndex - 1]);
+        }
+    };
+
     const getStatusColor = (status: string) => {
         const s = status.toLowerCase();
         if (s.includes('track') && !s.includes('off')) return 'bg-[#8ce0a4] text-emerald-900';
@@ -69,6 +153,19 @@ export default function StrategicPrioritiesDashboard() {
         if (s.includes('off') || s.includes('urgent') || s.includes('high')) return 'bg-[#fba49b] text-red-900';
         return 'bg-gray-200 text-gray-700';
     };
+
+    const formatSprintLabel = (sprint: string): string => {
+        const months: Record<string, string> = { '1': 'Jul - Sep', '2': 'Oct - Dec', '3': 'Jan - Mar', '4': 'Apr - Jun' };
+        const full = sprint.match(/Q(\d)FY(\d{2})/);
+        if (full) return `Q${full[1]} FY${full[2]} (${months[full[1]] || ''})`;
+        const q = sprint.match(/^Q(\d)$/);
+        if (q) return `Q${q[1]} (${months[q[1]] || ''})`;
+        return sprint;
+    };
+
+    const currentSprint = getCurrentSprint();
+    const currentPlainSprint = `Q${currentSprint.match(/Q(\d)/)?.[1] || ''}`;
+    const isCurrentSprint = selectedSprint === currentSprint || selectedSprint === currentPlainSprint;
 
     return (
         <div className="min-h-screen bg-[#f8f8fa] font-sans pb-20 animate-in fade-in duration-500">
@@ -87,10 +184,60 @@ export default function StrategicPrioritiesDashboard() {
             </header>
 
             <div className="max-w-5xl mx-auto p-4 md:p-6 mt-4">
+
+                {/* Sprint Selector */}
+                {!isAsanaLoading && sprintOptions.length > 0 && (
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={goToPreviousSprint}
+                                    disabled={currentSprintIndex >= sprintOptions.length - 1}
+                                    className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                    title="Previous sprint"
+                                >
+                                    <ChevronLeft size={18} />
+                                </button>
+                                <div className="text-center min-w-[180px]">
+                                    <div className="text-sm font-bold text-gray-900">{formatSprintLabel(selectedSprint)}</div>
+                                    {isCurrentSprint && (
+                                        <div className="text-[10px] font-bold text-[#485D4D] uppercase tracking-widest">Current Quarter</div>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={goToNextSprint}
+                                    disabled={currentSprintIndex <= 0}
+                                    className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                    title="Next sprint"
+                                >
+                                    <ChevronRight size={18} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                            {sprintOptions.map(sprint => (
+                                <button
+                                    key={sprint}
+                                    onClick={() => setSelectedSprint(sprint)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                        selectedSprint === sprint
+                                            ? 'bg-[#485D4D] text-white shadow-sm'
+                                            : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:text-gray-900'
+                                    } ${(sprint === currentSprint || sprint === currentPlainSprint) && selectedSprint !== sprint ? 'ring-1 ring-[#485D4D]/30' : ''}`}
+                                >
+                                    {sprint}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="mb-4">
-                    <h2 className="text-sm font-bold tracking-widest text-gray-800 uppercase">Current Quarter Priorities</h2>
+                    <h2 className="text-sm font-bold tracking-widest text-gray-800 uppercase">
+                        {selectedSprint ? `${selectedSprint} Priorities` : 'Current Quarter Priorities'}
+                    </h2>
                     {!isAsanaLoading && (
-                        <p className="text-xs text-gray-500 mt-1">{asanaTasks.length} {asanaTasks.length === 1 ? 'priority' : 'priorities'}</p>
+                        <p className="text-xs text-gray-500 mt-1">{filteredTasks.length} {filteredTasks.length === 1 ? 'priority' : 'priorities'}</p>
                     )}
                 </div>
 
@@ -99,13 +246,13 @@ export default function StrategicPrioritiesDashboard() {
                         <Loader2 className="w-8 h-8 text-[#485D4D] animate-spin mb-4" />
                         <p className="text-gray-500 font-medium">Loading initiatives from Asana...</p>
                     </div>
-                ) : asanaTasks.length === 0 ? (
+                ) : filteredTasks.length === 0 ? (
                     <div className="p-8 bg-white rounded-2xl border border-gray-200 shadow-sm text-center text-gray-500 mt-4">
-                        No active initiatives found in the REVEL section.
+                        No priorities found for {selectedSprint || 'this quarter'}.
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {asanaTasks.map((task) => {
+                        {filteredTasks.map((task) => {
                             const isComplete = task.progress === 100;
                             const barColor = isComplete ? 'bg-[#34a853]' : (task.hasOverdueSubtask ? 'bg-[#D1493B]' : 'bg-[#34a853]');
 
