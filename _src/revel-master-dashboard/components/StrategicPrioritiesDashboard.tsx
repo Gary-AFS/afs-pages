@@ -110,18 +110,13 @@ export default function StrategicPrioritiesDashboard() {
                 setAsanaTasks(tasks);
                 setSprintOptions(sprints);
 
-                // Default to the current quarter; if it has no priorities yet, fall back to
-                // the most recent quarter that does (Revel's live data currently sits in Q4).
+                // Default to the current quarter (like GAF/Force), even if it has no
+                // priorities yet — the empty state signals the quarter hasn't been set up.
                 const current = getCurrentSprint();
                 const currentPlain = `Q${current.match(/Q(\d)/)?.[1] || ''}`;
                 const isCur = (s: string) => s === current || s === currentPlain;
-                const withTasks = sprints.filter(s => tasks.some(t => t.sprint === s));
 
-                if (sprints.some(isCur) && withTasks.some(isCur)) {
-                    setSelectedSprint(sprints.find(isCur)!);
-                } else if (withTasks.length > 0) {
-                    setSelectedSprint(withTasks[0]);
-                } else if (sprints.some(isCur)) {
+                if (sprints.some(isCur)) {
                     setSelectedSprint(sprints.find(isCur)!);
                 } else if (sprints.length > 0) {
                     setSelectedSprint(sprints[0]);
