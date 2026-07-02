@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { DashboardSkeleton } from './DashboardSkeleton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Calendar, BarChart3, ShoppingCart, DollarSign, Loader2, PhoneIncoming, PhoneOutgoing, TrendingUp, TrendingDown, Video, Heart, MessageCircle, Repeat, Package, Trophy, PieChart as PieChartIcon, Activity, ChevronDown, ChevronRight, ChevronLeft, Target, Info, MousePointer2, Eye, Percent, ExternalLink, Image as ImageIcon, MapPin, Navigation, ArrowUp, ArrowDown } from "lucide-react";
+import { Calendar, BarChart3, ShoppingCart, DollarSign, Loader2, PhoneIncoming, PhoneOutgoing, TrendingUp, TrendingDown, Video, Heart, MessageCircle, Repeat, Package, Trophy, PieChart as PieChartIcon, Activity, ChevronDown, ChevronRight, ChevronLeft, Target, Info, Eye, Percent, ExternalLink, Image as ImageIcon, MapPin, ArrowUp, ArrowDown } from "lucide-react";
 import { fetchDashboardData, fetchProductInsightsData, fetchInstagramData, getCachedData, isCacheStale } from "../services/dataService";
 import { BrandConfig, BrandData, BrandData as BrandDataType, BrandBudget, BrandInstagram, ProductInsightsData, ProductPerformance } from "../types";
 import { GAF_COLORS, CHART_COLORS } from "../constants";
@@ -113,162 +113,6 @@ const CustomYAxisTick = ({ x, y, payload }: any) => {
         </div>
       </foreignObject>
     </g>
-  );
-};
-
-const GoogleBusinessProfileSection = ({ productData, brandColor, brand, isUpdating }: { productData: ProductInsightsData | null, brandColor: string, brand: any, isUpdating: boolean }) => {
-  const [activeTab, setActiveTab] = useState<'popular' | 'trendingUp' | 'trendingDown'>('popular');
-
-  const now = new Date();
-  const monthName = now.toLocaleString('default', { month: 'long' });
-  const year = now.getFullYear();
-
-  // Snapshot data adapted for Google Business Profile
-  const snapshotData = {
-    interactions: "14.28K",
-    interactionsVar: 28.4,
-    profileViews: "1.92M",
-    viewsVar: -4.1,
-    directions: "682",
-    directionsVar: 12.5
-  };
-
-  const displayProducts = React.useMemo(() => {
-    if (activeTab === 'popular') {
-      return [
-        { name: "Revel Tampere 4 Person Traditional Sa…", clicks: "1.67K", change: 62.8 },
-        { name: "Revel Eden - 4 Person Traditional Barre…", clicks: "1.47K", change: 19.5 },
-        { name: "Revel Virta 4 Person Traditional Cabin (…", clicks: "1.46K", change: 84.8 },
-        { name: "Revel Glacier Duo – Premium Cedar Ic…", clicks: "1.06K", change: 36.3 },
-        { name: "Revel Eden 4 Person Traditional Barrel …", clicks: "922", change: 100, customLabel: "Up from 0" },
-        { name: "Revel Edenview - 4 Person Traditional …", clicks: "773", change: 16.9 },
-        { name: "Revel Kora 3 Person Far Infrared Sauna…", clicks: "689", change: -18.7 },
-      ];
-    } else if (activeTab === 'trendingUp') {
-      return [
-        { name: "Revel Eden 4 Person Traditional Barrel …", clicks: "1.76K", change: 100, customLabel: "Up from 0" },
-        { name: "NordicWave 2 Person Infrared & Traditi…", clicks: "1.72K", change: 100, customLabel: "Up from 0" },
-        { name: "Revel Aurora 2 Person Traditional Ceda…", clicks: "1.10K", change: 100, customLabel: "Up from 0" },
-        { name: "Revel Edenview 4 Person Traditional C…", clicks: "698", change: 100, customLabel: "Up from 0" },
-        { name: "Revel Virta 4 Person Traditional Cabin (…", clicks: "1.46K", change: 84.8 },
-        { name: "Revel Tampere 4 Person Traditional Sa…", clicks: "1.67K", change: 62.8 },
-        { name: "NordicWave 3 Person Infrared & Traditi…", clicks: "636", change: 100, customLabel: "Up from 0" },
-      ];
-    } else if (activeTab === 'trendingDown') {
-      return [
-        { name: "Revel Tampere 4 Person Traditional Sauna", clicks: "184", change: -90.9 },
-        { name: "Revel Eden – 4 Person Traditional Barrel", clicks: "173", change: -91.0 },
-        { name: "Revel Virta 4 Person Traditional Cabin", clicks: "299", change: -81.5 },
-        { name: "Revel Glacier Duo – Premium Cedar Ice Bath", clicks: "160", change: -86.9 },
-        { name: "Revel Edenview – 4 Person Traditional", clicks: "112", change: -89.2 },
-        { name: "Revel Kora 3 Person Far Infrared Sauna", clicks: "58", change: -93.6 },
-        { name: "Revel Aurora 2 Person Traditional Cedar", clicks: "11", change: -98.7 },
-      ];
-    }
-    return [];
-  }, [activeTab]);
-
-  return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Header Summary - Matching Dashboard Styling */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6 relative">
-        <UpdatingBadge isUpdating={isUpdating} />
-        <div className="flex items-center gap-3 mb-6">
-            <div className={`p-3 rounded-xl bg-gradient-to-br ${brand.colors.gradient} shadow-lg`}>
-              <Navigation className="w-6 h-6 text-white" />
-            </div>
-            <div>
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900">Google Business Performance</h3>
-                <p className="text-xs text-gray-500 font-medium mt-0.5">{monthName} {year} • Ads + Organic</p>
-            </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <div className="text-[11px] font-bold text-gray-500 mb-2 uppercase tracking-wider flex items-center gap-2">
-              <MousePointer2 size={14} className="text-gray-400" /> Interactions
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{snapshotData.interactions}</div>
-            <div className={`text-sm font-bold ${snapshotData.interactionsVar >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
-              {snapshotData.interactionsVar >= 0 ? '↑' : '↓'} {Math.abs(snapshotData.interactionsVar)}%
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <div className="text-[11px] font-bold text-gray-500 mb-2 uppercase tracking-wider flex items-center gap-2">
-              <Eye size={14} className="text-gray-400" /> Profile Views
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{snapshotData.profileViews}</div>
-            <div className={`text-sm font-bold ${snapshotData.viewsVar >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
-              {snapshotData.viewsVar >= 0 ? '↑' : '↓'} {Math.abs(snapshotData.viewsVar)}%
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <div className="text-[11px] font-bold text-gray-500 mb-2 uppercase tracking-wider flex items-center gap-2">
-              <Navigation size={14} className="text-gray-400" /> Directions
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{snapshotData.directions}</div>
-            <div className={`text-sm font-bold ${snapshotData.directionsVar >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
-              {snapshotData.directionsVar >= 0 ? '↑' : '↓'} {Math.abs(snapshotData.directionsVar)}%
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabbed Products List - Matching Dashboard Styling */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6 relative">
-        <UpdatingBadge isUpdating={isUpdating} />
-        <div className="mb-6">
-          <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1">Your Products</h3>
-          <p className="text-xs text-gray-500 font-medium">Performance insights across Search and Maps</p>
-        </div>
-
-        <div className="flex border-b border-gray-100 mb-6 gap-6 md:gap-10">
-          {[
-            { id: 'popular', label: 'Popular now' },
-            { id: 'trendingUp', label: 'Trending up' },
-            { id: 'trendingDown', label: 'Trending down' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-4 text-xs md:text-sm font-bold transition-all relative ${
-                activeTab === tab.id ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              {tab.label}
-              {activeTab === tab.id && (
-                <div className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-full" style={{ backgroundColor: brandColor }} />
-              )}
-            </button>
-          ))}
-        </div>
-
-        <div className="overflow-x-auto">
-          <div className="min-w-[600px]">
-            <div className="grid grid-cols-12 px-4 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-              <div className="col-span-8">Product Title</div>
-              <div className="col-span-2 text-right">Views</div>
-              <div className="col-span-2 text-right">Trend</div>
-            </div>
-            {displayProducts.map((p, i) => (
-              <div key={i} className="grid grid-cols-12 px-4 py-4 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors group cursor-pointer items-center">
-                <div className="col-span-8 pr-6">
-                  <p className="text-xs md:text-sm font-semibold text-gray-900 group-hover:text-gray-700 transition-colors truncate">{p.name}</p>
-                </div>
-                <div className="col-span-2 text-right">
-                  <span className="text-xs md:text-sm font-bold text-gray-700">{p.clicks}</span>
-                </div>
-                <div className="col-span-2 text-right">
-                  <span className={`text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full ${p.change >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}`}>
-                    {p.customLabel || `${p.change >= 0 ? '+' : ''}${p.change.toFixed(1)}%`}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 };
 
@@ -1039,9 +883,6 @@ export default function SalesDashboard() {
                 )}
             </div>
         </div>
-
-        {/* Google Business Profile Performance Section */}
-        <GoogleBusinessProfileSection productData={productData} brandColor={brand.colors.accent} brand={brand} isUpdating={isUpdating} />
 
         <div className="mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6 relative">
