@@ -30,87 +30,162 @@ export default function OPSPDashboard() {
       { title: "Build a High-Performance Profitable Growth Engine", desc: "Increase GM%, AOV, conversion, and customer quality" },
       { title: "Power with a Reliable Supply and Data Engine", desc: "Ensure availability, margin, and data-driven decisions" }
     ],
-    fy27Revenue: "$25,800,000",
-    fy27GPMargin: "42.6%",
+    fy27Revenue: "$25,239,066.87",
+    fy27GPMargin: "37.19%",
     initiatives: [
-      "Launch a loyalty program to drive engagement and repeat purchases, aiming for 100,000 members by Jan 1, 2030",
-      "Roll-out retail concepts with 3-4 AU/NZ chains, spanning sports, electronics, furniture, and discount retailer channels",
-      "Position Gym and Fitness as the go-to for home and commercial gym gear by building a content engine driven by influencers, education, and transformations",
-      "Strengthen sales capability to meet FY26 targets through smart hiring, better systems, and a high-performing team culture",
-      "Establish Nike Strengths presence in Australia through 3 verticals: Direct (GAF), Retail (Big Box) and Commercial achieving $2.5-3mil sales FY26 end"
+      "Successfully pivot our brand positioning and digital acquisition to champion the Home Gym Builder by developing and executing on a Home Gym Builder marketing strategy - including brand positioning, channel plan, website direction, and the AI Gym Designer MVP",
+      "By 30 June 2027, transform GAF into an industry-leading powerhouse by rationalising product and establishing a high-margin core range that focuses on GAF's best-performing customers",
+      "Build a scalable, profitable wholesale channel that strengthens dealer relationships and strategically aligns with GAF Retail",
+      "Improve GMROI performance through disciplined inventory optimisation, improved stock velocity, and stronger category margin management."
     ],
     q4AovProgress: "5%",
     q4GpProgress: "42.6%"
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-        // Fetch BHAG data separately so it doesn't fail if allorigins rate limits
+    let cancelled = false;
+
+    // BHAG charts fetch their own CSVs and must never block the OPSP text render.
+    // Fire-and-forget: the chart useMemos already handle a null/empty result.
+    fetchBHAGData()
+        .then((res) => { if (!cancelled) setBhagData(res); })
+        .catch((bhagErr) => console.warn("BHAG fetch failed", bhagErr));
+
+    // Google publishes the doc cross-origin, so we proxy it. allorigins is flaky
+    // (rate-limits / hangs), which used to leave the tab stuck on the loader — so we
+    // race a timeout and fall back to a second proxy before degrading to static data.
+    const buildProxyUrls = (docUrl: string) => [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(docUrl)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(docUrl)}`,
+    ];
+
+    const fetchViaProxy = async (proxyUrl: string): Promise<string | null> => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
         try {
-            const bhagRes = await fetchBHAGData();
-            setBhagData(bhagRes);
-        } catch (bhagErr) {
-            console.warn("BHAG fetch failed", bhagErr);
+            const res = await fetch(proxyUrl, { signal: controller.signal });
+            if (!res.ok) throw new Error(`proxy HTTP ${res.status}`);
+            const contentType = res.headers.get('content-type') || '';
+            // allorigins wraps the payload as JSON { contents }; corsproxy returns raw HTML.
+            if (contentType.includes('application/json')) {
+                const json = await res.json();
+                return json.contents || null;
+            }
+            return await res.text();
+        } finally {
+            clearTimeout(timer);
+        }
+    };
+
+    const loadOpsp = async () => {
+        const docUrl = `https://docs.google.com/document/d/e/2PACX-1vRKUADNpV9pz1kwD44mxS2sdmTKqhQ8E64f9d8AnODzC1ekkZeL6OU9ND6OrofrYeQFuJfiOJMlSgzg/pub?_t=${Date.now()}`;
+
+        let htmlText: string | null = null;
+        for (const proxyUrl of buildProxyUrls(docUrl)) {
+            try {
+                htmlText = await fetchViaProxy(proxyUrl);
+                if (htmlText) break;
+            } catch (e) {
+                console.warn("OPSP proxy failed, trying next.", e);
+            }
+        }
+        if (!htmlText) {
+            console.warn("All OPSP proxies failed, utilizing fallback data.");
+            if (!cancelled) setOpspData(fallbackData);
+            return;
         }
 
         try {
-            const docUrl = `https://docs.google.com/document/d/e/2PACX-1vRKUADNpV9pz1kwD44mxS2sdmTKqhQ8E64f9d8AnODzC1ekkZeL6OU9ND6OrofrYeQFuJfiOJMlSgzg/pub?_t=${Date.now()}`;
-            const opspRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(docUrl)}`);
-            if (!opspRes.ok) throw new Error('Failed to fetch from proxy');
-            const data = await opspRes.json();
-            
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data.contents, 'text/html');
-            // Strip scripts/styles/head before reading text. Google's published-doc HTML
-            // embeds inline <script> blocks (incl. the $jscomp polyfill); on a detached
-            // DOMParser document innerText can include script text in some browsers, which
-            // leaked raw JS into the rendered Purpose/BHAG values. textContent after removal
-            // is deterministic across browsers.
+            const doc = new DOMParser().parseFromString(htmlText, 'text/html');
             doc.querySelectorAll('script, style, head').forEach((el: Element) => el.remove());
-            const lines = (doc.body.textContent || '').split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0);
+
+            // Google publishes the doc as a SINGLE line with no newlines, so the old
+            // textContent.split('\n') parse silently matched nothing and every field fell
+            // back to hardcoded data (incl. the FY26-era Key Initiatives). Parse the DOM
+            // structure directly instead — newline-independent and deterministic.
+            const looksLikeCode = (s: string) =>
+                /[{};]|=>|\bfunction\b|prototype|\bvar\b|typeof/.test(s);
+            const clean = (s: string | null | undefined) =>
+                (s && !looksLikeCode(s) ? s.trim() : null);
+
+            // Ordered list of text runs (each paragraph / table cell is one block).
+            const blocks = Array.from(doc.querySelectorAll('p, h1, h2, h3, h4, li'))
+                .map((el) => (el.textContent || '').trim())
+                .filter(Boolean);
+
+            const valueAfter = (label: string, opts: { exact?: boolean; from?: number } = {}) => {
+                const { exact = false, from = 0 } = opts;
+                const i = blocks.findIndex((b, idx) => idx >= from && (exact
+                    ? b.toLowerCase() === label.toLowerCase()
+                    : b.toLowerCase().includes(label.toLowerCase())));
+                return i !== -1 && blocks[i + 1] ? blocks[i + 1] : null;
+            };
+
+            // Read the Initiative column (2nd cell) of numbered rows in the table that
+            // follows a given heading (e.g. "Key Initiatives", "Key Thrusts").
+            const rowsOfTableAfter = (headingMatch: RegExp): string[] => {
+                const heading = Array.from(doc.querySelectorAll('h1,h2,h3,h4,p,span'))
+                    .find((el) => headingMatch.test(el.textContent || ''));
+                if (!heading) return [];
+                const tbl = Array.from(doc.querySelectorAll('table')).find(
+                    (t) => heading.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING);
+                if (!tbl) return [];
+                const out: string[] = [];
+                for (const row of Array.from(tbl.querySelectorAll('tr')).slice(1)) {
+                    const cells = Array.from(row.querySelectorAll('td')).map((c) => (c.textContent || '').trim());
+                    if (cells.length >= 2 && /^\d+$/.test(cells[0]) && cells[1]) out.push(cells[1]);
+                }
+                return out;
+            };
 
             const parsed = { ...fallbackData };
 
-            // Reject anything that looks like code so a malformed/unexpected response
-            // never renders as page content; the hardcoded fallback is used instead.
-            const looksLikeCode = (s: string) =>
-                /[{};]|=>|\bfunction\b|prototype|\bvar\b|typeof/.test(s);
-            const clean = (s: string | null) => (s && !looksLikeCode(s) ? s : null);
-
-            const findValueAfter = (header: string, offset = 1) => {
-                const idx = lines.findIndex((l: string) => l.toUpperCase().includes(header.toUpperCase()));
-                if (idx !== -1 && lines[idx + offset]) return lines[idx + offset];
-                return null;
-            };
-
-            const purpose = clean(findValueAfter("Purpose (Why)"));
+            const purpose = clean(valueAfter("Purpose (Why)"));
             if (purpose) parsed.purpose = purpose;
 
-            const bhag = clean(findValueAfter("BHAG (Big Hairy Audacious Goal)"));
+            const bhag = clean(valueAfter("BHAG (Big Hairy Audacious Goal)"));
             if (bhag) parsed.bhag = bhag;
 
-            const fy30Rev = clean(findValueAfter("FY30", 1));
-            if (fy30Rev && fy30Rev.includes("$")) parsed.fy30Revenue = fy30Rev;
-
-            const fy27RevIdx = lines.findIndex((l: string) => l.includes("REVENUE") && l === "REVENUE");
-            if (fy27RevIdx !== -1 && lines[fy27RevIdx + 1] && lines[fy27RevIdx + 1].includes("$") && !looksLikeCode(lines[fy27RevIdx + 1])) {
-                parsed.fy27Revenue = lines[fy27RevIdx + 1];
+            const bpIdx = blocks.findIndex((b) => /Brand Promises/i.test(b));
+            if (bpIdx !== -1) {
+                const p1 = clean(blocks[bpIdx + 1]);
+                const p2 = clean(blocks[bpIdx + 2]);
+                if (p1 && p2) parsed.brandPromises = [p1, p2];
             }
 
-            const fy27GpIdx = lines.findIndex((l: string) => l.includes("GROSS PROFIT %"));
-            if (fy27GpIdx !== -1 && lines[fy27GpIdx + 1] && lines[fy27GpIdx + 1].includes("%") && !looksLikeCode(lines[fy27GpIdx + 1])) {
-                parsed.fy27GPMargin = lines[fy27GpIdx + 1];
-            }
+            const fy30Rev = valueAfter("FY30", { exact: true });
+            if (fy30Rev && fy30Rev.includes("$") && !looksLikeCode(fy30Rev)) parsed.fy30Revenue = fy30Rev;
 
-            setOpspData(parsed);
+            // FY27 numbers live in the "One Year - Goals FY2027" table; scope the search
+            // after that heading so we don't pick up the 3-5yr (FY2030) figures.
+            const oyIdx = blocks.findIndex((b) => /One Year.*FY2027/i.test(b));
+            const from = oyIdx !== -1 ? oyIdx : 0;
+
+            const fy27Rev = valueAfter("REVENUE", { exact: true, from });
+            if (fy27Rev && fy27Rev.includes("$") && !looksLikeCode(fy27Rev)) parsed.fy27Revenue = fy27Rev;
+
+            const fy27Gp = valueAfter("GROSS PROFIT %", { exact: true, from });
+            if (fy27Gp && fy27Gp.includes("%") && !looksLikeCode(fy27Gp)) parsed.fy27GPMargin = fy27Gp;
+
+            const thrusts = rowsOfTableAfter(/Key Thrusts/i).map((t) => {
+                const [title, ...rest] = t.split(' - ');
+                return { title: title.trim(), desc: rest.join(' - ').trim() };
+            });
+            if (thrusts.length) parsed.keyThrusts = thrusts;
+
+            const initiatives = rowsOfTableAfter(/Key Initiatives/i).filter((x) => !looksLikeCode(x));
+            if (initiatives.length) parsed.initiatives = initiatives;
+
+            if (!cancelled) setOpspData(parsed);
         } catch (e) {
-            console.warn("Live parsing failed, utilizing fallback data.", e);
-            setOpspData(fallbackData);
-        } finally {
-            setIsLoading(false);
+            console.warn("OPSP parse failed, utilizing fallback data.", e);
+            if (!cancelled) setOpspData(fallbackData);
         }
     };
-    fetchData();
+
+    loadOpsp().finally(() => { if (!cancelled) setIsLoading(false); });
+
+    return () => { cancelled = true; };
   }, []);
 
   const weeklyCallsData = useMemo(() => {
