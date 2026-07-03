@@ -303,13 +303,16 @@ function KeywordsTab({ keywords, searchTerms }) {
   const extra = view==='keywords'
     ? [{ key:'name', label:'Keyword', render:r=><div><div className="font-medium text-gray-800 truncate max-w-[280px]" title={r.name}>{r.name}</div><div className="text-[11px] text-gray-400">{r.match_type} · {r.campaign}</div></div> }]
     : [{ key:'name', label:'Search term', render:nameCell }];
+  const cols = view==='keywords'
+    ? [...perfCols(extra), { key:'search_impression_share', label:'Impr. Share', align:'right', render:r=>r.search_impression_share==null?'—':pct(r.search_impression_share,0) }]
+    : perfCols(extra);
   return (
     <div className="space-y-4">
       <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-max">
         {[['keywords','Keywords'],['search','Search terms']].map(([k,l])=><button key={k} onClick={()=>setView(k)}
           className={`px-4 py-1 rounded-md text-xs font-semibold tab-btn ${view===k?'bg-white shadow text-gray-900':'text-gray-500'}`}>{l}</button>)}
       </div>
-      <div className="dash-card p-2"><DataTable rows={rows} columns={perfCols(extra)}/></div>
+      <div className="dash-card p-2"><DataTable rows={rows} columns={cols}/></div>
     </div>
   );
 }
