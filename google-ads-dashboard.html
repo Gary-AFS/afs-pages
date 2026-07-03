@@ -22,6 +22,13 @@ h1,h2,h3,h4,h5,h6,.font-display{font-family:'Montserrat',sans-serif}
 .scrollbar-thin::-webkit-scrollbar-thumb{background:#d4d4d8;border-radius:4px}
 .tab-btn{transition:all .15s ease}
 table{border-collapse:collapse}
+.tip{position:relative;cursor:help;border-bottom:1px dotted rgba(120,120,130,.5)}
+.tip .tip-b{visibility:hidden;opacity:0;position:absolute;z-index:60;bottom:150%;left:0;
+  background:#111827;color:#fff;padding:7px 9px;border-radius:7px;font-size:11px;font-weight:400;
+  width:210px;line-height:1.4;box-shadow:0 6px 20px rgba(0,0,0,.22);transition:opacity .12s;
+  text-transform:none;letter-spacing:normal;pointer-events:none;white-space:normal;text-align:left}
+.tip.tip-r .tip-b{left:auto;right:0}
+.tip:hover .tip-b{visibility:visible;opacity:1}
 </style>
 </head>
 <body>
@@ -46,6 +53,31 @@ const CHANNEL_LABELS = {
   DISPLAY:'Display', VIDEO:'Video', DEMAND_GEN:'Demand Gen', MULTI_CHANNEL:'Demand Gen', UNKNOWN:'Other',
 };
 
+// ---- metric definitions (hover tooltips) ----
+const METRIC_DEFS = {
+  spend: "Total amount spent on Google Ads in the selected window.",
+  impressions: "Number of times your ads were shown.",
+  clicks: "Number of clicks on your ads.",
+  ctr: "Click-through rate — clicks ÷ impressions.",
+  avg_cpc: "Average cost per click — spend ÷ clicks.",
+  conversions: "Primary conversions (purchases) Google Ads attributes to your ads.",
+  conv_value: "Total revenue value of those primary conversions.",
+  roas: "Return on ad spend — conversion value ÷ spend. Higher is better.",
+  cpa: "Cost per acquisition — spend ÷ conversions. Lower is better.",
+  add_to_cart: "Add-to-cart events attributed to Google Ads (Shopping conversion action). A secondary conversion — not counted in ROAS.",
+  atc_rate: "Add-to-cart rate — add-to-carts ÷ clicks.",
+  sis: "Search impression share — the % of available Search impressions your ads actually received. Low = you're missing reachable demand.",
+  search_impression_share: "Search impression share — the % of available Search impressions your ads actually received. Low = you're missing reachable demand.",
+  channel: "Google Ads campaign type — Search, Shopping, Performance Max, Display or Demand Gen.",
+  name: "",
+  match_type: "How closely a search must match the keyword (Broad, Phrase or Exact).",
+};
+
+function Tip({ text, align, children }) {
+  if (!text) return children;
+  return <span className={`tip${align==='right'?' tip-r':''}`}>{children}<span className="tip-b">{text}</span></span>;
+}
+
 // ---- formatters ----
 const money = (v,dp=0)=> v==null?'—':'$'+Number(v).toLocaleString('en-AU',{minimumFractionDigits:dp,maximumFractionDigits:dp});
 const num   = (v,dp=0)=> v==null?'—':Number(v).toLocaleString('en-AU',{minimumFractionDigits:dp,maximumFractionDigits:dp});
@@ -69,9 +101,9 @@ function Delta({ value, metric }) {
 function KpiCard({ label, value, delta, metric, sub, primary }) {
   return (
     <div className="dash-card p-4 flex flex-col justify-between">
-      <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold">{label}</div>
+      <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold"><Tip text={METRIC_DEFS[metric]}>{label}</Tip></div>
       <div className="mt-2 flex items-end justify-between gap-2">
-        <div className="text-2xl font-display font-extrabold text-gray-900 leading-none" style={{color:primary&&metric==='roas'?primary:undefined}}>{value}</div>
+        <div className="text-2xl font-display font-extrabold text-gray-900 leading-none">{value}</div>
         {delta!==undefined && <Delta value={delta} metric={metric} />}
       </div>
       {sub && <div className="text-[11px] text-gray-400 mt-1">{sub}</div>}
@@ -118,17 +150,6 @@ function TrendChart({ daily, metric, primary }) {
   );
 }
 
-const TIER = {
-  win:  { label:'Win',   bg:'bg-emerald-50', text:'text-emerald-700', dot:'#10b981' },
-  watch:{ label:'Watch', bg:'bg-amber-50',   text:'text-amber-700',   dot:'#f59e0b' },
-  waste:{ label:'Waste', bg:'bg-rose-50',    text:'text-rose-700',    dot:'#f43f5e' },
-};
-function TierBadge({ tier }) {
-  const t = TIER[tier]||TIER.watch;
-  return <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${t.bg} ${t.text}`}>
-    <span className="w-1.5 h-1.5 rounded-full" style={{background:t.dot}}></span>{t.label}</span>;
-}
-
 function ChannelBadge({ channel }) {
   return <span className="text-[11px] px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium whitespace-nowrap">{CHANNEL_LABELS[channel]||channel}</span>;
 }
@@ -150,7 +171,7 @@ function DataTable({ rows, columns, defaultSort='spend' }) {
         <thead><tr className="text-left border-b border-gray-200">
           {columns.map(c=><th key={c.key} onClick={()=>c.sortable!==false&&click(c.key)}
             className={`py-2.5 px-3 text-[11px] uppercase tracking-wide text-gray-500 font-semibold ${c.align==='right'?'text-right':''} ${c.sortable!==false?'cursor-pointer select-none hover:text-gray-800':''}`}>
-            {c.label}{sort.key===c.key?(sort.dir==='asc'?' ↑':' ↓'):''}</th>)}
+            <Tip text={METRIC_DEFS[c.key]} align={c.align==='right'?'right':'left'}>{c.label}</Tip>{sort.key===c.key?(sort.dir==='asc'?' ↑':' ↓'):''}</th>)}
         </tr></thead>
         <tbody>
           {sorted.map((row,i)=><tr key={i} className="border-b border-gray-50 hover:bg-gray-50/60">
@@ -173,7 +194,7 @@ const perfCols = (extra=[])=>[
   { key:'avg_cpc', label:'CPC', align:'right', render:r=>money(r.avg_cpc,2) },
   { key:'conversions', label:'Conv.', align:'right', render:r=>num(r.conversions,1) },
   { key:'conv_value', label:'Conv. Value', align:'right', render:r=>money(r.conv_value) },
-  { key:'roas', label:'ROAS', align:'right', render:r=><b>{roasFmt(r.roas)}</b> },
+  { key:'roas', label:'ROAS', align:'right', render:r=>roasFmt(r.roas) },
   { key:'cpa', label:'CPA', align:'right', render:r=>money(r.cpa) },
 ];
 
@@ -195,10 +216,7 @@ function OverviewTab({ w, daily, primary }) {
     ['ATC Rate', k.atc_rate==null?'n/a':pct(k.atc_rate,2), d.atc_rate, 'atc_rate'],
     ['Search Impr. Share', k.search_impression_share==null?'n/a':pct(k.search_impression_share), undefined, 'sis'],
   ];
-  const camps = w.campaigns;
-  const winners = camps.filter(c=>c.tier==='win').sort((a,b)=>b.spend-a.spend).slice(0,5);
-  const waste = camps.filter(c=>c.tier==='waste').sort((a,b)=>b.spend-a.spend);
-  const wasteSpend = waste.reduce((s,c)=>s+c.spend,0);
+  const topSpend = [...w.campaigns].sort((a,b)=>b.spend-a.spend).slice(0,8);
   const channels = Object.entries(w.channels).sort((a,b)=>b[1].spend-a[1].spend);
   const totalChan = channels.reduce((s,[,v])=>s+v.spend,0)||1;
   return (
@@ -206,6 +224,11 @@ function OverviewTab({ w, daily, primary }) {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {cards.map(([l,v,dl,m])=><KpiCard key={l} label={l} value={v} delta={dl} metric={m} primary={primary}/>)}
       </div>
+
+      <p className="text-xs text-gray-400 flex items-start gap-1.5">
+        <span className="text-gray-300">ⓘ</span>
+        <span>Many purchases close offline (phone &amp; sales team), so on-site <b className="font-semibold text-gray-500">Conversions</b>, <b className="font-semibold text-gray-500">ROAS</b> and <b className="font-semibold text-gray-500">CPA</b> understate campaigns that generate leads. Treat them as directional signals, not a verdict.</span>
+      </p>
 
       <div className="dash-card p-5">
         <div className="flex items-center justify-between mb-3">
@@ -218,25 +241,18 @@ function OverviewTab({ w, daily, primary }) {
         <TrendChart daily={daily} metric={metric} primary={primary}/>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="dash-card p-5">
-          <h3 className="font-display font-bold text-gray-800 mb-1">Scale winners</h3>
-          <p className="text-xs text-gray-400 mb-3">Top Win-tier campaigns — candidates for more budget</p>
-          {winners.length? winners.map((c,i)=><div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-            <div className="min-w-0 mr-3"><div className="text-sm font-medium text-gray-800 truncate" title={c.name}>{c.name}</div><div className="text-[11px] text-gray-400">{CHANNEL_LABELS[c.channel]||c.channel}</div></div>
-            <div className="text-right whitespace-nowrap"><div className="text-sm font-bold" style={{color:primary}}>{roasFmt(c.roas)}</div><div className="text-[11px] text-gray-400">{money(c.spend)}</div></div>
-          </div>) : <p className="text-sm text-gray-400 py-4">No Win-tier campaigns.</p>}
-        </div>
-        <div className="dash-card p-5">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-display font-bold text-gray-800">Budget at risk</h3>
-            <span className="text-lg font-display font-extrabold text-rose-600">{money(wasteSpend)}</span>
-          </div>
-          <p className="text-xs text-gray-400 mb-3">Waste-tier spend — ROAS under 50% of account average</p>
-          {waste.length? waste.slice(0,5).map((c,i)=><div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-            <div className="min-w-0 mr-3"><div className="text-sm font-medium text-gray-800 truncate" title={c.name}>{c.name}</div><div className="text-[11px] text-gray-400">{CHANNEL_LABELS[c.channel]||c.channel}</div></div>
-            <div className="text-right whitespace-nowrap"><div className="text-sm font-bold text-rose-500">{roasFmt(c.roas)}</div><div className="text-[11px] text-gray-400">{money(c.spend)}</div></div>
-          </div>) : <p className="text-sm text-gray-400 py-4">Nothing flagged as waste.</p>}
+      <div className="dash-card p-5">
+        <h3 className="font-display font-bold text-gray-800 mb-1">Top campaigns by spend</h3>
+        <p className="text-xs text-gray-400 mb-3">Where the budget is going this window. Conversions &amp; ROAS shown for reference only.</p>
+        <div className="space-y-1">
+          {topSpend.map((c,i)=><div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+            <div className="min-w-0 mr-3 flex items-center gap-2"><ChannelBadge channel={c.channel}/><span className="text-sm font-medium text-gray-800 truncate" title={c.name}>{c.name}</span></div>
+            <div className="flex items-center gap-5 text-xs text-gray-500 whitespace-nowrap">
+              <span className="hidden sm:inline">Conv <span className="text-gray-700">{num(c.conversions,1)}</span></span>
+              <span className="hidden sm:inline">ROAS <span className="text-gray-700">{roasFmt(c.roas)}</span></span>
+              <span className="text-sm font-bold text-gray-900 w-24 text-right">{money(c.spend)}</span>
+            </div>
+          </div>)}
         </div>
       </div>
 
@@ -258,11 +274,9 @@ function OverviewTab({ w, daily, primary }) {
 function CampaignsTab({ w, primary }) {
   const [chan,setChan] = useState('ALL');
   const chans = ['ALL', ...Object.keys(w.channels)];
-  const tiers = w.campaigns.reduce((a,c)=>{a[c.tier]=(a[c.tier]||0)+1;return a;},{});
   const rows = chan==='ALL'? w.campaigns : w.campaigns.filter(c=>c.channel===chan);
   const cols = perfCols([
     { key:'name', label:'Campaign', render:r=><div className="flex items-center gap-2"><ChannelBadge channel={r.channel}/><span className="font-medium text-gray-800 truncate max-w-[240px]" title={r.name}>{r.name}</span></div> },
-    { key:'tier', label:'Tier', render:r=><TierBadge tier={r.tier}/> },
   ]);
   return (
     <div className="space-y-4">
@@ -270,11 +284,6 @@ function CampaignsTab({ w, primary }) {
         <div className="flex gap-1 bg-gray-100 rounded-lg p-1 flex-wrap">
           {chans.map(c=><button key={c} onClick={()=>setChan(c)}
             className={`px-3 py-1 rounded-md text-xs font-semibold tab-btn ${chan===c?'bg-white shadow text-gray-900':'text-gray-500'}`}>{c==='ALL'?'All channels':(CHANNEL_LABELS[c]||c)}</button>)}
-        </div>
-        <div className="flex gap-3 text-xs text-gray-500 ml-auto">
-          <span>Win <b className="text-emerald-600">{tiers.win||0}</b></span>
-          <span>Watch <b className="text-amber-600">{tiers.watch||0}</b></span>
-          <span>Waste <b className="text-rose-500">{tiers.waste||0}</b></span>
         </div>
       </div>
       <div className="dash-card p-2"><DataTable rows={rows} columns={cols}/></div>
@@ -379,7 +388,7 @@ function App() {
         {tab==='Ad Groups'  && <TableTab rows={b.ad_groups} extraCols={[{key:'name',label:'Ad group',render:nameCell}]}/>}
         {tab==='Keywords / Search Terms' && <KeywordsTab keywords={b.keywords} searchTerms={b.search_terms}/>}
         {tab==='Ads'        && <TableTab rows={b.ads} extraCols={[{key:'name',label:'Ad',render:nameCell}]}/>}
-        {tab!=='Overview' && <p className="text-[11px] text-gray-400 mt-4">Breakdown tables reflect the last 90 days. KPI cards and campaign tiers reflect the selected window.</p>}
+        {tab!=='Overview' && <p className="text-[11px] text-gray-400 mt-4">Breakdown tables reflect the last 90 days. KPI cards and campaign figures reflect the selected window.</p>}
       </main>
       <footer className="text-center text-xs text-gray-400 py-6">AFS Group · Google Ads dashboard · refreshed daily at 3am ACST</footer>
     </div>
