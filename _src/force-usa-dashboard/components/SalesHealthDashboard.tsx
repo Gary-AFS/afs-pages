@@ -784,7 +784,9 @@ const SalesHealthDashboard = () => {
   }, [activeData, selectedCustomer, selectedCountry])
 
   const summary = useMemo(() => {
-    if (!activeData) return null
+    // Degrade to a zeroed summary (not null) so the dashboard renders an empty state
+    // instead of crashing when the selected FY has no data yet (e.g. early FY27).
+    if (!activeData) return { currentMonth: { b: 0, a: 0 }, nextMonth: { b: 0, a: 0 }, currentQuarter: { b: 0, a: 0 }, lastQuarter: { b: 0, a: 0 }, ytd: { b: 0, a: 0 }, monthly: [] as any[] }
     const out: any = {
       currentMonth: { b: 0, a: 0 },
       nextMonth: { b: 0, a: 0 },
@@ -851,7 +853,7 @@ const SalesHealthDashboard = () => {
 
   /* ---------------- AFS METRICS -------------------------------- */
   const afsSummary = useMemo(() => {
-    if (!activeAfs) return null
+    if (!activeAfs) return { currentMonth: { b: 0, a: 0 }, nextMonth: { b: 0, a: 0 }, currentQuarter: { b: 0, a: 0 }, ytd: { b: 0, a: 0 }, monthly: [] as any[] }
     const out: any = {
       currentMonth: { b: 0, a: 0 },
       nextMonth: { b: 0, a: 0 },
@@ -877,7 +879,7 @@ const SalesHealthDashboard = () => {
 
   /* ---------------- USA METRICS -------------------------------- */
   const usaSummary = useMemo(() => {
-    if (!activeUsa) return null
+    if (!activeUsa) return { currentMonth: { a: 0 }, currentQuarter: { a: 0 }, ytd: { a: 0 }, monthly: [] as any[] }
     const out: any = {
       currentMonth: { a: 0 },
       currentQuarter: { a: 0 },

@@ -6,6 +6,7 @@ const FORCE_USA_DOC_URL = "https://docs.google.com/document/d/e/2PACX-1vQPEzXwMi
 
 const PROXIES = [
   (url: string) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+  (url: string) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
   (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
 ];
 
@@ -172,7 +173,7 @@ export default function OPSPDashboard() {
         for (const proxyFn of PROXIES) {
           try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 5000);
+            const timeout = setTimeout(() => controller.abort(), 8000);
             const res = await fetch(proxyFn(docUrl), { signal: controller.signal });
             clearTimeout(timeout);
             if (!res.ok) continue;
@@ -188,26 +189,95 @@ export default function OPSPDashboard() {
         }
         if (!htmlContent) throw new Error('All proxies failed');
 
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
         doc.querySelectorAll('script, style, head').forEach((el: Element) => el.remove());
-        const lines = (doc.body.textContent || '').split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0);
 
-        const parsed = { ...fallbackData };
+        // Google publishes the doc as a SINGLE line with no newlines, so the old
+        // textContent.split('\n') parse matched nothing and every field silently fell
+        // back to hardcoded data (incl. Key Initiatives / SWOT). Parse the DOM structure
+        // directly instead — newline-independent and deterministic.
         const looksLikeCode = (s: string) => /[{};]|=>|\bfunction\b|prototype|\bvar\b|typeof/.test(s);
-        const clean = (s: string | null) => (s && !looksLikeCode(s) ? s : null);
-        const findValueAfter = (header: string, offset = 1) => {
-          const idx = lines.findIndex((l: string) => l.toUpperCase().includes(header.toUpperCase()));
-          if (idx !== -1 && lines[idx + offset]) return lines[idx + offset];
-          return null;
+        const clean = (s: string | null | undefined) => (s && !looksLikeCode(s) ? s.trim() : null);
+
+        // Ordered list of text runs (each paragraph / table cell is one block).
+        const blocks = Array.from(doc.querySelectorAll('p, h1, h2, h3, h4, li'))
+          .map((el) => (el.textContent || '').trim())
+          .filter(Boolean);
+
+        const valueAfter = (label: string, opts: { exact?: boolean; from?: number } = {}) => {
+          const { exact = false, from = 0 } = opts;
+          const i = blocks.findIndex((b, idx) => idx >= from && (exact
+            ? b.toLowerCase() === label.toLowerCase()
+            : b.toLowerCase().includes(label.toLowerCase())));
+          return i !== -1 && blocks[i + 1] ? blocks[i + 1] : null;
         };
 
-        const purpose = clean(findValueAfter("Purpose (Why)"));
+        // Numbered rows of the table following a heading, as arrays of cell text.
+        const rowsAfter = (headingMatch: RegExp): string[][] => {
+          const heading = Array.from(doc.querySelectorAll('h1,h2,h3,h4,p,span'))
+            .find((el) => headingMatch.test(el.textContent || ''));
+          if (!heading) return [];
+          const tbl = Array.from(doc.querySelectorAll('table')).find(
+            (t) => heading.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING);
+          if (!tbl) return [];
+          const out: string[][] = [];
+          for (const row of Array.from(tbl.querySelectorAll('tr')).slice(1)) {
+            const cells = Array.from(row.querySelectorAll('td')).map((c) => (c.textContent || '').trim());
+            if (cells.length >= 2 && /^\d+$/.test(cells[0])) out.push(cells);
+          }
+          return out;
+        };
+        // Second column (the content column) of a numbered table.
+        const listAfter = (headingMatch: RegExp) =>
+          rowsAfter(headingMatch).map((c) => c[1]).filter((v) => v && !looksLikeCode(v));
+
+        const parsed = { ...fallbackData };
+
+        const coreValues = listAfter(/Core Values/i);
+        if (coreValues.length) parsed.coreValues = coreValues;
+
+        const purpose = clean(valueAfter("Purpose (Why)"));
         if (purpose) parsed.purpose = purpose;
-        const bhag = clean(findValueAfter("BHAG (Big Hairy Audacious Goal)"));
+
+        const bhag = clean(valueAfter("BHAG (Big Hairy Audacious Goal)"));
         if (bhag) parsed.bhag = bhag;
-        const fy30Rev = clean(findValueAfter("FY30", 1));
-        if (fy30Rev && fy30Rev.includes("$")) parsed.fy30Revenue = fy30Rev;
+
+        const fy30Rev = valueAfter("FY30", { exact: true });
+        if (fy30Rev && fy30Rev.includes("$") && !looksLikeCode(fy30Rev)) parsed.fy30Revenue = fy30Rev;
+
+        // Initiatives: the owner is embedded as a trailing "(XX)" tag, status is the last cell.
+        const initiatives = rowsAfter(/Key Initiatives/i).map((cells) => {
+          let text = cells[1] || '';
+          const ownerMatch = text.match(/\(([A-Za-z]{2,4})\)\s*$/);
+          const owner = ownerMatch ? ownerMatch[1] : '';
+          if (ownerMatch) text = text.slice(0, ownerMatch.index).trim();
+          return { text, owner, status: cells[cells.length - 1] || 'Not Set' };
+        }).filter((i) => i.text && !looksLikeCode(i.text));
+        if (initiatives.length) parsed.initiatives = initiatives;
+
+        const strengths = listAfter(/^Strengths$/i);
+        if (strengths.length) parsed.strengths = strengths;
+        const weaknesses = listAfter(/Weaknesses/i);
+        if (weaknesses.length) parsed.weaknesses = weaknesses;
+        const opportunities = listAfter(/Opportunities/i);
+        if (opportunities.length) parsed.opportunities = opportunities;
+        const threats = listAfter(/Trends \/ Threats/i);
+        if (threats.length) parsed.threats = threats;
+
+        // Sandbox + Process are label→value pairs in their own tables.
+        const sbFrom = blocks.findIndex((b) => /Sandbox \/ Ideal Client/i.test(b));
+        if (sbFrom !== -1) {
+          parsed.sandbox = {
+            geography: clean(valueAfter("Geography", { exact: true, from: sbFrom })) || fallbackData.sandbox.geography,
+            channel: clean(valueAfter("Channel", { exact: true, from: sbFrom })) || fallbackData.sandbox.channel,
+            offering: clean(valueAfter("Offering", { exact: true, from: sbFrom })) || fallbackData.sandbox.offering,
+          };
+        }
+        parsed.processes = {
+          makeBuy: clean(valueAfter("Make/Buy", { exact: true })) || fallbackData.processes.makeBuy,
+          sell: clean(valueAfter("Sell", { exact: true })) || fallbackData.processes.sell,
+          recordkeeping: clean(valueAfter("Recordkeeping", { exact: true })) || fallbackData.processes.recordkeeping,
+        };
 
         setOpspData(parsed);
       } catch (e) {
