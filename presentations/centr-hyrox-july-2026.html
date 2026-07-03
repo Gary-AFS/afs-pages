@@ -478,7 +478,154 @@ const DigitalSlide = ({ n, t }) => {
   );
 };
 
-// ===== SLIDE 5: WINS =====
+// ===== SLIDE 5: AD PERFORMANCE =====
+const adMonthlySpend = [
+  { m: "Jul '25", meta: 2144, google: 51 },
+  { m: 'Aug', meta: 2171, google: 51 },
+  { m: 'Sep', meta: 2106, google: 28 },
+  { m: 'Oct', meta: 2146, google: 15 },
+  { m: 'Nov', meta: 2109, google: 36 },
+  { m: 'Dec', meta: 2170, google: 3 },
+  { m: "Jan '26", meta: 2150, google: 2 },
+  { m: 'Feb', meta: 1958, google: 7 },
+  { m: 'Mar', meta: 2189, google: 2 },
+  { m: 'Apr', meta: 2093, google: 4 },
+  { m: 'May', meta: 2150, google: 8 },
+  { m: 'Jun', meta: 1585, google: 14 },
+];
+
+const adCreatives = [
+  { name: 'Competition Equipment', type: 'Carousel', status: 'Paused', img: 'assets/centr-hyrox-tcr.jpg' },
+  { name: 'Power Up Your Routine', type: 'Single Image', status: 'Active', img: 'assets/centr-power-up.jpg' },
+];
+
+const AdSlide = ({ n, t }) => {
+  const th = useTheme();
+  const maxSpend = Math.max(...adMonthlySpend.map(d => d.meta + d.google));
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="Advertising" title="AD PERFORMANCE" sub="Meta Ads + Google Ads — Centr x Hyrox campaigns | July 2025 — June 2026" />
+    <div className="flex flex-col flex-1 gap-3 min-h-0">
+      <div className="grid grid-cols-4 gap-4 shrink-0 stagger">
+        <Kpi label="Total Ad Spend" value="$25,190" sub="Meta $24,971 · Google $219" />
+        <Kpi label="Purchases" value="233" sub="$107 cost per purchase" />
+        <Kpi label="Impressions" value="1.58M" sub="384K unique reach" />
+        <Kpi label="ROAS" value="53x" sub="$1.34M rev on $25K spend" accent />
+      </div>
+      <div className="flex gap-4 flex-1 min-h-0">
+        <div className="flex-1 flex flex-col gap-3">
+          {/* Monthly Spend Chart */}
+          <div className={`flex-1 ${th.cardBg} rounded-lg border ${th.cardBorder} p-4`}>
+            <div className="flex items-center justify-between mb-3">
+              <p className={`text-[13px] font-heading tracking-[.3em] ${th.sub} uppercase`}>Monthly Ad Spend</p>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-gaf-orange"></div><span className={`text-[12px] font-body ${th.sub}`}>Meta</span></div>
+                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm" style={{backgroundColor:'#666'}}></div><span className={`text-[12px] font-body ${th.sub}`}>Google</span></div>
+              </div>
+            </div>
+            <div className="flex items-end gap-[6px] h-[calc(100%-36px)]">
+              {adMonthlySpend.map((d, i) => {
+                const total = d.meta + d.google;
+                const metaPct = d.meta / total * 100;
+                return (
+                <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+                  <span className={`text-[10px] font-body font-semibold ${th.sub} mb-1`}>${(total/1000).toFixed(1)}K</span>
+                  <div className="w-full rounded-sm bar-grow origin-bottom overflow-hidden" style={{
+                    height: `${(total / maxSpend) * 85}%`, minHeight: '3px',
+                    animationDelay: `${i * 0.06}s`
+                  }}>
+                    <div className="w-full" style={{height: `${metaPct}%`, background: 'linear-gradient(to top, #c03008, #f26422)'}}></div>
+                    <div className="w-full" style={{height: `${100-metaPct}%`, background: '#666'}}></div>
+                  </div>
+                  <span className={`text-[10px] ${th.muted} mt-1.5 font-body`}>{d.m}</span>
+                </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* Campaign Performance */}
+          <div className={`${th.cardBg} rounded-lg border ${th.cardBorder} p-4 shrink-0`}>
+            <p className={`text-[13px] font-heading tracking-[.3em] ${th.sub} uppercase mb-3`}>Campaign Breakdown</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className={`${th.bg3} p-3 rounded-lg`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gaf-orange"></div>
+                  <p className={`text-[13px] font-heading font-semibold ${th.text}`}>Prospecting</p>
+                  <span className={`text-[11px] font-body px-1.5 py-0.5 rounded ${th.greenBg} ${th.green}`}>Active</span>
+                </div>
+                <div className="flex gap-4">
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>Spend</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>$18,233</p></div>
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>Purchases</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>171</p></div>
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>CPA</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>$107</p></div>
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>CTR</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>1.58%</p></div>
+                </div>
+              </div>
+              <div className={`${th.bg3} p-3 rounded-lg`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{backgroundColor:'#888'}}></div>
+                  <p className={`text-[13px] font-heading font-semibold ${th.text}`}>Retargeting</p>
+                  <span className={`text-[11px] font-body px-1.5 py-0.5 rounded ${th.amberBg} ${th.amber}`}>Paused Jun</span>
+                </div>
+                <div className="flex gap-4">
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>Spend</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>$6,739</p></div>
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>Purchases</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>62</p></div>
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>CPA</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>$109</p></div>
+                  <div><p className={`text-[11px] ${th.muted} font-body`}>CTR</p><p className={`text-[14px] font-heading font-semibold ${th.text}`}>1.16%</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Right column: ad creatives + engagement stats */}
+        <div className="w-[320px] shrink-0 flex flex-col gap-3">
+          <div className={`${th.cardBg} rounded-lg border ${th.cardBorder} p-4 flex-1 flex flex-col`}>
+            <p className={`text-[13px] font-heading tracking-[.3em] ${th.sub} uppercase mb-3`}>Ad Creatives</p>
+            <div className="flex-1 flex flex-col gap-2">
+              {adCreatives.map((c, i) => (
+                <div key={i} className={`flex gap-3 items-start ${th.bg3} rounded-lg p-2`}>
+                  <img src={c.img} alt={c.name} className="w-16 h-16 object-cover rounded" />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-[13px] font-heading font-semibold ${th.text} leading-tight`}>{c.name}</p>
+                    <p className={`text-[11px] ${th.sub} font-body mt-0.5`}>{c.type}</p>
+                    <span className={`text-[10px] font-body px-1.5 py-0.5 rounded mt-1 inline-block ${c.status === 'Active' ? `${th.greenBg} ${th.green}` : `${th.amberBg} ${th.amber}`}`}>{c.status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={`${th.cardBg} rounded-lg border ${th.cardBorder} p-4 shrink-0`}>
+            <p className={`text-[13px] font-heading tracking-[.3em] ${th.sub} uppercase mb-3`}>Engagement</p>
+            <div className="space-y-2">
+              {[
+                { label: 'Video Views', value: '138K', pct: 100 },
+                { label: 'Landing Page Views', value: '15.3K', pct: 45 },
+                { label: 'Add to Cart', value: '1,911', pct: 25 },
+                { label: 'Initiate Checkout', value: '963', pct: 15 },
+                { label: 'Purchases', value: '233', pct: 8 },
+              ].map((s, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-baseline mb-1">
+                    <span className={`text-[13px] font-body ${th.sub}`}>{s.label}</span>
+                    <span className={`text-[14px] font-heading font-semibold ${th.text}`}>{s.value}</span>
+                  </div>
+                  <div className={`w-full ${th.bg3} rounded-full h-1`}>
+                    <div className="h-full rounded-full fill-anim" style={{'--target-w': `${s.pct}%`, background: 'linear-gradient(to right, #c03008, #f26422)'}}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className={`mt-3 pt-3 border-t ${th.cardBorder}`}>
+              <p className={`text-[13px] ${th.sub} font-body leading-snug`}><span className="text-gaf-orange font-semibold">99% Meta</span> · 1% Google · $2.1K/mo avg spend</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 6: WINS =====
 const WinsSlide = ({ n, t }) => {
   const th = useTheme();
   return (
@@ -736,7 +883,7 @@ const QSlide = ({ n, t }) => {
 };
 
 // ===== APP =====
-const SLIDES = [TitleSlide, PerfSlide, SalesSlide, DigitalSlide, WinsSlide, ChallengesSlide, PlansSlide, ExpSlide, SupportSlide, QSlide];
+const SLIDES = [TitleSlide, PerfSlide, SalesSlide, DigitalSlide, AdSlide, WinsSlide, ChallengesSlide, PlansSlide, ExpSlide, SupportSlide, QSlide];
 
 function App() {
   const [idx, setIdx] = useState(0);
