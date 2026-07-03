@@ -89,7 +89,7 @@ export default function OPSPDashboard() {
   const fallbackData = {
     coreValues: ["PEOPLE", "NIMBAGILITY", "CONTINUOUS IMPROVEMENT", "COLLABORATION", "EMPATHY", "INCLUSIVITY"],
     purpose: "Improve lives through fitness and wellness",
-    bhag: "To be a top 3 global brand leader in integrated strength systems, reaching $100M revenue and hero units in 1,000 retail stores by 2030",
+    bhag: "By 2030 Force will become the Top 3 global strength brand delivering innovative, integrated strength systems, generating $100M+ revenue with 1,000+ physical locations globally",
     fy30Revenue: "$100,000,000",
     keyThrusts: [] as { title: string; desc: string }[],
     initiatives: [
@@ -530,13 +530,29 @@ export default function OPSPDashboard() {
               <h3 className="font-bold text-gray-900 text-lg">Strategy (One Phrase)</h3>
             </div>
             <div className="space-y-2">
-              {opspData.onePhraseStrategy.map((s: string, i: number) => (
+              {opspData.onePhraseStrategy.filter((s: string) => !/^FEEL\b/i.test(s)).map((s: string, i: number) => (
                 <div key={i} className="flex gap-3 items-start">
                   <div className="w-6 h-6 rounded-full bg-blue-50 text-[#185787] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</div>
                   <div className="text-sm text-gray-700 leading-snug">{s}</div>
                 </div>
               ))}
             </div>
+            {(() => {
+              const feel = opspData.onePhraseStrategy.find((s: string) => /^FEEL\b/i.test(s));
+              if (!feel) return null;
+              const desc = feel.replace(/^FEEL[:\s-]*/i, "");
+              return (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-start gap-3 p-3 bg-blue-50/60 rounded-xl border border-blue-100">
+                    <div className="text-xl font-black tracking-[0.2em] text-[#185787] shrink-0 leading-none pt-0.5">FEEL</div>
+                    <div className="text-sm text-gray-600 leading-snug">
+                      <span className="block text-[10px] uppercase font-bold text-[#185787]/70 tracking-widest mb-0.5">Key Differentiator</span>
+                      {desc}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
