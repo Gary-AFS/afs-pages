@@ -191,6 +191,8 @@ function OverviewTab({ w, daily, primary }) {
     ['Conv. Value', money(k.conv_value), d.conv_value, 'conv_value'],
     ['ROAS', roasFmt(k.roas), d.roas, 'roas'],
     ['CPA', money(k.cpa), d.cpa, 'cpa'],
+    ['Add to Cart', num(k.add_to_cart), d.add_to_cart, 'add_to_cart'],
+    ['ATC Rate', k.atc_rate==null?'n/a':pct(k.atc_rate,2), d.atc_rate, 'atc_rate'],
     ['Search Impr. Share', k.search_impression_share==null?'n/a':pct(k.search_impression_share), undefined, 'sis'],
   ];
   const camps = w.campaigns;
