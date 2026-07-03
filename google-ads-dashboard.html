@@ -37,8 +37,10 @@ table{border-collapse:collapse}
 const { useState, useEffect, useMemo } = React;
 
 const BRANDS = {
-  gaf:   { key:'gaf',   label:'Gym and Fitness', primary:'#f26422', primaryLight:'#fff3ec', headerBg:'#000000', accentText:'#f26422' },
-  revel: { key:'revel', label:'Revel Saunas',    primary:'#25B34B', primaryLight:'#ecfdf0', headerBg:'#0d2818', accentText:'#25B34B' },
+  gaf:   { key:'gaf',   label:'Gym and Fitness', primary:'#f26422', primaryLight:'#fff3ec', headerBg:'#000000', accentText:'#f26422',
+           logo:'https://cdn.shopify.com/s/files/1/1950/1891/files/GAFLogo-Primary-WhiteBG_51691f07-8b4f-4d1d-aefc-f2fc004eaa84.png?v=1775792576' },
+  revel: { key:'revel', label:'Revel Saunas',    primary:'#25B34B', primaryLight:'#ecfdf0', headerBg:'#0d2818', accentText:'#25B34B',
+           logo:'https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-White-02.png?v=1691241102' },
 };
 
 const WINDOWS = [
@@ -350,7 +352,10 @@ function App() {
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest opacity-60">
                 <span>Google Ads</span><span>·</span><span>Performance Dashboard</span>
               </div>
-              <h1 className="font-display font-extrabold text-2xl md:text-3xl mt-1">{b.name}</h1>
+              <div className="flex items-center gap-3 mt-2">
+                <img src={brand.logo} alt={b.name} className="h-9 md:h-11 w-auto object-contain" />
+                <h1 className="sr-only">{b.name}</h1>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex rounded-lg overflow-hidden border border-white/20">
