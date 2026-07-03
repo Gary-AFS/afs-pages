@@ -163,6 +163,33 @@ export default function OPSPDashboard() {
       sell: "Global distributor network + US DTC (forceusa.co) + Force App",
       recordkeeping: "Align (projects), A-line (forecasting), Asana",
     },
+    onePhraseStrategy: [
+      "Focus on a Global Brand",
+      "Expand A+ Distributors",
+      "Enable Innovative, Integrated Strength Systems",
+      "Lead in Physical Display & CX",
+      "FEEL: increasing accessibility of physical product in locations and retail floors where people can experience it first-hand",
+    ],
+    strategicPillars: [
+      "Innovative & Integrated Strength Systems",
+      "High-Performance Distributor Network",
+      "Product & NPI Excellence",
+      "Content and Commercial Execution Engine",
+      "Customer and CX Visibility and Improvement",
+    ],
+    brandPromises: [
+      "One system, every workout: premium integrated strength, built in-house to last (WIP - TBC)",
+      "A partner that brings you customers and insight, not just product (WIP - TBC)",
+    ],
+    brandPromiseKpis: "Trustpilot / NPS; distributor satisfaction + reorder rate (WIP - TBC)",
+    people: {
+      employees: "Employee engagement / eNPS score (WIP - TBC)",
+      customers: "NPS + Trustpilot rating; distributor satisfaction score (WIP - TBC)",
+      shareholders: "Revenue growth %, gross margin %, EBITDA (WIP - TBC)",
+    },
+    theme: { theme: "TBC", target: "TBC", celebration: "TBC", reward: "TBC" },
+    fy27Goals: { revenue: "TBC", grossProfit: "TBC", gpPercent: "TBC" },
+    profitX: "(TBC)",
   };
 
   useEffect(() => {
@@ -278,6 +305,65 @@ export default function OPSPDashboard() {
           sell: clean(valueAfter("Sell", { exact: true })) || fallbackData.processes.sell,
           recordkeeping: clean(valueAfter("Recordkeeping", { exact: true })) || fallbackData.processes.recordkeeping,
         };
+
+        // Index of the first block matching a heading (for scoped lookups).
+        const idxOf = (re: RegExp, from = 0) => blocks.findIndex((b, i) => i >= from && re.test(b));
+        // Body-text lines between two heading markers (for paragraph sections).
+        const blocksBetween = (startRe: RegExp, endRe: RegExp) => {
+          const s = idxOf(startRe);
+          if (s === -1) return [];
+          const e = idxOf(endRe, s + 1);
+          return blocks.slice(s + 1, e === -1 ? undefined : e).filter((b) => b && !looksLikeCode(b));
+        };
+
+        // Strategic Pillars (the "Key Thrusts / Capabilities" 3-5yr table).
+        const strategicPillars = listAfter(/Key Thrusts/i);
+        if (strategicPillars.length) parsed.strategicPillars = strategicPillars;
+
+        // One-phrase strategy (body lines between its label and the BHAG heading).
+        const onePhrase = blocksBetween(/Strategy \(one phrase\)/i, /BHAG/i);
+        if (onePhrase.length) parsed.onePhraseStrategy = onePhrase;
+
+        // Brand Promises + KPIs (paragraph sections between their labels).
+        const promises = blocksBetween(/^Brand Promises$/i, /Brand Promises KPIs/i);
+        if (promises.length) parsed.brandPromises = promises;
+        const promiseKpi = blocksBetween(/Brand Promises KPIs/i, /Three to Five/i);
+        if (promiseKpi.length) parsed.brandPromiseKpis = promiseKpi.join(" ");
+
+        // People (Reputation Drivers) — non-numbered label→value rows, scoped by heading.
+        const peopleFrom = idxOf(/People \(Reputation Drivers\)/i);
+        if (peopleFrom !== -1) {
+          parsed.people = {
+            employees: clean(valueAfter("Employees", { exact: true, from: peopleFrom })) || fallbackData.people.employees,
+            customers: clean(valueAfter("Customers", { exact: true, from: peopleFrom })) || fallbackData.people.customers,
+            shareholders: clean(valueAfter("Shareholders", { exact: true, from: peopleFrom })) || fallbackData.people.shareholders,
+          };
+        }
+
+        // Theme (Qtr/Annual) — scoped label→value rows.
+        const themeFrom = idxOf(/Theme \(Qtr\/Annual\)/i);
+        if (themeFrom !== -1) {
+          parsed.theme = {
+            theme: valueAfter("Theme", { exact: true, from: themeFrom }) || fallbackData.theme.theme,
+            target: valueAfter("Measurable Target / Critical #", { exact: true, from: themeFrom }) || fallbackData.theme.target,
+            celebration: valueAfter("Celebration", { exact: true, from: themeFrom }) || fallbackData.theme.celebration,
+            reward: valueAfter("Reward", { exact: true, from: themeFrom }) || fallbackData.theme.reward,
+          };
+        }
+
+        // One Year Goals FY2027 (Revenue / Gross Profit / GP%).
+        const goalsFrom = idxOf(/One Year - Goals FY2027/i);
+        if (goalsFrom !== -1) {
+          parsed.fy27Goals = {
+            revenue: valueAfter("REVENUE", { exact: true, from: goalsFrom }) || fallbackData.fy27Goals.revenue,
+            grossProfit: valueAfter("GROSS PROFIT", { exact: true, from: goalsFrom }) || fallbackData.fy27Goals.grossProfit,
+            gpPercent: valueAfter("GROSS PROFIT %", { exact: true, from: goalsFrom }) || fallbackData.fy27Goals.gpPercent,
+          };
+        }
+
+        // Profit/X (heading carries an inline value, e.g. "Profit/X (TBC)").
+        const profitBlock = blocks.find((b) => /^Profit\/X/i.test(b));
+        if (profitBlock) parsed.profitX = profitBlock.replace(/^Profit\/X\s*/i, "").trim() || "(TBC)";
 
         setOpspData(parsed);
       } catch (e) {
@@ -436,6 +522,42 @@ export default function OPSPDashboard() {
           </div>
         </div>
 
+        {/* STRATEGY (ONE PHRASE) + BRAND PROMISES */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><Compass size={18} /></div>
+              <h3 className="font-bold text-gray-900 text-lg">Strategy (One Phrase)</h3>
+            </div>
+            <div className="space-y-2">
+              {opspData.onePhraseStrategy.map((s: string, i: number) => (
+                <div key={i} className="flex gap-3 items-start">
+                  <div className="w-6 h-6 rounded-full bg-blue-50 text-[#185787] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</div>
+                  <div className="text-sm text-gray-700 leading-snug">{s}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><Heart size={18} /></div>
+              <h3 className="font-bold text-gray-900 text-lg">Brand Promises</h3>
+            </div>
+            <div className="space-y-3">
+              {opspData.brandPromises.map((p: string, i: number) => (
+                <div key={i} className="flex gap-3 text-sm text-gray-700 leading-snug">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#185787] shrink-0 mt-1.5" /><span>{p}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">KPIs</div>
+              <div className="text-sm text-gray-600">{opspData.brandPromiseKpis}</div>
+            </div>
+          </div>
+        </div>
+
         {/* STRATEGIC GOALS (BHAGs) */}
         <div>
           <div className="flex items-center gap-2 mb-5">
@@ -491,6 +613,50 @@ export default function OPSPDashboard() {
                   <div className="h-full bg-[#185787] rounded-full transition-all duration-1000" style={{ width: `${Math.min((currentEuStores / storeTarget) * 100, 100)}%` }} />
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* STRATEGIC PILLARS (3-5 YEARS) */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><Target size={18} /></div>
+            <h3 className="font-bold text-gray-900 text-lg">Strategic Pillars (3-5 Years)</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {opspData.strategicPillars.map((p: string, i: number) => (
+              <div key={i} className="flex gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 items-center">
+                <div className="w-7 h-7 rounded-full bg-[#185787] text-white flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</div>
+                <div className="text-sm font-semibold text-gray-800 leading-snug">{p}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ONE YEAR GOALS (FY2027) */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><TrendingUp size={18} /></div>
+              <h3 className="font-bold text-gray-900 text-lg">One Year Goals (FY2027)</h3>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-0.5">Profit / X</div>
+              <div className="text-sm font-bold text-gray-700">{opspData.profitX}</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Revenue</div>
+              <div className="text-xl font-black text-[#081C28]">{opspData.fy27Goals.revenue}</div>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Gross Profit</div>
+              <div className="text-xl font-black text-[#081C28]">{opspData.fy27Goals.grossProfit}</div>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">GP %</div>
+              <div className="text-xl font-black text-[#185787]">{opspData.fy27Goals.gpPercent}</div>
             </div>
           </div>
         </div>
@@ -611,58 +777,6 @@ export default function OPSPDashboard() {
           </div>
         </div>
 
-        {/* QUARTERLY SECTION */}
-        <div className="bg-[#081C28] rounded-2xl shadow-md p-6 md:p-8 text-white relative overflow-hidden">
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#185787] to-gray-500"></div>
-          <div className="flex items-center gap-2 mb-6">
-            <div className="p-2 bg-white/10 text-white rounded-lg"><Calendar size={20} /></div>
-            <div>
-              <h3 className="font-bold text-xl">Q1 FY27 Actions</h3>
-              <p className="text-xs text-gray-400">Jul - Sep 2026</p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            {opspData.quarterlyActions.map((action: string, i: number) => (
-              <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm flex gap-3">
-                <div className="w-2 h-2 rounded-full bg-blue-400 shrink-0 mt-1.5" />
-                <div className="text-sm text-gray-200 leading-snug">{action}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* COMPANY PRIORITIES */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><Users size={18} /></div>
-            <h3 className="font-bold text-gray-900 text-lg">Company Priorities</h3>
-          </div>
-          <div className="space-y-3">
-            {opspData.companyPriorities.map((p: any, i: number) => (
-              <div key={i} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="text-xs font-bold text-[#185787] mb-1">{p.owner}</div>
-                <div className="text-sm text-gray-700 leading-snug">{p.text}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* YOUR PRIORITY */}
-        <div className="bg-gradient-to-r from-[#185787] to-[#1a6aaa] rounded-2xl shadow-md p-6 md:p-8 text-white relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-white/10 text-white rounded-lg"><Crosshair size={20} /></div>
-            <h3 className="font-bold text-xl">Your Priority (Josh)</h3>
-          </div>
-          <div className="mb-4">
-            <div className="text-[10px] uppercase font-bold text-blue-200 tracking-widest mb-2">Goal</div>
-            <p className="text-sm md:text-base text-white/90 leading-relaxed">{opspData.yourPriority.goal}</p>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase font-bold text-blue-200 tracking-widest mb-2">KPI</div>
-            <p className="text-sm text-white/80 leading-relaxed">{opspData.yourPriority.kpi}</p>
-          </div>
-        </div>
-
         {/* SWOT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
@@ -709,6 +823,48 @@ export default function OPSPDashboard() {
             <div className="space-y-2">
               {opspData.threats.map((t: string, i: number) => (
                 <div key={i} className="flex gap-2 text-sm text-gray-700"><span className="text-red-500 shrink-0 mt-0.5">!</span><span>{t}</span></div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* PEOPLE (REPUTATION DRIVERS) + THEME */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><Users size={18} /></div>
+              <h3 className="font-bold text-gray-900 text-lg">People (Reputation Drivers)</h3>
+            </div>
+            <div className="space-y-3">
+              {[
+                { label: "Employees", value: opspData.people.employees },
+                { label: "Customers", value: opspData.people.customers },
+                { label: "Shareholders", value: opspData.people.shareholders },
+              ].map((r) => (
+                <div key={r.label} className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#185787] mb-1">{r.label}</div>
+                  <div className="text-sm text-gray-700 leading-snug">{r.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="p-2 bg-blue-100 text-[#185787] rounded-lg"><Rocket size={18} /></div>
+              <h3 className="font-bold text-gray-900 text-lg">Theme (Q1 FY27)</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { label: "Theme", value: opspData.theme.theme },
+                { label: "Measurable Target", value: opspData.theme.target },
+                { label: "Celebration", value: opspData.theme.celebration },
+                { label: "Reward", value: opspData.theme.reward },
+              ].map((r) => (
+                <div key={r.label} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">{r.label}</div>
+                  <div className="text-sm text-gray-700 font-medium">{r.value}</div>
+                </div>
               ))}
             </div>
           </div>
