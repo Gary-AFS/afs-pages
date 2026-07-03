@@ -366,7 +366,7 @@ export default function OPSPDashboard() {
 
   const monthsPassed = fyMonthIndex + 1;
   const revenueRunRate = revenueYtd > 0 ? (revenueYtd / monthsPassed) * 12 : 0;
-  const revenueTarget = 30_000_000;
+  const revenueTarget = 100_000_000;
   const currentEuStores = showroomData?.euStoresWithUnits || 0;
   const storeTarget = 100;
 
@@ -448,8 +448,8 @@ export default function OPSPDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <span className="bg-[#185787] px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">FY30 Revenue BHAG</span>
                 </div>
-                <div className="text-4xl md:text-5xl font-black mb-2 tracking-tight">$30.00M USD</div>
-                <div className="text-gray-400 font-medium text-lg mb-6">in a financial year (32% YOY growth)</div>
+                <div className="text-4xl md:text-5xl font-black mb-2 tracking-tight">$100.00M USD</div>
+                <div className="text-gray-400 font-medium text-lg mb-6">in a financial year by FY2030</div>
               </div>
               <div className="relative z-10 pt-6 border-t border-white/10">
                 <div className="flex justify-between items-end mb-2">
