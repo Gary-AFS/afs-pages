@@ -454,7 +454,9 @@ export default function OPSPDashboard() {
   const revenueRunRate = revenueYtd > 0 ? (revenueYtd / monthsPassed) * 12 : 0;
   const revenueTarget = 100_000_000;
   const currentEuStores = showroomData?.euStoresWithUnits || 0;
+  const currentTotalStores = showroomData?.totalStoresWithUnits || 0;
   const storeTarget = 100;
+  const showroomBhagTarget = 1000;
 
   if (isLoading || !opspData) {
     return (
@@ -609,24 +611,24 @@ export default function OPSPDashboard() {
             <div className="rounded-2xl bg-white border border-gray-200 p-8 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[280px]">
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="bg-blue-50 text-[#185787] px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">FY27 Showroom BHAG</span>
+                  <span className="bg-blue-50 text-[#185787] px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">2030 Showroom BHAG</span>
                 </div>
-                <div className="text-4xl md:text-5xl font-black text-[#081C28] mb-2 tracking-tight">100 Stores</div>
-                <div className="text-gray-500 font-medium text-lg mb-6">in the EU + UK with an Ai1 Unit</div>
+                <div className="text-4xl md:text-5xl font-black text-[#081C28] mb-2 tracking-tight">1,000 Stores</div>
+                <div className="text-gray-500 font-medium text-lg mb-6">globally with an Ai1 Unit by 2030</div>
               </div>
               <div className="relative z-10 pt-6 border-t border-gray-100">
                 <div className="flex justify-between items-end mb-2">
                   <div>
                     <div className="text-sm text-gray-500 font-medium mb-1">Current Status</div>
-                    <div className="text-2xl font-bold text-[#081C28]">{currentEuStores} Stores</div>
+                    <div className="text-2xl font-bold text-[#081C28]">{currentTotalStores} Stores</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-[#185787]">{((currentEuStores / storeTarget) * 100).toFixed(0)}%</div>
+                    <div className="text-2xl font-bold text-[#185787]">{((currentTotalStores / showroomBhagTarget) * 100).toFixed(1)}%</div>
                     <div className="text-sm text-gray-500">to target</div>
                   </div>
                 </div>
                 <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#185787] rounded-full transition-all duration-1000" style={{ width: `${Math.min((currentEuStores / storeTarget) * 100, 100)}%` }} />
+                  <div className="h-full bg-[#185787] rounded-full transition-all duration-1000" style={{ width: `${Math.min((currentTotalStores / showroomBhagTarget) * 100, 100)}%` }} />
                 </div>
               </div>
             </div>
