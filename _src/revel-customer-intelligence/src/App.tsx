@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, CartesianGrid, ComposedChart, Line, LabelList } from "recharts";
 import { Sun, Moon } from "lucide-react";
-import { META, MONTHLY, STATES, CATEGORIES, TOP_PRODUCTS, FUNC, EMO, BARRIERS, STAGE, TIMELINE, COMPETITORS, JOIN, ARCHETYPES, CROSSTAB, PATTERNS } from "./data";
+import { META, MONTHLY, STATES, CATEGORIES, TOP_PRODUCTS, FUNC, EMO, BARRIERS, STAGE, TIMELINE, COMPETITORS, JOIN, ARCHETYPES, PATTERNS } from "./data";
 
 // ═══════════════════════════════════════════════════════════
 // REVEL CUSTOMER INTELLIGENCE & JTBD DEEP DIVE — v2.1
@@ -104,8 +104,8 @@ const ChartTitle = ({ children }: any) => (
 
 const NAV_ITEMS = [
   { id: "exec", label: "Summary" },
-  { id: "join", label: "Call → Revenue" },
   { id: "macro", label: "Drivers" },
+  { id: "join", label: "Call → Revenue" },
   { id: "who", label: "Archetypes" },
   { id: "validate", label: "Validation" },
   { id: "v1v2", label: "v1 vs v2" },
@@ -114,8 +114,6 @@ const NAV_ITEMS = [
   { id: "method", label: "Method" },
 ];
 
-const V1_ORDER = ["Sanctuary Seeker", "Home Renovator", "Performance Biohacker", "Commercial Operator", "Cautious Researcher", "Unclassified"];
-const V2_ORDER = ["The Home Health-Seeker", "The Contrast Athlete", "The Commercial Recovery Operator", "The Quiet Shopper"];
 
 const VERDICTS = [
   { v1: "Sanctuary Seeker", verdict: "VALIDATED — NOW THE HOME HEALTH-SEEKER", color: "#2E8B4A", note: "77% of Sanctuary Seekers land in the Home Health-Seeker — v1's core archetype was right. What v1 missed is the fork inside it: a near 50/50 infrared-vs-traditional pathway split (mirrored 617 vs 694 in the actual customer base) that changes the creative language, PDP content and barrier handling, without being a separate 'who'." },
@@ -216,44 +214,8 @@ export default function App() {
           </div>
         </Card>
 
-        {/* ═══ B: CALL → REVENUE JOIN ═══ */}
-        <SectionHeader id="join" eyebrow="Section B" title="The Call → Revenue Join" subtitle="Each caller's phone number matched against NetSuite customer records, then their actual orders. Every number below is observed, not modelled." />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 24 }}>
-          <StatCard label="Unique Callers" value={fmt(JOIN.uniqueCallers)} sub={`from ${fmt(JOIN.calls)} analysed calls`} />
-          <StatCard label="Matched to a Customer" value={fmt(JOIN.matched)} sub={`${JOIN.matchPct}% by normalised phone`} />
-          <StatCard hero label="Purchased" value={fmt(JOIN.purchasers)} sub={`${JOIN.convPct}% of all callers — a floor, not a ceiling`} />
-          <StatCard label="Avg Spend per Buyer" value={fmtK(JOIN.avgSpend)} sub={`median ${fmtK(JOIN.medianSpend)}`} />
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, marginBottom: 32 }}>
-          <Card>
-            <ChartTitle>When Do Callers Buy? (First Call → First Order)</ChartTitle>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={JOIN.timing} margin={{ left: 10, right: 30, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-                <XAxis dataKey="bucket" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-14} textAnchor="end" height={62} axisLine={{ stroke: C.border }} tickLine={false} />
-                <YAxis tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
-                <Bar dataKey="count" name="Purchasing callers" radius={[4, 4, 0, 0]}>
-                  {JOIN.timing.map((t: any, i: number) => <Cell key={i} fill={t.bucket === "Same week as call" ? GREEN : GREY_BAR} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <p style={{ color: C.muted, fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
-              The median purchasing caller orders <strong style={{ color: C.text }}>the same day they call</strong> — which is exactly why callers can't define our archetypes on their own: the phone attracts people who are already close to buying.
-            </p>
-          </Card>
-          <Card>
-            <ChartTitle>Why 31.8% Is a Floor</ChartTitle>
-            <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
-              <p style={{ marginBottom: 10 }}>The match requires the caller's number to be stored on their NetSuite customer record. Web orders sync phones reliably; <strong style={{ color: C.text }}>manually-keyed phone sales often don't</strong> — we verified purchasers on recorded calls whose customer records hold no phone at all.</p>
-              <p style={{ marginBottom: 10 }}>~3% of Revel order customers have no phone on record, and others transact under a partner's number or a different line.</p>
-              <p>So treat {JOIN.convPct}% as the <strong style={{ color: C.text }}>observable minimum</strong>. True caller conversion is meaningfully higher — and either way, callers represent at least {Math.round(JOIN.callerRevenue / META.revenueIncGst * 100)}% of all Revel revenue.</p>
-            </div>
-          </Card>
-        </div>
-
-        {/* ═══ C: MARKET DRIVERS ═══ */}
-        <SectionHeader id="macro" eyebrow="Section C" title="Macro Market Drivers" subtitle={`Jobs-to-be-done and friction across ${fmt(META.uniqueCallers)} unique callers (counting each person once, not each call).`} />
+        {/* ═══ B: MARKET DRIVERS ═══ */}
+        <SectionHeader id="macro" eyebrow="Section B" title="Macro Market Drivers" subtitle={`Jobs-to-be-done and friction across ${fmt(META.uniqueCallers)} unique callers (counting each person once, not each call).`} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           <Card>
             <ChartTitle>Functional Job Themes</ChartTitle>
@@ -327,6 +289,42 @@ export default function App() {
             <p style={{ color: C.muted, fontSize: 12, marginTop: 16, lineHeight: 1.5 }}>
               66% of callers with a timeline want to buy <strong style={{ color: C.text }}>this month or sooner</strong>. This is the self-selection of the phone channel — the customer base is broader than the people who ring at the end of their journey.
             </p>
+          </Card>
+        </div>
+
+        {/* ═══ C: CALL → REVENUE JOIN ═══ */}
+        <SectionHeader id="join" eyebrow="Section C" title="The Call → Revenue Join" subtitle="Each caller's phone number matched against NetSuite customer records, then their actual orders. Every number below is observed, not modelled." />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 24 }}>
+          <StatCard label="Unique Callers" value={fmt(JOIN.uniqueCallers)} sub={`from ${fmt(JOIN.calls)} analysed calls`} />
+          <StatCard label="Matched to a Customer" value={fmt(JOIN.matched)} sub={`${JOIN.matchPct}% by normalised phone`} />
+          <StatCard hero label="Purchased" value={fmt(JOIN.purchasers)} sub={`${JOIN.convPct}% of all callers — a floor, not a ceiling`} />
+          <StatCard label="Avg Spend per Buyer" value={fmtK(JOIN.avgSpend)} sub={`median ${fmtK(JOIN.medianSpend)}`} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, marginBottom: 32 }}>
+          <Card>
+            <ChartTitle>When Do Callers Buy? (First Call → First Order)</ChartTitle>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={JOIN.timing} margin={{ left: 10, right: 30, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
+                <XAxis dataKey="bucket" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-14} textAnchor="end" height={62} axisLine={{ stroke: C.border }} tickLine={false} />
+                <YAxis tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
+                <Bar dataKey="count" name="Purchasing callers" radius={[4, 4, 0, 0]}>
+                  {JOIN.timing.map((t: any, i: number) => <Cell key={i} fill={t.bucket === "Same week as call" ? GREEN : GREY_BAR} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
+              The median purchasing caller orders <strong style={{ color: C.text }}>the same day they call</strong> — which is exactly why callers can't define our archetypes on their own: the phone attracts people who are already close to buying.
+            </p>
+          </Card>
+          <Card>
+            <ChartTitle>Why 31.8% Is a Floor</ChartTitle>
+            <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
+              <p style={{ marginBottom: 10 }}>The match requires the caller's number to be stored on their NetSuite customer record. Web orders sync phones reliably; <strong style={{ color: C.text }}>manually-keyed phone sales often don't</strong> — we verified purchasers on recorded calls whose customer records hold no phone at all.</p>
+              <p style={{ marginBottom: 10 }}>~3% of Revel order customers have no phone on record, and others transact under a partner's number or a different line.</p>
+              <p>So treat {JOIN.convPct}% as the <strong style={{ color: C.text }}>observable minimum</strong>. True caller conversion is meaningfully higher — and either way, callers represent at least {Math.round(JOIN.callerRevenue / META.revenueIncGst * 100)}% of all Revel revenue.</p>
+            </div>
           </Card>
         </div>
 
@@ -542,36 +540,6 @@ export default function App() {
 
         {/* ═══ F: V1 vs V2 ═══ */}
         <SectionHeader id="v1v2" eyebrow="Section F" title="Did We Get It Right the First Time?" subtitle="Each caller was assigned to their v1 archetype using v1's own rules, then cross-tabulated against the new identity clusters. The verdict is kinder to v1 than our first rerun was — once journey-stage noise is removed." />
-        <Card style={{ marginBottom: 24, overflowX: "auto" }}>
-          <ChartTitle>v1 Archetype → v2 Identity Cluster (Callers)</ChartTitle>
-          <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse", minWidth: 720 }}>
-            <thead>
-              <tr style={{ borderBottom: `2px solid ${GREEN}` }}>
-                <th style={{ ...EYEBROW, textAlign: "left", padding: "10px 6px", color: C.muted, fontSize: 10 }}>v1 (Apr 2026) ↓</th>
-                {V2_ORDER.map(c => <th key={c} style={{ ...EYEBROW, textAlign: "right", padding: "10px 6px", color: C.muted, fontSize: 10 }}>{c.replace("The ", "")}</th>)}
-                <th style={{ ...EYEBROW, textAlign: "right", padding: "10px 6px", color: C.muted, fontSize: 10 }}>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {V1_ORDER.map(r => {
-                const row = V2_ORDER.map(c => (CROSSTAB as any)[c]?.[r] ?? 0);
-                const tot = row.reduce((a: number, b: number) => a + b, 0);
-                const mx = Math.max(...row);
-                return (
-                  <tr key={r} style={{ borderBottom: `1px solid ${C.border}` }}>
-                    <td style={{ padding: "9px 6px", fontWeight: 700 }}>{r}</td>
-                    {row.map((v: number, i: number) => (
-                      <td key={i} style={{ padding: "9px 6px", textAlign: "right", fontWeight: v === mx && v > 0 ? 700 : 400, color: v === mx && v > 0 ? C.greenBody : v > 0 ? C.text : C.faint, background: v === mx && v > 0 ? C.greenSoft : "transparent" }}>
-                        {v > 0 ? `${v} (${Math.round(v / tot * 100)}%)` : "—"}
-                      </td>
-                    ))}
-                    <td style={{ padding: "9px 6px", textAlign: "right", color: C.muted }}>{tot}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </Card>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16, marginBottom: 32 }}>
           {VERDICTS.map((v, i) => (
             <Card key={i} style={{ borderLeft: `4px solid ${v.color}` }}>
