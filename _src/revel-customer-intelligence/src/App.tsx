@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, CartesianGrid, ComposedChart, Line, LabelList } from "recharts";
 import { Sun, Moon } from "lucide-react";
-import { META, MONTHLY, STATES, CATEGORIES, TOP_PRODUCTS, FUNC, EMO, BARRIERS, STAGE, TIMELINE, COMPETITORS, JOIN, ARCHETYPES, CROSSTAB, CALLER_STATES, PATTERNS } from "./data";
+import { META, MONTHLY, STATES, CATEGORIES, TOP_PRODUCTS, FUNC, EMO, BARRIERS, STAGE, TIMELINE, COMPETITORS, JOIN, ARCHETYPES, CROSSTAB, PATTERNS } from "./data";
 
 // ═══════════════════════════════════════════════════════════
 // REVEL CUSTOMER INTELLIGENCE & JTBD DEEP DIVE — v2.1
@@ -106,8 +106,7 @@ const NAV_ITEMS = [
   { id: "exec", label: "Summary" },
   { id: "join", label: "Call → Revenue" },
   { id: "macro", label: "Drivers" },
-  { id: "who", label: "Who (Archetypes)" },
-  { id: "where", label: "Where (Readiness)" },
+  { id: "who", label: "Archetypes" },
   { id: "validate", label: "Validation" },
   { id: "v1v2", label: "v1 vs v2" },
   { id: "revenue", label: "Revenue" },
@@ -196,7 +195,7 @@ export default function App() {
           <StatCard hero label="Revenue Traced to Callers" value={fmtM(JOIN.callerRevenue)} sub={`${fmtK(JOIN.callerGP)} GP · median ${fmtK(JOIN.medianSpend)} per purchasing caller`} />
           <StatCard label="Dominant Functional Job" value="Health / Detox" sub={`${FUNC[0].count} callers (${FUNC[0].pct}%)`} />
           <StatCard label="Dominant Barrier" value="Financial" sub={`${BARRIERS[0].count} callers (${BARRIERS[0].pct}%) · confidence + electrical close behind`} />
-          <StatCard label="Repeat Customers" value={`${META.repeatPct}%`} sub={`${fmt(META.repeatCustomers)} customers · ${META.repeatRevPct}% of revenue`} />
+          <StatCard label="True Repeat Customers" value={`${META.repeatPct}%`} sub={`${fmt(META.repeatCustomers)} of ${fmt(META.paidCustomers)} paid customers · ${META.repeatRevPct}% of revenue · $0 warranty orders excluded`} />
         </div>
 
         <Card style={{ marginBottom: 32 }}>
@@ -206,7 +205,7 @@ export default function App() {
               { n: "01", t: "Callers Are Worth $4M+, and They Buy Fast", b: <>At least <strong style={{ color: C.text }}>{JOIN.convPct}% of phone callers become customers</strong> (a floor — phone-keyed orders often lack a stored number), worth {fmtM(JOIN.callerRevenue)}. Of those who buy after calling, 65% order within a week of the first call.</> },
               { n: "02", t: "Who You Are ≠ Where You Are", b: <>Five stable identity archetypes describe WHO customers are. Readiness (WHERE they are in the journey) is a separate overlay that <strong style={{ color: C.text }}>roughly doubles conversion inside every archetype</strong> — 46-55% at decision stage vs ~20-25% earlier.</> },
               { n: "03", t: "The Health Buyer Splits in Two", b: <>The core home wellness buyer divides on <strong style={{ color: C.text }}>product philosophy</strong>: Infrared Health-Seekers vs Traditional Purists — near-equal halves of both the call base and the actual customer base (619 vs 693 buyers). One range, two languages.</> },
-              { n: "04", t: "Contrast Buyers Are the Value Segment", b: <>Sauna + ice customers average <strong style={{ color: C.text }}>$12.9K (2.2× a single-modality buyer)</strong> and 51% buy again within the year. The cross-sell from one modality to the second is Revel's highest-leverage revenue play.</> },
+              { n: "04", t: "Contrast Buyers Are the Value Segment", b: <>Sauna + ice customers average <strong style={{ color: C.text }}>$12.9K (2.2× a single-modality buyer)</strong> and 39% place another paid order within the year — 4× the single-modality repeat rate, even after stripping out $0 warranty orders that inflate naive repeat metrics.</> },
             ].map((h, i) => (
               <div key={i}>
                 <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 6 }}>{h.n}</div>
@@ -416,6 +415,50 @@ export default function App() {
               </div>
             </div>
 
+            {/* JTBD one layer deeper (GAF deep-dive style) */}
+            {arch.jobs.length > 0 && (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>The Jobs, One Layer Deeper — In Their Words</div>
+                <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(240px, 1fr))`, gap: 16 }}>
+                  {arch.jobs.slice(0, 4).map((j: any, i: number) => (
+                    <div key={i} style={{ background: "var(--color-bg-subtle)", border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
+                      <div style={{ fontSize: 10, color: C.faint, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: 4 }}>{j.type} job · {j.pct_of_arch}% of this archetype</div>
+                      <div style={{ ...UPPER, fontWeight: 700, fontSize: 14, marginBottom: 10 }}>{j.theme}</div>
+                      {j.subthemes.map((s: any, k: number) => (
+                        <div key={k} style={{ marginBottom: 7 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
+                            <span>{s.label}</span>
+                            <span style={{ fontWeight: 700, color: k === 0 ? C.greenBody : C.muted }}>{s.pct}%</span>
+                          </div>
+                          <div style={{ height: 4, background: C.chip, borderRadius: 2 }}>
+                            <div style={{ height: 4, width: `${Math.min(s.pct, 100)}%`, background: k === 0 ? GREEN : GREY_BAR, borderRadius: 2 }} />
+                          </div>
+                        </div>
+                      ))}
+                      <div style={{ fontSize: 10, color: C.faint, marginTop: 8 }}>% of the {j.theme} cohort within this archetype</div>
+                    </div>
+                  ))}
+                </div>
+                {arch.id === 1 && <p style={{ fontSize: 12, color: C.muted, marginTop: 8 }}>The Quiet Shopper's jobs are largely uncategorised — they don't articulate needs on calls, which is precisely their defining trait (and the coaching opportunity).</p>}
+              </div>
+            )}
+
+            {/* motivations, triggers, location */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 20 }}>
+              {[["Motivations", arch.motivations], ["Trigger Events", arch.triggers], ["Equipment Location", (arch.locations || []).filter((x: any) => x.name !== "unspecified").map((x: any) => ({ label: pretty(x.name), pct: x.pct }))]].map(([label, items]: any, i) => (
+                <div key={i} style={{ background: "var(--color-bg-subtle)", border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
+                  <div style={{ ...EYEBROW, color: C.greenBody, fontSize: 10, marginBottom: 10 }}>{label}</div>
+                  {(items as any[]).slice(0, 5).map((x: any, k: number) => (
+                    <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${C.border}`, fontSize: 12 }}>
+                      <span>{x.label}</span>
+                      <span style={{ fontWeight: 700, color: k === 0 ? C.greenBody : C.muted }}>{x.pct}%</span>
+                    </div>
+                  ))}
+                  {(items as any[]).length === 0 && <p style={{ fontSize: 12, color: C.faint }}>Not articulated on calls.</p>}
+                </div>
+              ))}
+            </div>
+
             {/* readiness overlay strip */}
             <div style={{ background: "var(--color-bg-subtle)", border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
               <div style={{ ...EYEBROW, color: C.faint, fontSize: 10, marginBottom: 10 }}>Readiness Overlay (WHERE this archetype sits when they call — not part of the clustering)</div>
@@ -429,72 +472,11 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
 
-        {/* ═══ E: WHERE — READINESS ═══ */}
-        <SectionHeader id="where" eyebrow="Section E · Where" title="Readiness: The Second Axis" subtitle="Because callers self-select toward the end of the funnel, readiness is treated as a state every archetype passes through — not an archetype itself. It matters operationally: within every single archetype, decision-stage callers convert at roughly double the rate." />
-        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 24, marginBottom: 24 }}>
-          <Card style={{ overflowX: "auto" }}>
-            <ChartTitle>Conversion by Archetype × Stage</ChartTitle>
-            <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse", minWidth: 520 }}>
-              <thead>
-                <tr style={{ borderBottom: `2px solid ${GREEN}` }}>
-                  <th style={{ ...EYEBROW, textAlign: "left", padding: "10px 6px", color: C.muted, fontSize: 10 }}>Archetype</th>
-                  <th style={{ ...EYEBROW, textAlign: "right", padding: "10px 6px", color: C.muted, fontSize: 10 }}>Decision</th>
-                  <th style={{ ...EYEBROW, textAlign: "right", padding: "10px 6px", color: C.muted, fontSize: 10 }}>Consideration</th>
-                  <th style={{ ...EYEBROW, textAlign: "right", padding: "10px 6px", color: C.muted, fontSize: 10 }}>Overall</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ARCH_SORTED.map((a: any) => (
-                  <tr key={a.id} style={{ borderBottom: `1px solid ${C.border}` }}>
-                    <td style={{ padding: "9px 6px", fontWeight: 700 }}>{a.name.replace("The ", "")}</td>
-                    <td style={{ padding: "9px 6px", textAlign: "right", background: C.greenSoft, color: C.greenBody, fontWeight: 700 }}>
-                      {a.stage_mix.decision.conv !== null ? `${a.stage_mix.decision.conv}%` : "—"} <span style={{ color: C.faint, fontWeight: 400 }}>({a.stage_mix.decision.pct_of_arch}% of them)</span>
-                    </td>
-                    <td style={{ padding: "9px 6px", textAlign: "right" }}>
-                      {a.stage_mix.consideration.conv !== null ? `${a.stage_mix.consideration.conv}%` : "—"} <span style={{ color: C.faint }}>({a.stage_mix.consideration.pct_of_arch}%)</span>
-                    </td>
-                    <td style={{ padding: "9px 6px", textAlign: "right", fontWeight: 700 }}>{a.conversion_pct}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p style={{ color: C.muted, fontSize: 12, marginTop: 10, lineHeight: 1.5 }}>
-              Read it as WHO × WHERE: the archetype tells you <strong style={{ color: C.text }}>what to say</strong>; the stage tells you <strong style={{ color: C.text }}>how fast to move</strong>. Readiness lifts conversion ~2× regardless of identity.
-            </p>
-          </Card>
-          <Card>
-            <ChartTitle>A Note on Selection Bias</ChartTitle>
-            <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
-              <p style={{ marginBottom: 10 }}>People who ring are disproportionately late-funnel — 66% want to buy within the month, and median purchase is same-day. A clustering fed journey-stage signals would simply rediscover the funnel (our first rerun did exactly that).</p>
-              <p style={{ marginBottom: 10 }}>So archetypes here use <strong style={{ color: C.text }}>identity and need fields only</strong>, and they're validated against the full order base below — including the majority of customers who never call.</p>
-              <p>Web-first and quiz/survey signals are the natural next inputs to round out the top of the funnel.</p>
-            </div>
-          </Card>
-        </div>
-        <Card style={{ marginBottom: 32 }}>
-          <ChartTitle>Phone Triage States (Channel Operations, Not Archetypes)</ChartTitle>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
-            {CALLER_STATES.map((s: any, i: number) => (
-              <div key={i} style={{ background: "var(--color-bg-subtle)", border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
-                <div style={{ ...UPPER, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{s.name}</div>
-                <div style={{ display: "flex", gap: 16, marginBottom: 8 }}>
-                  <span style={{ fontSize: 20, fontWeight: 700, color: C.greenBody }}>{s.pct}%</span>
-                  <span style={{ fontSize: 13, color: C.muted, alignSelf: "center" }}>of callers · conv {s.conv}% · avg {fmtK(s.avg)}</span>
-                </div>
-                <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.55 }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-          <p style={{ color: C.muted, fontSize: 12, marginTop: 14 }}>
-            These are states people pass through on the phone — any archetype can be in any state. They drive queue routing and SLAs, while the archetypes drive message and offer.
-          </p>
-        </Card>
-
-        {/* ═══ F: VALIDATION ═══ */}
-        <SectionHeader id="validate" eyebrow="Section F" title="Validation Against the Full Customer Base" subtitle={`The call base is a biased sample. As a check, every one of the ${fmt(META.customers)} customers in the 12-month window was grouped by what they actually bought — no call data involved.`} />
+        {/* ═══ E: VALIDATION ═══ */}
+        <SectionHeader id="validate" eyebrow="Section E" title="Validation Against the Full Customer Base" subtitle={`The call base is a biased sample. As a check, every one of the ${fmt(META.customers)} customers in the 12-month window was grouped by what they actually bought — no call data involved.`} />
         <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, marginBottom: 32 }}>
           <Card>
-            <ChartTitle>Purchase Patterns — All Customers, 12mo</ChartTitle>
+            <ChartTitle>Purchase Patterns — All Customers, 12mo (Paid Orders Only)</ChartTitle>
             <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${GREEN}` }}>
@@ -522,15 +504,16 @@ export default function App() {
             <ChartTitle>What the Cross-Check Says</ChartTitle>
             <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
               <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The philosophy split is real.</strong> Traditional-only (693) and infrared-only (619) buyers are near-equal halves of the equipment base — matching the Purist / Health-Seeker divide found independently in the calls.</p>
-              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Contrast is the value segment.</strong> 214 customers bought sauna + ice: $12.9K average and a 51% repeat rate — the behavioural signature of the Contrast Athlete (and the commercial fit-out).</p>
-              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The owner tail is enormous in count, tiny in dollars.</strong> 1,169 "customers" (38%) bought only add-ons — heaters, stones, accessories. They're the service population the phone triage handles, not an acquisition target.</p>
+              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Contrast is the value segment.</strong> 213 customers bought sauna + ice: $12.9K average and a 39% paid-repeat rate — 4× the single-modality buyer. The behavioural signature of the Contrast Athlete (and the commercial fit-out).</p>
+              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The owner tail is big in count, tiny in dollars.</strong> 1,063 customers bought only add-ons — heaters, stones, accessories. They're a service population, not an acquisition target.</p>
+              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Warranty orders inflate naive repeat metrics.</strong> 851 of 4,454 sales orders (19%) are $0 — warranty replacements and parts raised as sales orders (e.g. SO 17868495: $0 total, −$4.5K GP). Counting them, "repeat rate" reads 24%; on paid orders it's {META.repeatPct}%. All figures on this page exclude them.</p>
               <p>Where the two lenses agree — and they do on every major group — we can trust the archetypes beyond the phone channel.</p>
             </div>
           </Card>
         </div>
 
-        {/* ═══ G: V1 vs V2 ═══ */}
-        <SectionHeader id="v1v2" eyebrow="Section G" title="Did We Get It Right the First Time?" subtitle="Each caller was assigned to their v1 archetype using v1's own rules, then cross-tabulated against the new identity clusters. The verdict is kinder to v1 than our first rerun was — once journey-stage noise is removed." />
+        {/* ═══ F: V1 vs V2 ═══ */}
+        <SectionHeader id="v1v2" eyebrow="Section F" title="Did We Get It Right the First Time?" subtitle="Each caller was assigned to their v1 archetype using v1's own rules, then cross-tabulated against the new identity clusters. The verdict is kinder to v1 than our first rerun was — once journey-stage noise is removed." />
         <Card style={{ marginBottom: 24, overflowX: "auto" }}>
           <ChartTitle>v1 Archetype → v2 Identity Cluster (Callers)</ChartTitle>
           <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse", minWidth: 720 }}>
@@ -573,8 +556,8 @@ export default function App() {
           ))}
         </div>
 
-        {/* ═══ H: REVENUE & PRODUCT ═══ */}
-        <SectionHeader id="revenue" eyebrow="Section H" title="Revenue & Product" subtitle={`Trailing 12 months to 8 Jul 2026: ${fmtM(META.revenueIncGst)} inc GST across ${fmt(META.orders)} orders (closed/cancelled orders excluded).`} />
+        {/* ═══ G: REVENUE & PRODUCT ═══ */}
+        <SectionHeader id="revenue" eyebrow="Section G" title="Revenue & Product" subtitle={`Trailing 12 months to 8 Jul 2026: ${fmtM(META.revenueIncGst)} inc GST across ${fmt(META.orders)} orders (closed/cancelled orders excluded).`} />
         <Card style={{ marginBottom: 24 }}>
           <ChartTitle>Monthly Revenue & Gross Profit</ChartTitle>
           <ResponsiveContainer width="100%" height={280}>
@@ -673,8 +656,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* ═══ I: ACTIONS ═══ */}
-        <SectionHeader id="strategy" eyebrow="Section I" title="Strategic Actions" subtitle="WHO decides the message. WHERE decides the speed. The validation decides what to build." />
+        {/* ═══ H: ACTIONS ═══ */}
+        <SectionHeader id="strategy" eyebrow="Section H" title="Strategic Actions" subtitle="WHO decides the message. WHERE decides the speed. The validation decides what to build." />
         <div style={{ display: "grid", gap: 24 }}>
           {[
             {
@@ -688,7 +671,7 @@ export default function App() {
             {
               title: "Marketing", items: [
                 { t: "1. Split creative by product philosophy", b: "The customer base is a near 50/50 split of traditional and infrared buyers (693 vs 619). Run distinct creative tracks: ritual/authenticity for Purists, health-tech/proof for Health-Seekers — one generic 'sauna' message under-serves both.", d: "693 vs 619 buyers" },
-                { t: "2. Sell the second modality", b: "Contrast customers are worth 2.2× a single-modality buyer and 51% repeat within the year. Market the upgrade path to every sauna owner (add the ice bath) and every ice-bath owner (add the sauna) — the data says they come back for it.", d: "$12.9K avg · 51% repeat" },
+                { t: "2. Sell the second modality", b: "Contrast customers are worth 2.2× a single-modality buyer and 39% place another paid order within the year (vs 9-11% for single-modality). Market the upgrade path to every sauna owner (add the ice bath) and every ice-bath owner (add the sauna).", d: "$12.9K avg · 39% paid repeat" },
                 { t: "3. Health outcomes remain the master message", b: "Health/Detox + Sleep + Recovery = 48% of stated jobs across archetypes. Lead with transformation; use the archetype split to choose the vehicle (ritual vs technology).", d: "674 callers health-led" },
                 { t: "4. Protect the two peaks", b: "Black Friday and EOFY each do ~$2.3M — 30% of the year in two months. Campaign planning, stock depth and sales staffing should be built around defending these windows.", d: "Nov + Jun = 30% of revenue" },
               ]
@@ -697,7 +680,7 @@ export default function App() {
               title: "Product & Digital", items: [
                 { t: "1. Traditional vs infrared chooser", b: "The philosophy split plus the confidence barrier justify a guided selector (goals, space, power → recommendation). It serves the Quiet Shopper especially — the people who don't articulate needs on the phone.", d: "confidence = #2 barrier" },
                 { t: "2. Recovery-station bundle builder", b: "Contrast is the highest-value purchase pattern ($2.75M from 214 customers). A sauna + ice + chiller configurator with bundle pricing converts the Contrast Athlete and the commercial fit-out without a phone call.", d: "$2.75M pattern" },
-                { t: "3. Owner self-serve for add-ons", b: "1,169 customers bought only heaters/stones/accessories this year — mostly by phone. An owners' accessories flow (and replenishment email) serves them cheaper and keeps sales lines free for buyers.", d: "1,169 add-on-only customers" },
+                { t: "3. Owner self-serve for add-ons", b: "1,063 customers bought only heaters/stones/accessories this year — mostly by phone. An owners' accessories flow (and replenishment email) serves them cheaper and keeps sales lines free for buyers.", d: "1,063 add-on-only customers" },
                 { t: "4. Phone-number hygiene at order entry", b: "One in three callers can't be traced to their order because manually-keyed sales often skip the phone field. Make it mandatory in NetSuite — it's the difference between guessing and knowing ROI on a $4M+ channel.", d: "match rate 31.8% (floor)" },
               ]
             },
@@ -718,17 +701,20 @@ export default function App() {
           ))}
         </div>
 
-        {/* ═══ J: METHODOLOGY ═══ */}
+        {/* ═══ I: METHODOLOGY — REPRODUCTION MANUAL ═══ */}
         <div id="method" style={{ marginTop: 64, padding: 28, background: "var(--revel-forest)", borderRadius: 16, color: "#fff" }}>
-          <h3 style={{ ...UPPER, fontSize: 14, fontWeight: 700, marginBottom: 14, color: "#fff" }}>Methodology & Data Notes</h3>
+          <h3 style={{ ...UPPER, fontSize: 14, fontWeight: 700, marginBottom: 6, color: "#fff" }}>Methodology — How to Reproduce This Analysis</h3>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 16 }}>Written as an instruction manual so a future analyst (human or AI) can rerun this end-to-end. Both source systems are read-only throughout.</p>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 1.8 }}>
-            <p><strong style={{ color: "#fff" }}>Call data:</strong> 2,043 AI-analysed pre-sale calls (Should_Analyze tab), 18 Nov 2025 – 8 Jul 2026, deduplicated to 1,392 unique callers by phone. v1 used 1,161 calls to 5 Apr 2026.</p>
-            <p><strong style={{ color: "#fff" }}>Sales data:</strong> NetSuite sales orders, Revel departments, trailing 12 months to 8 Jul 2026. Closed/cancelled excluded (957 orders, $3.7M). Topline revenue is GST-inclusive; category revenue/margins are ex-GST item lines; GP is NetSuite estimated gross profit. v1's 36.1% margin was GP ÷ inc-GST revenue; the ex-GST equivalent is {META.marginPct}%.</p>
-            <p><strong style={{ color: "#fff" }}>Caller→order join:</strong> phones normalised to last 9 digits, matched against customer phone/mobile fields (443/1,392). Undercounts — some purchasers' records hold no phone — so caller conversion and traced revenue are floors.</p>
-            <p><strong style={{ color: "#fff" }}>Archetypes (WHO):</strong> k-means (k=5) on nine identity/need fields over 1,127 prospects. Journey-stage fields (buying stage, timeline, urgency) were excluded from clustering to avoid the phone channel's late-funnel self-selection bias; 126 post-purchase callers and 139 sparse profiles set aside. Purchase outcomes and readiness measured per cluster afterwards. Cluster separation is modest (silhouette ≈ 0.09), normal for categorical data — treat archetypes as strong tendencies, not hard walls.</p>
-            <p><strong style={{ color: "#fff" }}>Readiness (WHERE):</strong> buying stage and timeline reported as an overlay; a separate stage-based clustering of the same callers informs the phone-triage states.</p>
-            <p><strong style={{ color: "#fff" }}>Validation:</strong> all {fmt(META.customers)} 12-month customers grouped by purchase composition (SKU-prefix product families) directly in NetSuite — no call data — and compared against the call-derived archetypes.</p>
-            <p><strong style={{ color: "#fff" }}>Privacy:</strong> aggregate data only; quotes verbatim but anonymised.</p>
+            <p><strong style={{ color: "#fff" }}>1 · Call data.</strong> Source: the "Revel_Transcript_Insights" Google Sheet, tab <em>Should_Analyze</em> (AI-classified Aircall transcripts; ~100 columns including customer_phone, JTBD themes and raw strings, motivations, triggers, barriers, buying stage, verbatim quotes). This run: 2,043 calls, 18 Nov 2025 – 8 Jul 2026. Access it with an authorised Google account (the anonymous CSV export is blocked; the sheet ID and API auth path live in Gary's memory: reference_revel_customer_intelligence_v2). Deduplicate to unique callers on normalised phone (strip non-digits, keep last 9) — here 1,392 from 2,043 calls.</p>
+            <p><strong style={{ color: "#fff" }}>2 · Sales data.</strong> NetSuite SuiteQL over sales orders. Revel is identified by <em>department</em> — REVEL (38), Revel Online AU (39), Revel Wholesale AU (46) on the mainline — there is no Revel subsidiary or class. Exclude status H (Closed = cancelled; 957 orders / $3.7M this window). Status G = billed, B = pending fulfilment. Window: trailing 12 months. Shipping state joins via transactionshippingaddress.nkey = transaction.shippingaddress; GP = header estgrossprofit.</p>
+            <p><strong style={{ color: "#fff" }}>3 · The warranty trap.</strong> Warranty replacements and missing parts are raised as <em>$0 sales orders in the same Revel departments</em> (often with PART-* SKUs and negative GP — e.g. SO 17868495, $0 / −$4.5K GP). They are 19% of all orders (851 of 4,454) and silently double any naive repeat-purchase metric (774 "repeat" customers vs 396 real). <em>Always filter foreigntotal &gt; 0 for customer-behaviour metrics.</em></p>
+            <p><strong style={{ color: "#fff" }}>4 · Product categories.</strong> Item class is unreliable; map SKU prefixes instead: R-FS/R-FI/R-BFS = infrared, R-TR/R-BT = traditional/barrel, R-CS = hybrid, R-ICE = ice bath, R-CHILL = chiller, R-H-/R-XEN/R-STONE = heaters & controls, PART- = parts. Revenue basis: topline = GST-inclusive order totals; category/margin = ex-GST item lines (v1's 36.1% margin divided GP by inc-GST revenue; ex-GST it is {META.marginPct}%).</p>
+            <p><strong style={{ color: "#fff" }}>5 · Caller→order join.</strong> Normalise both sides to last-9-digits and match against customer phone AND mobilephone. Do <em>not</em> regex-scan the whole customer table (it times out) — scope the inner query to Revel-order customers first, then apply the IN-list. Result here: 443/1,392 matched, 435 purchasers, $4.0M traced. Treat as a floor: ~3% of customers have no phone on record and manually-keyed phone sales often skip the field.</p>
+            <p><strong style={{ color: "#fff" }}>6 · Archetypes (WHO).</strong> k-means (k=5, one-hot, "unspecified"/"Uncategorized" columns down-weighted ×0.15) on nine <em>identity</em> fields only: segment, functional theme, emotional theme, barrier, location, price sensitivity, product family, experience, decision role. Journey-stage fields (buying stage, timeline, urgency) are deliberately excluded — phone callers self-select toward the end of the funnel (66% want to buy within the month; median purchase same-day), so stage signals would just rediscover the funnel, as our first rerun proved. Exclude post-purchase callers (126) and sparse profiles (139); cluster the remaining 1,127. Purchase outcomes and readiness are measured per cluster afterwards, never clustered on. Separation is modest (silhouette ≈ 0.09) — treat archetypes as strong tendencies.</p>
+            <p><strong style={{ color: "#fff" }}>7 · Layer-2 sub-themes.</strong> The deep-dive percentages come from keyword-bucketing the raw free-text classifications (job_functional, job_emotional, motivation_primary/secondary, trigger_event_primary/secondary) within each theme cohort, per archetype. Buckets are regex keyword groups (e.g. Control/Optimization → install|setup|fit|electrical for "getting install right"); a caller can match multiple sub-themes.</p>
+            <p><strong style={{ color: "#fff" }}>8 · Validation.</strong> Group ALL 12-month customers (paid orders only) by purchase composition via per-customer MAX(CASE) flags on the SKU prefixes, aggregated entirely in SuiteQL — no call data. Compare against the call-derived archetypes; agreement on the major groups is what licenses using call-based archetypes beyond the phone channel.</p>
+            <p><strong style={{ color: "#fff" }}>9 · Known limitations.</strong> Call base ≠ customer base (web-only buyers never call); quiet callers depress theme coverage; keyword buckets are heuristic; the v1 comparison approximates v1's rules from its published definitions. Privacy: aggregates and anonymised quotes only — no names or contact details on this page.</p>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.25)" }}>
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>Generated 9 Jul 2026 by Gary · sources read-only · LIVE LONGER, LIVE BETTER.</span>
