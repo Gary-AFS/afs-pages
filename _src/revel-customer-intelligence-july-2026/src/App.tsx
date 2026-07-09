@@ -498,6 +498,31 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
 
+        <Card style={{ marginBottom: 32 }}>
+          <ChartTitle>Micro-Segments & Language Registers (Not Archetypes)</ChartTitle>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6, marginBottom: 16, maxWidth: 860 }}>
+            Segments often proposed in marketing conversations, measured against the same call corpus. Each is real but tiny, with no distinct economics or coherent cluster of its own — use them as creative angles and channel plays inside the archetypes, not as personas to build plans around.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+            {[
+              { name: "Elite Athlete", size: "2.6%", n: "33 callers (generous match: pro/club sport, triathlon, marathon)", home: "Scattered — largest share sits with the Commercial Operator as trainers and clubs buying for athletes", use: "A partnerships & proof play for commercial (club fit-outs, testimonials), not a consumer persona. Likely under-measured here: elite athletes rarely ring a retail line.", econ: "45% conv · $9.4K avg (small n)" },
+              { name: "Biohacker", size: "2.4%", n: "31 callers using protocol language (longevity, Wim Hof, red light, HRV)", home: "Mostly ordinary Home Health-Seekers (17) and Recovery Seekers (9)", use: "A creative flavour for the infrared pathway and Recovery Seeker — ad angles, content, keywords. v1 named a whole archetype after this 5%; the data doesn't support that.", econ: "32% conv · $6.9K avg — same as base" },
+              { name: "Stressed Professional", size: "0.5%", n: "6 callers pairing stress language with any work context (1.1% mention stress at all)", home: "Inside the Home Health-Seeker's Self-Care job", use: "The stress-relief need is real but generic; the 'professional' wrapper is unobservable on calls (occupation is almost never volunteered). Treat as copy angle only, and don't size plans on it.", econ: "too small to read" },
+            ].map((m, i) => (
+              <div key={i} style={{ background: "var(--color-bg-subtle)", border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+                  <span style={{ ...UPPER, fontWeight: 700, fontSize: 13 }}>{m.name}</span>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: C.greenBody }}>{m.size}</span>
+                </div>
+                <p style={{ fontSize: 12, color: C.muted, marginBottom: 8 }}>{m.n}</p>
+                <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.55, marginBottom: 8 }}><strong style={{ color: C.text }}>Where they live:</strong> {m.home}</p>
+                <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.55, marginBottom: 10 }}><strong style={{ color: C.text }}>How to use:</strong> {m.use}</p>
+                <Chip tone="plain">{m.econ}</Chip>
+              </div>
+            ))}
+          </div>
+        </Card>
+
         {/* ═══ E: VALIDATION ═══ */}
         <SectionHeader id="validate" eyebrow="Section E" title="Validation Against the Full Customer Base" subtitle={`The call base is a biased sample. As a check, every one of the ${fmt(META.customers)} customers in the 12-month window was grouped by what they actually bought — no call data involved.`} />
         <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, marginBottom: 32 }}>
