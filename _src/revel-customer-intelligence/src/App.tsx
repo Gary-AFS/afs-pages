@@ -120,7 +120,7 @@ const VERDICTS = [
   { v1: "Performance Biohacker", verdict: "VALIDATED", color: "#2E8B4A", note: "57% land together as the Recovery Seeker — defined by the recovery job (90% Performance/Contrast or Pain/Recovery), with contrast equipment as its signature purchase. Drop the 'biohacker' framing, and 'athlete' too: explicit sport language is 4% of their calls, 1.8% overall. Second-highest basket ($10.7K)." },
   { v1: "Commercial Operator", verdict: "VALIDATED", color: "#2E8B4A", note: "77% cohesion into the Commercial Recovery Operator — gyms, studios, developers fitting out recovery spaces. v1 had this right. (Our own first rerun briefly merged it away; with journey-stage noise removed, it separates cleanly.)" },
   { v1: "Cautious Researcher", verdict: "MOSTLY AN ARTIFACT", color: "#C23B22", note: "52% are simply Quiet Shoppers — callers who revealed little on the phone. 'Caution' was largely missing data plus no timeline, not a customer identity. The real insight is a needs-discovery gap on calls, which is a coaching opportunity, not a persona." },
-  { v1: "Home Renovator", verdict: "DISSOLVED", color: "#C23B22", note: "Renovators scatter across all five identity archetypes. Renovation is a trigger and a timing signal — build it into campaign timing and PDP content, but don't market to 'renovators' as a who." },
+  { v1: "Home Renovator", verdict: "DISSOLVED", color: "#C23B22", note: "Renovators spread across the four archetypes roughly in proportion to their size (60% land in the Home Health-Seeker — which is half of everyone). Renovation is a trigger and a timing signal — build it into campaign timing and PDP content, but don't market to 'renovators' as a who." },
   { v1: "— (new in v2)", verdict: "FOUND: THE QUIET SHOPPER", color: "#2F6BAF", note: "23% of callers disclose almost nothing — yet they still convert at 26% and buy full-price saunas. Every point of needs-discovery improvement on these calls is measurable revenue. This is a sales-coaching archetype, not a marketing one." },
 ];
 
@@ -201,7 +201,7 @@ export default function App() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
             {[
               { n: "01", t: "Callers Are Worth $4M+, and They Buy Fast", b: <>At least <strong style={{ color: C.text }}>{JOIN.convPct}% of phone callers become customers</strong> (a floor — phone-keyed orders often lack a stored number), worth {fmtM(JOIN.callerRevenue)}. Of those who buy after calling, 65% order within a week of the first call.</> },
-              { n: "02", t: "Who You Are ≠ Where You Are", b: <>Five stable identity archetypes describe WHO customers are. Readiness (WHERE they are in the journey) is a separate overlay that <strong style={{ color: C.text }}>roughly doubles conversion inside every archetype</strong> — 46-55% at decision stage vs ~20-25% earlier.</> },
+              { n: "02", t: "Who You Are ≠ Where You Are", b: <>Four stable identity archetypes describe WHO customers are. Readiness (WHERE they are in the journey) is a separate overlay that <strong style={{ color: C.text }}>roughly doubles conversion inside every archetype</strong> — 46-55% at decision stage vs ~20-25% earlier.</> },
               { n: "03", t: "One Flagship Buyer, Two Pathways", b: <>The Home Health-Seeker is half of all prospects — one archetype with a near 50/50 <strong style={{ color: C.text }}>product-philosophy fork</strong> (infrared science vs traditional ritual, mirrored 617 vs 694 in the customer base). Same why; different language, placement and barriers.</> },
               { n: "04", t: "Contrast Buyers Are the Value Segment", b: <>Sauna + ice customers average <strong style={{ color: C.text }}>$12.9K (2.2× a single-modality buyer)</strong> and 39% place another paid order within the year — 4× the single-modality repeat rate, even after stripping out $0 warranty orders that inflate naive repeat metrics.</> },
             ].map((h, i) => (
@@ -329,7 +329,7 @@ export default function App() {
         </div>
 
         {/* ═══ D: WHO — IDENTITY ARCHETYPES ═══ */}
-        <SectionHeader id="who" eyebrow="Section D · Who" title="Customer Archetypes (Identity Only)" subtitle="Five clusters found by k-means on nine identity and need fields — segment, jobs, barriers, location, product philosophy, experience, price posture. Journey-stage fields were excluded from clustering, and post-purchase service callers were set aside. Conversion and spend are real NetSuite outcomes, shown as results, not inputs." />
+        <SectionHeader id="who" eyebrow="Section D · Who" title="Customer Archetypes (Identity Only)" subtitle="Four archetypes, from k-means on nine identity and need fields — segment, jobs, barriers, location, experience, price posture. Journey-stage fields were excluded from clustering, post-purchase service callers were set aside, and the two raw clusters that differed only on product preference are presented as one archetype with two pathways. Conversion and spend are real NetSuite outcomes, shown as results, not inputs." />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 24 }}>
           {ARCH_SORTED.map((a: any) => {
             const active = activeArchetype === a.id;
@@ -529,7 +529,7 @@ export default function App() {
           <Card>
             <ChartTitle>What the Cross-Check Says</ChartTitle>
             <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
-              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The philosophy split is real.</strong> Traditional-only (693) and infrared-only (619) buyers are near-equal halves of the equipment base — matching the Purist / Health-Seeker divide found independently in the calls.</p>
+              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The philosophy split is real.</strong> Traditional-only (694) and infrared-only (617) buyers are near-equal halves of the equipment base — matching the traditional/infrared pathway split found independently inside the Home Health-Seeker on calls.</p>
               <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Contrast is the value segment.</strong> 213 customers bought sauna + ice: $12.9K average and a 39% paid-repeat rate — 4× the single-modality buyer. The behavioural signature of the Recovery Seeker (and the commercial fit-out).</p>
               <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The owner tail is big in count, tiny in dollars.</strong> 1,063 customers bought only add-ons — heaters, stones, accessories. They're a service population, not an acquisition target.</p>
               <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Warranty orders inflate naive repeat metrics.</strong> 851 of 4,454 sales orders (19%) are $0 — warranty replacements and parts raised as sales orders (e.g. SO 17868495: $0 total, −$4.5K GP). Counting them, "repeat rate" reads 24%; on paid orders it's {META.repeatPct}%. All figures on this page exclude them.</p>
@@ -660,7 +660,7 @@ export default function App() {
               title: "Sales", items: [
                 { t: "1. Ask two questions on every call: who + where", b: "Identify the archetype (message) and the stage (urgency) in the first minutes. Decision-stage callers convert at 46-55% across every archetype — flag them in the CRM and mandate same-day quote turnaround.", d: "conv ~2× at decision stage" },
                 { t: "2. Coach the Quiet Shopper gap", b: "23% of callers reveal almost nothing, yet convert at 26% anyway. Structured needs-discovery (goals, space, power, budget posture) on these calls is the cheapest conversion lift available — it also fixes the #2 barrier, confidence.", d: "263 callers · discovery gap" },
-                { t: "3. Speak the caller's sauna language", b: "Purists want ritual, heat authenticity and outdoor durability; Health-Seekers want health proof, ease and electrical clarity. Same range, two scripts — and the barrier profile differs (space/heater vs electrical).", d: "two scripts, one range" },
+                { t: "3. Speak the caller's pathway language", b: "Traditional-pathway buyers want ritual, heat authenticity and outdoor durability; infrared-pathway buyers want health proof, ease and electrical clarity. Same archetype, same range — two scripts, and different barriers to pre-empt (budget/space vs electrical).", d: "two scripts, one range" },
                 { t: "4. Keep the owner lane + commercial motion", b: "14% of calls are existing owners (route to service + scripted add-on). Commercial Recovery Operators are validated as a distinct archetype — spec sheets, commercial warranty, fit-out timing.", d: "42% add-on conv · 77% cohesion" },
               ]
             },
