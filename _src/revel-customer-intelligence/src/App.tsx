@@ -5,22 +5,40 @@ import { Sun, Moon } from "lucide-react";
 import { META, MONTHLY, STATES, CATEGORIES, TOP_PRODUCTS, FUNC, EMO, BARRIERS, LOC, STAGE, TIMELINE, OUTCOME, SEGMENT, COMPETITORS, JOIN, ARCHETYPES, CROSSTAB } from "./data";
 
 // ═══════════════════════════════════════════════════════════
-// REVEL CUSTOMER INTELLIGENCE & JTBD DEEP DIVE — v2 (RERUN)
-// Data: 2,043 analysed pre-sale calls × NetSuite sales orders
-// joined caller-by-caller on normalised phone number.
-// v1 (Apr 2026) was a hard-coded snapshot; every figure here is
-// derived from source data. Blind archetype re-derivation included.
+// REVEL CUSTOMER INTELLIGENCE & JTBD DEEP DIVE — v2
+// Styled to the Revel 2025 visual identity: Montserrat 400/700,
+// uppercase display, Revel Green as the single accent, grey
+// non-target data, white-dominant with black dark mode.
 // ═══════════════════════════════════════════════════════════
 
-const COLORS = {
-  accent: "#c27d3e", accentAlt: "#2d5a4a", gold: "#d4a056", teal: "#3a8a7a",
-  purple: "#7c5cbf", ice: "#5ba4cf", green: "#16c79a", red: "#ec6b7a",
-  bg: "var(--color-bg)", card: "var(--color-card)", text: "var(--color-text)",
-  muted: "var(--color-muted)", border: "var(--color-border)",
-  navBg: "var(--color-nav-bg)", tooltipBg: "var(--color-tooltip-bg)",
+const C = {
+  green: "var(--revel-green)",
+  greenBody: "var(--color-green-body)",
+  greenSoft: "var(--color-green-soft)",
+  forest: "var(--revel-forest)",
+  sage: "var(--revel-sage)",
+  info: "var(--revel-info)",
+  warning: "var(--revel-warning)",
+  danger: "var(--revel-danger)",
+  success: "var(--revel-success)",
+  bg: "var(--color-bg)",
+  card: "var(--color-card)",
+  text: "var(--color-text)",
+  muted: "var(--color-muted)",
+  faint: "var(--color-faint)",
+  border: "var(--color-border)",
+  chip: "var(--color-chip-bg)",
+  navBg: "var(--color-nav-bg)",
+  tooltipBg: "var(--color-tooltip-bg)",
+  shadow: "var(--shadow-card)",
 };
-const CHART_COLORS = ["#c27d3e", "#5ba4cf", "#3a8a7a", "#7c5cbf", "#d4a056", "#ec6b7a", "#4ecdc4", "#f5a623", "#8b5cf6", "#06b6d4"];
-const ARCH_COLORS: Record<number, string> = { 0: "#16c79a", 1: "#94a3b8", 2: "#5ba4cf", 3: "#7c5cbf", 4: "#d4a056", 5: "#c27d3e" };
+const GREEN = "#25B34B";
+const GREY_BAR = "#C4C4C4";
+const PIE_COLORS = ["#25B34B", "#485D4D", "#ABB99C", "#8EE0A5", "#177E33", "#9E9E9E"];
+const ARCH_COLORS: Record<number, string> = { 0: "#25B34B", 1: "#9E9E9E", 2: "#ABB99C", 3: "#2F6BAF", 4: "#D99100", 5: "#485D4D" };
+
+const LOGO_WHITE = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-White-02.png?v=1691241102";
+const LOGO_BLACK = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-Black-01.png?v=1691024664";
 
 const fmtM = (v: number) => `$${(v / 1000000).toFixed(1)}M`;
 const fmtK = (v: number) => v >= 1000000 ? fmtM(v) : `$${(v / 1000).toFixed(0)}K`;
@@ -29,71 +47,87 @@ const fmt = (v: number) => v.toLocaleString();
 const CATMAP: Record<string, string> = { INF: "Infrared", TRD: "Traditional", BAR: "Barrel", HYB: "Hybrid", ICE: "Ice Bath", CHL: "Chiller", HTC: "Heater", ACC: "Accessories", "n/a": "Other" };
 const prettyCats = (k: string) => k.split("+").map(c => CATMAP[c] || c).join(" + ");
 
+const UPPER: React.CSSProperties = { textTransform: "uppercase", letterSpacing: "0.02em" };
+const EYEBROW: React.CSSProperties = { fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" };
+
 // ── UI atoms ────────────────────────────────────────────
-const StatCard = ({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) => (
-  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-    style={{ background: COLORS.card, borderRadius: 12, padding: "20px 24px", borderLeft: `4px solid ${accent || COLORS.accent}` }}>
-    <div style={{ color: COLORS.muted, fontSize: 12, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 4 }}>{label}</div>
-    <div style={{ color: COLORS.text, fontSize: 28, fontWeight: 700 }}>{value}</div>
-    {sub && <div style={{ color: COLORS.muted, fontSize: 13, marginTop: 4 }}>{sub}</div>}
+const StatCard = ({ label, value, sub, hero }: { label: string; value: string; sub?: string; hero?: boolean }) => (
+  <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+    style={{ background: C.card, borderRadius: 10, padding: "22px 24px", border: `1px solid ${C.border}`, boxShadow: C.shadow }}>
+    <div style={{ ...EYEBROW, color: C.muted, marginBottom: 8 }}>{label}</div>
+    <div style={{ color: hero ? C.green : C.text, fontSize: 30, fontWeight: 700, letterSpacing: "-0.01em" }}>{value}</div>
+    {sub && <div style={{ color: C.muted, fontSize: 13, marginTop: 6, lineHeight: 1.4 }}>{sub}</div>}
   </motion.div>
 );
 
-const SectionHeader = ({ title, subtitle, id }: { title: string; subtitle?: string; id: string }) => (
-  <div id={id} style={{ marginBottom: 24, paddingTop: 48 }}>
-    <h2 style={{ color: COLORS.text, fontSize: 22, fontWeight: 700, marginBottom: 6, borderBottom: `2px solid ${COLORS.accent}`, paddingBottom: 8, display: "inline-block" }}>{title}</h2>
-    {subtitle && <p style={{ color: COLORS.muted, fontSize: 14, marginTop: 8, maxWidth: 760 }}>{subtitle}</p>}
+const SectionHeader = ({ eyebrow, title, subtitle, id }: { eyebrow: string; title: string; subtitle?: string; id: string }) => (
+  <div id={id} style={{ marginBottom: 28, paddingTop: 56 }}>
+    <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 8 }}>{eyebrow}</div>
+    <h2 style={{ ...UPPER, color: C.text, fontSize: 26, fontWeight: 700, marginBottom: 12 }}>{title}</h2>
+    <div style={{ width: 64, borderTop: `2px solid ${GREEN}`, marginBottom: 12 }} />
+    {subtitle && <p style={{ color: C.muted, fontSize: 14, maxWidth: 760, lineHeight: 1.55 }}>{subtitle}</p>}
   </div>
 );
 
-const Tag = ({ children, color }: { children: React.ReactNode; color?: string }) => (
-  <span style={{ display: "inline-block", background: color || COLORS.accentAlt, color: "#fff", padding: "3px 10px", borderRadius: 12, fontSize: 11, fontWeight: 600, marginRight: 6, marginBottom: 4 }}>{children}</span>
-);
+const Chip = ({ children, tone }: { children: React.ReactNode; tone?: "green" | "danger" | "plain" }) => {
+  const styles = tone === "green"
+    ? { background: C.greenSoft, color: C.greenBody }
+    : tone === "danger"
+      ? { background: "rgba(194,59,34,0.10)", color: "#C23B22" }
+      : { background: C.chip, color: C.text };
+  return (
+    <span style={{ display: "inline-block", ...styles, padding: "4px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginRight: 6, marginBottom: 6 }}>{children}</span>
+  );
+};
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: COLORS.tooltipBg, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
-      <div style={{ fontWeight: 600, marginBottom: 4, color: COLORS.text }}>{label}</div>
+    <div style={{ background: C.tooltipBg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 14px", fontSize: 13, boxShadow: "0 6px 14px rgba(0,0,0,.08)" }}>
+      <div style={{ fontWeight: 700, marginBottom: 4, color: C.text }}>{label}</div>
       {payload.map((p: any, i: number) => (
-        <div key={i} style={{ color: p.color || COLORS.muted }}>{p.name}: {typeof p.value === "number" ? p.value.toLocaleString() : p.value}</div>
+        <div key={i} style={{ color: C.muted }}>{p.name}: <span style={{ color: C.text, fontWeight: 700 }}>{typeof p.value === "number" ? p.value.toLocaleString() : p.value}</span></div>
       ))}
     </div>
   );
 };
 
 const Card = ({ children, style }: any) => (
-  <div style={{ background: COLORS.card, borderRadius: 12, padding: 24, ...style }}>{children}</div>
+  <div style={{ background: C.card, borderRadius: 10, padding: 24, border: `1px solid ${C.border}`, boxShadow: C.shadow, ...style }}>{children}</div>
+);
+
+const ChartTitle = ({ children }: any) => (
+  <h3 style={{ ...UPPER, fontSize: 14, fontWeight: 700, marginBottom: 16, color: C.text }}>{children}</h3>
 );
 
 const NAV_ITEMS = [
-  { id: "exec", label: "Executive Summary" },
+  { id: "exec", label: "Summary" },
   { id: "join", label: "Call → Revenue" },
   { id: "macro", label: "Market Drivers" },
   { id: "archetypes", label: "Archetypes v2" },
   { id: "v1v2", label: "v1 vs v2" },
-  { id: "revenue", label: "Revenue & Product" },
+  { id: "revenue", label: "Revenue" },
   { id: "strategy", label: "Actions" },
-  { id: "method", label: "Methodology" },
+  { id: "method", label: "Method" },
 ];
 
 const V1_ORDER = ["Sanctuary Seeker", "Home Renovator", "Performance Biohacker", "Commercial Operator", "Cautious Researcher", "Unclassified"];
 const V2_ORDER = ["The Ready Buyer", "The Health-Seeker", "The Contrast Recovery Builder", "The Owner & Add-On Caller", "The Patient Planner", "The Window Shopper"];
 
 const VERDICTS = [
-  { v1: "Sanctuary Seeker", verdict: "VALIDATED (at its core)", color: "#16c79a", note: "49% of Sanctuary Seekers land in the Health-Seeker cluster — the health-first home buyer is real and is still the biggest group. But 23% of them were actually decision-stage Ready Buyers, a far more valuable group v1 lumped in with everyone else." },
-  { v1: "Performance Biohacker", verdict: "PARTIALLY REAL", color: "#d4a056", note: "The contrast-therapy job exists (29% land in Contrast Recovery Builder), but the 'biohacker' framing over-personified it. Another 26% were simply Ready Buyers who happened to want ice baths." },
-  { v1: "Commercial Operator", verdict: "MERGED", color: "#d4a056", note: "55% of commercial callers cluster with the Contrast Recovery Builder. Commercial is a context (who pays), not a distinct job-to-be-done — they want the same recovery outcome, with commercial-grade specs." },
-  { v1: "Cautious Researcher", verdict: "SPLIT IN TWO", color: "#ec6b7a", note: "v1 conflated two opposite groups: Window Shoppers (31%, ~6% conversion, browsing with no timeline) and Patient Planners (30%, 20% conversion at the highest spend of any archetype). One deserves a nurture track; the other barely deserves a follow-up." },
-  { v1: "Home Renovator", verdict: "DISSOLVED", color: "#ec6b7a", note: "Renovators scatter across every v2 cluster (34% Health-Seeker, 30% Patient Planner, 15% Ready Buyer). Renovation is a trigger event, not an archetype — it tells you when they buy, not who they are or what they need." },
-  { v1: "— (not in v1)", verdict: "MISSED: Ready Buyer", color: "#5ba4cf", note: "The single most valuable group — 20% of callers, 48% conversion, buying within days — wasn't an archetype in v1 at all. It was invisible because v1 clustered on segment × location instead of readiness." },
-  { v1: "— (not in v1)", verdict: "MISSED: Owner & Add-On Caller", color: "#5ba4cf", note: "14% of inbound calls are existing customers — support, delivery chasing, and add-on purchases. v1 treated the phone queue as 100% pre-sale. It isn't, and these calls convert to add-on revenue at 42%." },
+  { v1: "Sanctuary Seeker", verdict: "VALIDATED (at its core)", color: "#2E8B4A", note: "49% of Sanctuary Seekers land in the Health-Seeker cluster — the health-first home buyer is real and is still the biggest group. But 23% of them were actually decision-stage Ready Buyers, a far more valuable group v1 lumped in with everyone else." },
+  { v1: "Performance Biohacker", verdict: "PARTIALLY REAL", color: "#D99100", note: "The contrast-therapy job exists (29% land in Contrast Recovery Builder), but the 'biohacker' framing over-personified it. Another 26% were simply Ready Buyers who happened to want ice baths." },
+  { v1: "Commercial Operator", verdict: "MERGED", color: "#D99100", note: "55% of commercial callers cluster with the Contrast Recovery Builder. Commercial is a context (who pays), not a distinct job-to-be-done — they want the same recovery outcome, with commercial-grade specs." },
+  { v1: "Cautious Researcher", verdict: "SPLIT IN TWO", color: "#C23B22", note: "v1 conflated two opposite groups: Window Shoppers (31%, ~6% conversion, browsing with no timeline) and Patient Planners (30%, 20% conversion at the highest spend of any archetype). One deserves a nurture track; the other barely deserves a follow-up." },
+  { v1: "Home Renovator", verdict: "DISSOLVED", color: "#C23B22", note: "Renovators scatter across every v2 cluster (34% Health-Seeker, 30% Patient Planner, 15% Ready Buyer). Renovation is a trigger event, not an archetype — it tells you when they buy, not who they are or what they need." },
+  { v1: "— (not in v1)", verdict: "MISSED: READY BUYER", color: "#2F6BAF", note: "The single most valuable group — 20% of callers, 48% conversion, buying within days — wasn't an archetype in v1 at all. It was invisible because v1 clustered on segment × location instead of readiness." },
+  { v1: "— (not in v1)", verdict: "MISSED: OWNER & ADD-ON", color: "#2F6BAF", note: "14% of inbound calls are existing customers — support, delivery chasing, and add-on purchases. v1 treated the phone queue as 100% pre-sale. It isn't, and these calls convert to add-on revenue at 42%." },
 ];
 
 export default function App() {
   const [activeArchetype, setActiveArchetype] = useState(0);
   const [activeSection, setActiveSection] = useState("exec");
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const arch = ARCHETYPES.find((a: any) => a.id === activeArchetype)!;
 
   const scrollTo = (id: string) => {
@@ -105,144 +139,138 @@ export default function App() {
   const boughtData = Object.entries(arch.bought).map(([k, v]) => ({ name: prettyCats(k), count: v }));
 
   return (
-    <div className={isDark ? "dark" : ""} style={{ background: COLORS.bg, minHeight: "100vh", color: COLORS.text, fontFamily: "var(--font-sans)", transition: "background-color 0.3s, color 0.3s" }}>
-      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: COLORS.navBg, backdropFilter: "blur(12px)", borderBottom: `1px solid ${COLORS.border}`, padding: "0 24px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", gap: 4, overflowX: "auto" }}>
-          <div style={{ fontWeight: 800, fontSize: 14, color: COLORS.accent, marginRight: 16, whiteSpace: "nowrap", padding: "12px 0", fontFamily: "var(--font-display)" }}>REVEL JTBD v2</div>
+    <div className={isDark ? "dark" : ""} style={{ background: C.bg, minHeight: "100vh", color: C.text, fontFamily: "var(--font-sans)", transition: "background-color 0.2s, color 0.2s" }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: C.navBg, backdropFilter: "blur(8px)", borderBottom: `1px solid ${C.border}`, padding: "0 24px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", gap: 6, overflowX: "auto", padding: "12px 0" }}>
+          <img src={isDark ? LOGO_WHITE : LOGO_BLACK} alt="Revel" style={{ height: 22, marginRight: 10 }} />
+          <div style={{ ...EYEBROW, color: C.muted, marginRight: 16, whiteSpace: "nowrap", fontSize: 10 }}>Customer Intelligence v2</div>
           {NAV_ITEMS.map(n => (
             <button key={n.id} onClick={() => scrollTo(n.id)}
-              style={{ background: activeSection === n.id ? COLORS.accent : "transparent", color: activeSection === n.id ? "#fff" : COLORS.muted, border: "none", padding: "8px 14px", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>
+              style={{ background: activeSection === n.id ? GREEN : "transparent", color: activeSection === n.id ? "#fff" : C.muted, border: "none", padding: "9px 16px", borderRadius: 999, cursor: "pointer", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap", transition: "background-color 120ms" }}>
               {n.label}
             </button>
           ))}
           <div style={{ flex: 1 }} />
           <button onClick={() => setIsDark(!isDark)} title="Toggle Light/Dark"
-            style={{ background: "transparent", border: "none", color: COLORS.muted, cursor: "pointer", padding: 8, display: "flex", borderRadius: "50%" }}>
+            style={{ background: "transparent", border: "none", color: C.muted, cursor: "pointer", padding: 8, display: "flex", borderRadius: "50%" }}>
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
       </nav>
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px 80px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px 80px" }}>
 
         {/* ═══ TITLE ═══ */}
-        <div style={{ paddingTop: 48, paddingBottom: 16, borderBottom: `1px solid ${COLORS.border}`, marginBottom: 32 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 8, fontFamily: "var(--font-display)" }}>Revel Customer Intelligence & JTBD Deep Dive — v2</h1>
-          <p style={{ color: COLORS.muted, fontSize: 15, maxWidth: 780 }}>
+        <div style={{ paddingTop: 64, paddingBottom: 32, borderBottom: `2px solid ${GREEN}`, marginBottom: 24 }}>
+          <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>Revel Saunas · Customer Intelligence</div>
+          <h1 style={{ ...UPPER, fontSize: 38, fontWeight: 700, marginBottom: 14, lineHeight: 1.15, maxWidth: 900 }}>
+            Customer Intelligence & JTBD Deep Dive — v2
+          </h1>
+          <p style={{ color: C.muted, fontSize: 15, maxWidth: 780, lineHeight: 1.55 }}>
             Rerun of the April 2026 analysis with 76% more call data and a real caller-level join to NetSuite:
             {" "}{fmt(META.calls)} analysed pre-sale calls matched by phone number to sales orders, plus a blind re-derivation
             of the customer archetypes to test how well v1 held up.
           </p>
-          <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-            <Tag color={COLORS.accent}>{fmt(META.calls)} Calls ({META.dateRange})</Tag>
-            <Tag color={COLORS.ice}>{fmtM(META.revenueIncGst)} Revenue (trailing 12mo)</Tag>
-            <Tag color={COLORS.accentAlt}>{fmt(META.orders)} Orders</Tag>
-            <Tag color={COLORS.green}>{fmtM(JOIN.callerRevenue)} traced to callers</Tag>
-            <Tag color="#7c5cbf">Blind k-means re-clustering</Tag>
+          <div style={{ display: "flex", gap: 4, marginTop: 18, flexWrap: "wrap" }}>
+            <Chip tone="green">{fmt(META.calls)} Calls · {META.dateRange}</Chip>
+            <Chip>{fmtM(META.revenueIncGst)} Revenue (12mo)</Chip>
+            <Chip>{fmt(META.orders)} Orders</Chip>
+            <Chip>{fmtM(JOIN.callerRevenue)} traced to callers</Chip>
+            <Chip>Blind re-clustering</Chip>
           </div>
         </div>
 
         {/* ═══ A: EXEC SUMMARY ═══ */}
-        <SectionHeader id="exec" title="A. Executive Summary" subtitle="Call intelligence and transactional data, now joined at the individual caller level." />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 16 }}>
-          <StatCard label="Pre-Sale Calls Analysed" value={fmt(META.calls)} sub={`${fmt(META.uniqueCallers)} unique callers · ${META.dateRange}`} accent={COLORS.accent} />
-          <StatCard label="Revenue (trailing 12mo)" value={fmtM(META.revenueIncGst)} sub={`${fmt(META.orders)} orders · ${fmt(META.customers)} customers · inc GST`} accent={COLORS.gold} />
-          <StatCard label="Gross Margin" value={`${META.marginPct}%`} sub={`${fmtM(META.gp)} GP on ${fmtM(META.netRevenue)} ex-GST revenue`} accent={COLORS.teal} />
-          <StatCard label="Caller Conversion (floor)" value={`${JOIN.convPct}%`} sub={`${JOIN.purchasers} of ${fmt(JOIN.uniqueCallers)} callers found in NetSuite orders`} accent={COLORS.green} />
+        <SectionHeader id="exec" eyebrow="Section A" title="Executive Summary" subtitle="Call intelligence and transactional data, now joined at the individual caller level." />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 16 }}>
+          <StatCard hero label="Pre-Sale Calls Analysed" value={fmt(META.calls)} sub={`${fmt(META.uniqueCallers)} unique callers · ${META.dateRange}`} />
+          <StatCard label="Revenue (Trailing 12mo)" value={fmtM(META.revenueIncGst)} sub={`${fmt(META.orders)} orders · ${fmt(META.customers)} customers · inc GST`} />
+          <StatCard label="Gross Margin" value={`${META.marginPct}%`} sub={`${fmtM(META.gp)} GP on ${fmtM(META.netRevenue)} ex-GST revenue`} />
+          <StatCard label="Caller Conversion (Floor)" value={`${JOIN.convPct}%`} sub={`${JOIN.purchasers} of ${fmt(JOIN.uniqueCallers)} callers found in NetSuite orders`} />
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 32 }}>
-          <StatCard label="Revenue Traced to Callers" value={fmtM(JOIN.callerRevenue)} sub={`${fmtK(JOIN.callerGP)} GP · median ${fmtK(JOIN.medianSpend)} per purchasing caller`} accent={COLORS.ice} />
-          <StatCard label="Dominant Functional Job" value="Health / Detox" sub={`${FUNC[0].count} callers (${FUNC[0].pct}%)`} accent={COLORS.accent} />
-          <StatCard label="Dominant Barrier" value="Financial" sub={`${BARRIERS[0].count} callers (${BARRIERS[0].pct}%) · confidence + electrical close behind`} accent="#c27d3e" />
-          <StatCard label="Repeat Customers" value={`${META.repeatPct}%`} sub={`${fmt(META.repeatCustomers)} customers · ${META.repeatRevPct}% of revenue`} accent={COLORS.purple} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 32 }}>
+          <StatCard hero label="Revenue Traced to Callers" value={fmtM(JOIN.callerRevenue)} sub={`${fmtK(JOIN.callerGP)} GP · median ${fmtK(JOIN.medianSpend)} per purchasing caller`} />
+          <StatCard label="Dominant Functional Job" value="Health / Detox" sub={`${FUNC[0].count} callers (${FUNC[0].pct}%)`} />
+          <StatCard label="Dominant Barrier" value="Financial" sub={`${BARRIERS[0].count} callers (${BARRIERS[0].pct}%) · confidence + electrical close behind`} />
+          <StatCard label="Repeat Customers" value={`${META.repeatPct}%`} sub={`${fmt(META.repeatCustomers)} customers · ${META.repeatRevPct}% of revenue`} />
         </div>
 
-        <Card style={{ marginBottom: 32, border: `1px solid ${COLORS.border}` }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>The Strategic Headlines</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-            <div>
-              <div style={{ color: COLORS.green, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>1. Callers Are Worth $4M+, and They Buy Fast</div>
-              <p style={{ color: COLORS.muted, fontSize: 13, lineHeight: 1.6 }}>
-                At least <strong style={{ color: COLORS.text }}>{JOIN.convPct}% of phone callers become customers</strong> (a floor — phone-keyed orders often lack a stored number), worth {fmtM(JOIN.callerRevenue)}. Of those who buy after calling, 65% order within a week of the first call.
-              </p>
-            </div>
-            <div>
-              <div style={{ color: COLORS.accent, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>2. Readiness Beats Demographics</div>
-              <p style={{ color: COLORS.muted, fontSize: 13, lineHeight: 1.6 }}>
-                Blind re-clustering says the phone base organises by <strong style={{ color: COLORS.text }}>buying stage and urgency</strong>, not segment or location. The Ready Buyer (20% of callers) converts at 48% — v1 never saw this group.
-              </p>
-            </div>
-            <div>
-              <div style={{ color: COLORS.ice, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>3. One Call in Seven Is an Existing Customer</div>
-              <p style={{ color: COLORS.muted, fontSize: 13, lineHeight: 1.6 }}>
-                14% of callers are post-purchase — support, delivery chasing, add-ons. They still convert at 42% on add-on orders. The phone line is a <strong style={{ color: COLORS.text }}>service + cross-sell channel</strong>, not just pre-sale.
-              </p>
-            </div>
-            <div>
-              <div style={{ color: COLORS.purple, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>4. Margin Is Better Than v1 Reported</div>
-              <p style={{ color: COLORS.muted, fontSize: 13, lineHeight: 1.6 }}>
-                v1's 36.1% margin divided GP by GST-inclusive revenue. On the correct ex-GST basis Revel runs at <strong style={{ color: COLORS.text }}>{META.marginPct}%</strong> — essentially on the FY27 44% target already.
-              </p>
-            </div>
+        <Card style={{ marginBottom: 32 }}>
+          <ChartTitle>The Strategic Headlines</ChartTitle>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+            {[
+              { n: "01", t: "Callers Are Worth $4M+, and They Buy Fast", b: <>At least <strong style={{ color: C.text }}>{JOIN.convPct}% of phone callers become customers</strong> (a floor — phone-keyed orders often lack a stored number), worth {fmtM(JOIN.callerRevenue)}. Of those who buy after calling, 65% order within a week of the first call.</> },
+              { n: "02", t: "Readiness Beats Demographics", b: <>Blind re-clustering says the phone base organises by <strong style={{ color: C.text }}>buying stage and urgency</strong>, not segment or location. The Ready Buyer (20% of callers) converts at 48% — v1 never saw this group.</> },
+              { n: "03", t: "One Call in Seven Is an Existing Customer", b: <>14% of callers are post-purchase — support, delivery chasing, add-ons. They still convert at 42% on add-on orders. The phone line is a <strong style={{ color: C.text }}>service + cross-sell channel</strong>, not just pre-sale.</> },
+              { n: "04", t: "Margin Is Better Than v1 Reported", b: <>v1's 36.1% margin divided GP by GST-inclusive revenue. On the correct ex-GST basis Revel runs at <strong style={{ color: C.text }}>{META.marginPct}%</strong> — essentially on the FY27 44% target already.</> },
+            ].map((h, i) => (
+              <div key={i}>
+                <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 6 }}>{h.n}</div>
+                <div style={{ ...UPPER, fontWeight: 700, fontSize: 14, marginBottom: 8, lineHeight: 1.3 }}>{h.t}</div>
+                <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6 }}>{h.b}</p>
+              </div>
+            ))}
           </div>
         </Card>
 
         {/* ═══ B: CALL → REVENUE JOIN ═══ */}
-        <SectionHeader id="join" title="B. The Call → Revenue Join" subtitle="What v1 couldn't do: each caller's phone number matched against NetSuite customer records, then their actual orders. Every number below is observed, not modelled." />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
-          <StatCard label="Unique Callers" value={fmt(JOIN.uniqueCallers)} sub={`from ${fmt(JOIN.calls)} analysed calls`} accent={COLORS.accent} />
-          <StatCard label="Matched to a Customer" value={fmt(JOIN.matched)} sub={`${JOIN.matchPct}% by normalised phone`} accent={COLORS.ice} />
-          <StatCard label="Purchased" value={fmt(JOIN.purchasers)} sub={`${JOIN.convPct}% of all callers — a floor, not a ceiling`} accent={COLORS.green} />
-          <StatCard label="Avg Spend per Buyer" value={fmtK(JOIN.avgSpend)} sub={`median ${fmtK(JOIN.medianSpend)}`} accent={COLORS.gold} />
+        <SectionHeader id="join" eyebrow="Section B" title="The Call → Revenue Join" subtitle="What v1 couldn't do: each caller's phone number matched against NetSuite customer records, then their actual orders. Every number below is observed, not modelled." />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 24 }}>
+          <StatCard label="Unique Callers" value={fmt(JOIN.uniqueCallers)} sub={`from ${fmt(JOIN.calls)} analysed calls`} />
+          <StatCard label="Matched to a Customer" value={fmt(JOIN.matched)} sub={`${JOIN.matchPct}% by normalised phone`} />
+          <StatCard hero label="Purchased" value={fmt(JOIN.purchasers)} sub={`${JOIN.convPct}% of all callers — a floor, not a ceiling`} />
+          <StatCard label="Avg Spend per Buyer" value={fmtK(JOIN.avgSpend)} sub={`median ${fmtK(JOIN.medianSpend)}`} />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, marginBottom: 32 }}>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.green }}>When Do Callers Buy? (first call → first order)</h3>
+            <ChartTitle>When Do Callers Buy? (First Call → First Order)</ChartTitle>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={JOIN.timing} margin={{ left: 10, right: 30, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-                <XAxis dataKey="bucket" tick={{ fill: COLORS.text, fontSize: 10 }} interval={0} angle={-12} textAnchor="end" height={50} />
-                <YAxis tick={{ fill: COLORS.muted, fontSize: 11 }} />
-                <Tooltip content={<CustomTooltip />} />
+                <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
+                <XAxis dataKey="bucket" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-12} textAnchor="end" height={50} axisLine={{ stroke: C.border }} tickLine={false} />
+                <YAxis tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
                 <Bar dataKey="count" name="Purchasing callers" radius={[4, 4, 0, 0]}>
-                  {JOIN.timing.map((_: any, i: number) => <Cell key={i} fill={i === 0 ? "#94a3b8" : CHART_COLORS[i % CHART_COLORS.length]} />)}
+                  {JOIN.timing.map((t: any, i: number) => <Cell key={i} fill={t.bucket === "Same week as call" ? GREEN : GREY_BAR} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <p style={{ color: COLORS.muted, fontSize: 12, marginTop: 8 }}>
-              The median purchasing caller orders <strong style={{ color: COLORS.text }}>the same day they call</strong>. 64 callers (15%) already owned Revel equipment more than a week before calling — the phone line's service tail.
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
+              The median purchasing caller orders <strong style={{ color: C.text }}>the same day they call</strong>. 64 callers (15%) already owned Revel equipment more than a week before calling — the phone line's service tail.
             </p>
           </Card>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: COLORS.ice }}>Why 31.8% Is a Floor</h3>
-            <div style={{ fontSize: 13, color: COLORS.muted, lineHeight: 1.7 }}>
-              <p style={{ marginBottom: 10 }}>The match requires the caller's number to be stored on their NetSuite customer record. Web orders sync phones reliably; <strong style={{ color: COLORS.text }}>manually-keyed phone sales often don't</strong> — we verified purchasers on recorded calls whose customer records hold no phone at all.</p>
+            <ChartTitle>Why 31.8% Is a Floor</ChartTitle>
+            <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
+              <p style={{ marginBottom: 10 }}>The match requires the caller's number to be stored on their NetSuite customer record. Web orders sync phones reliably; <strong style={{ color: C.text }}>manually-keyed phone sales often don't</strong> — we verified purchasers on recorded calls whose customer records hold no phone at all.</p>
               <p style={{ marginBottom: 10 }}>~3% of Revel order customers have no phone on record, and others transact under a partner's number or a different line.</p>
-              <p>So treat {JOIN.convPct}% as the <strong style={{ color: COLORS.text }}>observable minimum</strong>. True caller conversion is meaningfully higher — and either way, callers represent at least {Math.round(JOIN.callerRevenue / META.revenueIncGst * 100)}% of all Revel revenue.</p>
+              <p>So treat {JOIN.convPct}% as the <strong style={{ color: C.text }}>observable minimum</strong>. True caller conversion is meaningfully higher — and either way, callers represent at least {Math.round(JOIN.callerRevenue / META.revenueIncGst * 100)}% of all Revel revenue.</p>
             </div>
           </Card>
         </div>
 
         {/* ═══ C: MARKET DRIVERS ═══ */}
-        <SectionHeader id="macro" title="C. Macro Market Drivers" subtitle={`Jobs-to-be-done and friction across ${fmt(META.uniqueCallers)} unique callers (counting each person once, not each call).`} />
+        <SectionHeader id="macro" eyebrow="Section C" title="Macro Market Drivers" subtitle={`Jobs-to-be-done and friction across ${fmt(META.uniqueCallers)} unique callers (counting each person once, not each call).`} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.accent }}>Functional Job Themes</h3>
+            <ChartTitle>Functional Job Themes</ChartTitle>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={FUNC.filter((f: any) => f.name !== "Other")} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <XAxis type="number" tick={{ fill: COLORS.muted, fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" width={150} tick={{ fill: COLORS.text, fontSize: 11 }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" fill={COLORS.accent} radius={[0, 4, 4, 0]} name="Callers" />
+                <XAxis type="number" tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={150} tick={{ fill: C.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Callers">
+                  {FUNC.filter((f: any) => f.name !== "Other").map((_: any, i: number) => <Cell key={i} fill={i === 0 ? GREEN : GREY_BAR} />)}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </Card>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.gold }}>Emotional Job Themes</h3>
+            <ChartTitle>Emotional Job Themes</ChartTitle>
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
                 <Pie data={EMO.filter((e: any) => e.name !== "Other")} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={85} label={({ pct }: any) => `${pct}%`} labelLine={false}>
-                  {EMO.filter((e: any) => e.name !== "Other").map((_: any, i: number) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                  {EMO.filter((e: any) => e.name !== "Other").map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -252,67 +280,70 @@ export default function App() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.accent }}>Primary Conversion Barriers</h3>
+            <ChartTitle>Primary Conversion Barriers</ChartTitle>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={BARRIERS.filter((b: any) => b.count > 20)} margin={{ left: 10, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-                <XAxis dataKey="name" tick={{ fill: COLORS.text, fontSize: 10 }} interval={0} angle={-12} textAnchor="end" height={45} />
-                <YAxis tick={{ fill: COLORS.muted, fontSize: 11 }} />
-                <Tooltip content={<CustomTooltip />} />
+                <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
+                <XAxis dataKey="name" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-12} textAnchor="end" height={45} axisLine={{ stroke: C.border }} tickLine={false} />
+                <YAxis tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Callers">
-                  {BARRIERS.map((_: any, i: number) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                  {BARRIERS.filter((b: any) => b.count > 20).map((_: any, i: number) => <Cell key={i} fill={i === 0 ? GREEN : GREY_BAR} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <p style={{ color: COLORS.muted, fontSize: 12, marginTop: 8 }}>
-              v1's top-3 (financial, electrical, space) still show, but with more data <strong style={{ color: COLORS.text }}>confidence</strong> ("is this the right one for me?") emerges as the #2 barrier — a sales-enablement problem, not a product one.
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
+              v1's top-3 (financial, electrical, space) still show, but with more data <strong style={{ color: C.text }}>confidence</strong> ("is this the right one for me?") emerges as the #2 barrier — a sales-enablement problem, not a product one.
             </p>
           </Card>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.teal }}>Buying Stage & Timeline</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <ChartTitle>Buying Stage & Timeline</ChartTitle>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div>
-                <div style={{ fontSize: 11, color: COLORS.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Stage</div>
+                <div style={{ ...EYEBROW, color: C.faint, marginBottom: 8, fontSize: 10 }}>Stage</div>
                 {STAGE.map((s: any, i: number) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${COLORS.border}`, fontSize: 13 }}>
-                    <span>{s.name}</span><span style={{ color: COLORS.teal, fontWeight: 600 }}>{s.pct}%</span>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: `1px solid ${C.border}`, fontSize: 13 }}>
+                    <span>{s.name}</span><span style={{ color: C.greenBody, fontWeight: 700 }}>{s.pct}%</span>
                   </div>
                 ))}
               </div>
               <div>
-                <div style={{ fontSize: 11, color: COLORS.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Timeline</div>
+                <div style={{ ...EYEBROW, color: C.faint, marginBottom: 8, fontSize: 10 }}>Timeline</div>
                 {TIMELINE.map((s: any, i: number) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${COLORS.border}`, fontSize: 13 }}>
-                    <span>{s.name}</span><span style={{ color: COLORS.gold, fontWeight: 600 }}>{s.pct}%</span>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: `1px solid ${C.border}`, fontSize: 13 }}>
+                    <span>{s.name}</span><span style={{ color: C.text, fontWeight: 700 }}>{s.pct}%</span>
                   </div>
                 ))}
               </div>
             </div>
-            <p style={{ color: COLORS.muted, fontSize: 12, marginTop: 14 }}>
-              66% of callers with a timeline want to buy <strong style={{ color: COLORS.text }}>this month or sooner</strong> — consistent with the join data showing same-week purchases dominate.
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 16, lineHeight: 1.5 }}>
+              66% of callers with a timeline want to buy <strong style={{ color: C.text }}>this month or sooner</strong> — consistent with the join data showing same-week purchases dominate.
             </p>
           </Card>
         </div>
 
         {/* ═══ D: ARCHETYPES v2 ═══ */}
-        <SectionHeader id="archetypes" title="D. Archetype Explorer — v2 (Blind Re-Derivation)" subtitle="Six clusters found by k-means on 12 need/intent fields across 1,262 callers — with purchase behaviour deliberately held out of the clustering, then measured per cluster afterwards. Conversion and spend below are real NetSuite outcomes." />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
-          {ARCHETYPES.map((a: any) => (
-            <button key={a.id} onClick={() => setActiveArchetype(a.id)}
-              style={{ background: activeArchetype === a.id ? ARCH_COLORS[a.id] : COLORS.card, border: `2px solid ${activeArchetype === a.id ? ARCH_COLORS[a.id] : COLORS.border}`, borderRadius: 12, padding: 14, cursor: "pointer", textAlign: "left" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: activeArchetype === a.id ? "#fff" : COLORS.text, marginBottom: 4 }}>{a.name.replace("The ", "")}</div>
-              <div style={{ fontSize: 11, color: activeArchetype === a.id ? "rgba(255,255,255,0.85)" : COLORS.muted }}>{a.pct_of_callers}% · conv {a.conversion_pct}%</div>
-            </button>
-          ))}
+        <SectionHeader id="archetypes" eyebrow="Section D" title="Archetype Explorer — v2" subtitle="Six clusters found by k-means on 12 need/intent fields across 1,262 callers — with purchase behaviour deliberately held out of the clustering, then measured per cluster afterwards. Conversion and spend below are real NetSuite outcomes." />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12, marginBottom: 24 }}>
+          {ARCHETYPES.map((a: any) => {
+            const active = activeArchetype === a.id;
+            return (
+              <button key={a.id} onClick={() => setActiveArchetype(a.id)}
+                style={{ background: active ? C.greenSoft : C.card, border: `2px solid ${active ? GREEN : C.border}`, borderRadius: 10, padding: 14, cursor: "pointer", textAlign: "left", transition: "border-color 120ms" }}>
+                <div style={{ ...UPPER, fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 4 }}>{a.name.replace("The ", "")}</div>
+                <div style={{ fontSize: 11, color: C.muted }}>{a.pct_of_callers}% · conv {a.conversion_pct}%</div>
+              </button>
+            );
+          })}
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div key={arch.id} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.25 }}
-            style={{ background: COLORS.card, borderRadius: 16, padding: 32, marginBottom: 32, border: `1px solid ${COLORS.border}` }}>
+          <motion.div key={arch.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
+            style={{ background: C.card, borderRadius: 16, padding: 32, marginBottom: 32, border: `1px solid ${C.border}`, boxShadow: C.shadow, borderTop: `4px solid ${ARCH_COLORS[arch.id]}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-              <div>
-                <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{arch.name}</h3>
-                <p style={{ color: COLORS.muted, fontSize: 14, fontStyle: "italic" }}>
+              <div style={{ maxWidth: 560 }}>
+                <h3 style={{ ...UPPER, fontSize: 24, fontWeight: 700, marginBottom: 6 }}>{arch.name}</h3>
+                <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5 }}>
                   {arch.id === 0 && "Decision-stage with a quote in hand — buying within days, price and delivery are the last hurdles"}
                   {arch.id === 1 && "Early research, no timeline — today's browser, occasionally next quarter's buyer"}
                   {arch.id === 2 && "Already a Revel customer — support, delivery chasing, and add-on purchases"}
@@ -321,56 +352,60 @@ export default function App() {
                   {arch.id === 5 && "The core buyer: health transformation at home, wants it this month"}
                 </p>
               </div>
-              <div style={{ display: "flex", gap: 24, textAlign: "right" }}>
-                <div><div style={{ fontSize: 28, fontWeight: 800, color: ARCH_COLORS[arch.id] }}>{arch.pct_of_callers}%</div><div style={{ color: COLORS.muted, fontSize: 11 }}>of callers ({arch.n})</div></div>
-                <div><div style={{ fontSize: 28, fontWeight: 800, color: COLORS.green }}>{arch.conversion_pct}%</div><div style={{ color: COLORS.muted, fontSize: 11 }}>bought (observed)</div></div>
-                <div><div style={{ fontSize: 28, fontWeight: 800, color: COLORS.gold }}>{fmtK(arch.avg_spend)}</div><div style={{ color: COLORS.muted, fontSize: 11 }}>avg spend</div></div>
-                <div><div style={{ fontSize: 28, fontWeight: 800, color: COLORS.ice }}>{fmtK(arch.total_revenue)}</div><div style={{ color: COLORS.muted, fontSize: 11 }}>traced revenue</div></div>
+              <div style={{ display: "flex", gap: 28, textAlign: "right", flexWrap: "wrap" }}>
+                {[[`${arch.pct_of_callers}%`, `of callers (${arch.n})`], [`${arch.conversion_pct}%`, "bought (observed)"], [fmtK(arch.avg_spend), "avg spend"], [fmtK(arch.total_revenue), "traced revenue"]].map(([v, l], i) => (
+                  <div key={i}>
+                    <div style={{ fontSize: 28, fontWeight: 700, color: i === 0 ? C.greenBody : C.text }}>{v}</div>
+                    <div style={{ ...EYEBROW, color: C.faint, fontSize: 10 }}>{l}</div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div style={{ background: "rgba(124,92,191,0.1)", borderRadius: 10, padding: 14, borderLeft: `3px solid ${COLORS.purple}`, marginBottom: 20 }}>
-              <p style={{ fontSize: 14, fontStyle: "italic", lineHeight: 1.6 }}>"{arch.quote}"</p>
+            <div style={{ borderLeft: `3px solid ${GREEN}`, background: C.greenSoft, borderRadius: "0 10px 10px 0", padding: "16px 20px", marginBottom: 24 }}>
+              <p style={{ fontFamily: "var(--font-editorial)", fontStyle: "italic", fontWeight: 600, fontSize: 20, lineHeight: 1.45 }}>"{arch.quote}"</p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24, marginBottom: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 28, marginBottom: 8 }}>
               <div>
-                <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: COLORS.accent }}>WHO & WHY</h4>
+                <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>Who & Why</div>
                 {[["Functional jobs", arch.functional], ["Emotional jobs", arch.emotional], ["Segments", arch.segments]].map(([label, items]: any, i) => (
                   <div key={i} style={{ marginBottom: 10 }}>
-                    <div style={{ fontSize: 10, color: COLORS.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{label}</div>
+                    <div style={{ fontSize: 10, color: C.faint, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: 4 }}>{label}</div>
                     {items.filter((x: any) => !["unspecified", "Uncategorized"].includes(x.name)).slice(0, 3).map((x: any, j: number) => (
-                      <Tag key={j} color={j === 0 ? COLORS.accent : COLORS.accentAlt}>{x.name} {x.pct}%</Tag>
+                      <Chip key={j} tone={j === 0 ? "green" : "plain"}>{x.name} {x.pct}%</Chip>
                     ))}
                   </div>
                 ))}
-                <div style={{ fontSize: 10, color: COLORS.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Top barriers</div>
+                <div style={{ fontSize: 10, color: C.faint, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: 4 }}>Top barriers</div>
                 {arch.barriers.filter((x: any) => x.name !== "unspecified").slice(0, 3).map((x: any, j: number) => (
-                  <Tag key={j} color={COLORS.red}>{x.name} {x.pct}%</Tag>
+                  <Chip key={j} tone="danger">{x.name} {x.pct}%</Chip>
                 ))}
               </div>
               <div>
-                <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: COLORS.gold }}>SENSITIVITY RADAR (data-derived)</h4>
+                <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>Sensitivity Radar (Data-Derived)</div>
                 <ResponsiveContainer width="100%" height={210}>
                   <RadarChart data={radarData} outerRadius={75}>
-                    <PolarGrid stroke={COLORS.border} />
-                    <PolarAngleAxis dataKey="axis" tick={{ fill: COLORS.muted, fontSize: 10 }} />
+                    <PolarGrid stroke={C.border} />
+                    <PolarAngleAxis dataKey="axis" tick={{ fill: C.muted, fontSize: 10 }} />
                     <PolarRadiusAxis tick={false} axisLine={false} domain={[0, 100]} />
-                    <Radar dataKey="val" stroke={ARCH_COLORS[arch.id]} fill={ARCH_COLORS[arch.id]} fillOpacity={0.3} />
+                    <Radar dataKey="val" stroke={ARCH_COLORS[arch.id]} fill={ARCH_COLORS[arch.id]} fillOpacity={0.28} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
               <div>
-                <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: COLORS.teal }}>WHAT THEY ACTUALLY BOUGHT</h4>
+                <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>What They Actually Bought</div>
                 <ResponsiveContainer width="100%" height={170}>
                   <BarChart data={boughtData} layout="vertical" margin={{ left: 10, right: 24 }}>
-                    <XAxis type="number" tick={{ fill: COLORS.muted, fontSize: 10 }} />
-                    <YAxis type="category" dataKey="name" width={130} tick={{ fill: COLORS.text, fontSize: 10 }} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="count" fill={COLORS.teal} radius={[0, 4, 4, 0]} name="Buyers" />
+                    <XAxis type="number" tick={{ fill: C.faint, fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" width={130} tick={{ fill: C.text, fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
+                    <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Buyers">
+                      {boughtData.map((_: any, i: number) => <Cell key={i} fill={i === 0 ? GREEN : GREY_BAR} />)}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
-                <p style={{ fontSize: 12, color: COLORS.muted, marginTop: 6 }}>
+                <p style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>
                   {arch.median_days_to_order !== null && arch.median_days_to_order <= 0 && "Median buyer orders on or before the day of the logged call."}
                   {arch.median_days_to_order !== null && arch.median_days_to_order > 0 && `Median buyer orders ${arch.median_days_to_order} days after first call.`}
                 </p>
@@ -379,35 +414,34 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
 
-        {/* archetype comparison strip */}
         <Card style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Archetype Economics at a Glance</h3>
+          <ChartTitle>Archetype Economics at a Glance</ChartTitle>
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={ARCHETYPES.map((a: any) => ({ name: a.name.replace("The ", ""), callers: a.n, conv: a.conversion_pct, rev: a.total_revenue }))} margin={{ left: 10, right: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-              <XAxis dataKey="name" tick={{ fill: COLORS.text, fontSize: 10 }} interval={0} angle={-10} textAnchor="end" height={45} />
-              <YAxis yAxisId="l" tick={{ fill: COLORS.muted, fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}K`} />
-              <YAxis yAxisId="r" orientation="right" tick={{ fill: COLORS.green, fontSize: 11 }} tickFormatter={(v: number) => `${v}%`} domain={[0, 60]} />
-              <Tooltip content={<CustomTooltip />} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
+              <XAxis dataKey="name" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-10} textAnchor="end" height={45} axisLine={{ stroke: C.border }} tickLine={false} />
+              <YAxis yAxisId="l" tick={{ fill: C.faint, fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}K`} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="r" orientation="right" tick={{ fill: C.faint, fontSize: 11 }} tickFormatter={(v: number) => `${v}%`} domain={[0, 60]} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Bar yAxisId="l" dataKey="rev" name="Traced revenue" radius={[4, 4, 0, 0]}>
                 {ARCHETYPES.map((a: any) => <Cell key={a.id} fill={ARCH_COLORS[a.id]} />)}
               </Bar>
-              <Line yAxisId="r" dataKey="conv" name="Conversion %" stroke={COLORS.green} strokeWidth={2.5} dot={{ r: 4 }} />
+              <Line yAxisId="r" dataKey="conv" name="Conversion %" stroke={isDark ? "#FFFFFF" : "#000000"} strokeWidth={2} dot={{ r: 4 }} />
             </ComposedChart>
           </ResponsiveContainer>
         </Card>
 
         {/* ═══ E: V1 vs V2 ═══ */}
-        <SectionHeader id="v1v2" title="E. Did We Get It Right the First Time?" subtitle="Each caller was also assigned to their v1 archetype using v1's own rules (segment × location × theme × barrier). The matrix shows where each v1 archetype's callers actually landed under blind re-clustering." />
+        <SectionHeader id="v1v2" eyebrow="Section E" title="Did We Get It Right the First Time?" subtitle="Each caller was also assigned to their v1 archetype using v1's own rules (segment × location × theme × barrier). The matrix shows where each v1 archetype's callers actually landed under blind re-clustering." />
         <Card style={{ marginBottom: 24, overflowX: "auto" }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.purple }}>v1 Archetype → v2 Cluster Flow (callers)</h3>
+          <ChartTitle>v1 Archetype → v2 Cluster Flow (Callers)</ChartTitle>
           <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse", minWidth: 720 }}>
             <thead>
-              <tr style={{ borderBottom: `2px solid ${COLORS.border}` }}>
-                <th style={{ textAlign: "left", padding: "8px 6px", color: COLORS.muted }}>v1 (Apr 2026) ↓</th>
-                {V2_ORDER.map(c => <th key={c} style={{ textAlign: "right", padding: "8px 6px", color: COLORS.muted }}>{c.replace("The ", "")}</th>)}
-                <th style={{ textAlign: "right", padding: "8px 6px", color: COLORS.muted }}>Total</th>
+              <tr style={{ borderBottom: `2px solid ${GREEN}` }}>
+                <th style={{ ...EYEBROW, textAlign: "left", padding: "10px 6px", color: C.muted, fontSize: 10 }}>v1 (Apr 2026) ↓</th>
+                {V2_ORDER.map(c => <th key={c} style={{ ...EYEBROW, textAlign: "right", padding: "10px 6px", color: C.muted, fontSize: 10 }}>{c.replace("The ", "")}</th>)}
+                <th style={{ ...EYEBROW, textAlign: "right", padding: "10px 6px", color: C.muted, fontSize: 10 }}>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -416,14 +450,14 @@ export default function App() {
                 const tot = row.reduce((a: number, b: number) => a + b, 0);
                 const mx = Math.max(...row);
                 return (
-                  <tr key={r} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-                    <td style={{ padding: "8px 6px", fontWeight: 600 }}>{r}</td>
+                  <tr key={r} style={{ borderBottom: `1px solid ${C.border}` }}>
+                    <td style={{ padding: "9px 6px", fontWeight: 700 }}>{r}</td>
                     {row.map((v: number, i: number) => (
-                      <td key={i} style={{ padding: "8px 6px", textAlign: "right", fontWeight: v === mx && v > 0 ? 800 : 400, color: v === mx && v > 0 ? COLORS.accent : v > 0 ? COLORS.text : COLORS.muted, background: v === mx && v > 0 ? "rgba(194,125,62,0.12)" : "transparent" }}>
+                      <td key={i} style={{ padding: "9px 6px", textAlign: "right", fontWeight: v === mx && v > 0 ? 700 : 400, color: v === mx && v > 0 ? C.greenBody : v > 0 ? C.text : C.faint, background: v === mx && v > 0 ? C.greenSoft : "transparent" }}>
                         {v > 0 ? `${v} (${Math.round(v / tot * 100)}%)` : "—"}
                       </td>
                     ))}
-                    <td style={{ padding: "8px 6px", textAlign: "right", color: COLORS.muted }}>{tot}</td>
+                    <td style={{ padding: "9px 6px", textAlign: "right", color: C.muted }}>{tot}</td>
                   </tr>
                 );
               })}
@@ -433,78 +467,82 @@ export default function App() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16, marginBottom: 32 }}>
           {VERDICTS.map((v, i) => (
             <Card key={i} style={{ borderLeft: `4px solid ${v.color}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, gap: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 14 }}>{v.v1}</span>
-                <span style={{ fontWeight: 800, fontSize: 11, color: v.color, whiteSpace: "nowrap" }}>{v.verdict}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, gap: 8, flexWrap: "wrap" }}>
+                <span style={{ ...UPPER, fontWeight: 700, fontSize: 13 }}>{v.v1}</span>
+                <span style={{ ...EYEBROW, fontSize: 10, color: v.color, whiteSpace: "nowrap" }}>{v.verdict}</span>
               </div>
-              <p style={{ fontSize: 13, color: COLORS.muted, lineHeight: 1.6 }}>{v.note}</p>
+              <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>{v.note}</p>
             </Card>
           ))}
         </div>
 
         {/* ═══ F: REVENUE & PRODUCT ═══ */}
-        <SectionHeader id="revenue" title="F. Revenue & Product" subtitle={`Trailing 12 months to 8 Jul 2026: ${fmtM(META.revenueIncGst)} inc GST across ${fmt(META.orders)} orders (closed/cancelled orders excluded).`} />
+        <SectionHeader id="revenue" eyebrow="Section F" title="Revenue & Product" subtitle={`Trailing 12 months to 8 Jul 2026: ${fmtM(META.revenueIncGst)} inc GST across ${fmt(META.orders)} orders (closed/cancelled orders excluded).`} />
         <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.gold }}>Monthly Revenue & Gross Profit</h3>
+          <ChartTitle>Monthly Revenue & Gross Profit</ChartTitle>
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={MONTHLY} margin={{ left: 10, right: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-              <XAxis dataKey="mth" tick={{ fill: COLORS.text, fontSize: 10 }} />
-              <YAxis tick={{ fill: COLORS.muted, fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(1)}M`} />
-              <Tooltip content={<CustomTooltip />} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
+              <XAxis dataKey="mth" tick={{ fill: C.muted, fontSize: 10 }} axisLine={{ stroke: C.border }} tickLine={false} />
+              <YAxis tick={{ fill: C.faint, fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(1)}M`} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="rev" name="Revenue (inc GST)" fill={COLORS.accent} radius={[4, 4, 0, 0]} />
-              <Line dataKey="gp" name="Gross profit" stroke={COLORS.teal} strokeWidth={2.5} dot={{ r: 3 }} />
+              <Bar dataKey="rev" name="Revenue (inc GST)" radius={[4, 4, 0, 0]}>
+                {MONTHLY.map((m: any, i: number) => <Cell key={i} fill={m.mth === "2025-11" || m.mth === "2026-06" ? GREEN : GREY_BAR} />)}
+              </Bar>
+              <Line dataKey="gp" name="Gross profit" stroke="#485D4D" strokeWidth={2.5} dot={{ r: 3 }} />
             </ComposedChart>
           </ResponsiveContainer>
-          <p style={{ color: COLORS.muted, fontSize: 12, marginTop: 8 }}>
-            Two engines drive the year: <strong style={{ color: COLORS.text }}>Black Friday (Nov)</strong> and <strong style={{ color: COLORS.text }}>EOFY (Jun)</strong>, each at ~$2.3M — 2.5× a normal month.
+          <p style={{ color: C.muted, fontSize: 12, marginTop: 8 }}>
+            Two engines drive the year: <strong style={{ color: C.text }}>Black Friday (Nov)</strong> and <strong style={{ color: C.text }}>EOFY (Jun)</strong>, each at ~$2.3M — 2.5× a normal month.
           </p>
         </Card>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.accent }}>Revenue by Category (ex GST)</h3>
+            <ChartTitle>Revenue by Category (ex GST)</ChartTitle>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={CATEGORIES.filter((c: any) => c.rev > 100000)} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <XAxis type="number" tick={{ fill: COLORS.muted, fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(1)}M`} />
-                <YAxis type="category" dataKey="cat" width={130} tick={{ fill: COLORS.text, fontSize: 11 }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="rev" fill={COLORS.accent} radius={[0, 4, 4, 0]} name="Net revenue" />
+                <XAxis type="number" tick={{ fill: C.faint, fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(1)}M`} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="cat" width={130} tick={{ fill: C.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
+                <Bar dataKey="rev" radius={[0, 4, 4, 0]} name="Net revenue">
+                  {CATEGORIES.filter((c: any) => c.rev > 100000).map((_: any, i: number) => <Cell key={i} fill={i === 0 ? GREEN : GREY_BAR} />)}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </Card>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.teal }}>Item Margin by Category</h3>
+            <ChartTitle>Item Margin by Category</ChartTitle>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={CATEGORIES.filter((c: any) => c.rev > 100000)} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <XAxis type="number" tick={{ fill: COLORS.muted, fontSize: 11 }} domain={[0, 60]} tickFormatter={(v: number) => `${v}%`} />
-                <YAxis type="category" dataKey="cat" width={130} tick={{ fill: COLORS.text, fontSize: 11 }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="margin" fill={COLORS.teal} radius={[0, 4, 4, 0]} name="Item margin %" />
+                <XAxis type="number" tick={{ fill: C.faint, fontSize: 11 }} domain={[0, 60]} tickFormatter={(v: number) => `${v}%`} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="cat" width={130} tick={{ fill: C.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
+                <Bar dataKey="margin" fill="#485D4D" radius={[0, 4, 4, 0]} name="Item margin %" />
               </BarChart>
             </ResponsiveContainer>
-            <p style={{ color: COLORS.muted, fontSize: 12, marginTop: 8 }}>
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 8 }}>
               Saunas cluster at 44-48% item margin. Ice baths at ~25% remain the volume/entry play; hybrids are the margin sweet spot at 48%.
             </p>
           </Card>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, marginBottom: 32 }}>
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.gold }}>Top 10 Products by Revenue</h3>
+            <ChartTitle>Top 10 Products by Revenue</ChartTitle>
             <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ borderBottom: `2px solid ${COLORS.border}` }}>
-                  <th style={{ textAlign: "left", padding: "7px 4px", color: COLORS.muted, fontSize: 11 }}>Product</th>
-                  <th style={{ textAlign: "right", padding: "7px 4px", color: COLORS.muted, fontSize: 11 }}>Units</th>
-                  <th style={{ textAlign: "right", padding: "7px 4px", color: COLORS.muted, fontSize: 11 }}>Revenue</th>
+                <tr style={{ borderBottom: `2px solid ${GREEN}` }}>
+                  <th style={{ ...EYEBROW, textAlign: "left", padding: "8px 4px", color: C.muted, fontSize: 10 }}>Product</th>
+                  <th style={{ ...EYEBROW, textAlign: "right", padding: "8px 4px", color: C.muted, fontSize: 10 }}>Units</th>
+                  <th style={{ ...EYEBROW, textAlign: "right", padding: "8px 4px", color: C.muted, fontSize: 10 }}>Revenue</th>
                 </tr>
               </thead>
               <tbody>
                 {TOP_PRODUCTS.slice(0, 10).map((p: any, i: number) => (
-                  <tr key={i} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-                    <td style={{ padding: "7px 4px" }}>{p.name}</td>
-                    <td style={{ padding: "7px 4px", textAlign: "right", color: COLORS.teal }}>{p.units}</td>
-                    <td style={{ padding: "7px 4px", textAlign: "right", color: COLORS.gold, fontWeight: 600 }}>${fmt(p.net_rev | 0)}</td>
+                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}>
+                    <td style={{ padding: "8px 4px" }}>{p.name}</td>
+                    <td style={{ padding: "8px 4px", textAlign: "right", color: C.muted }}>{p.units}</td>
+                    <td style={{ padding: "8px 4px", textAlign: "right", fontWeight: 700, color: i === 0 ? C.greenBody : C.text }}>${fmt(p.net_rev | 0)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -512,35 +550,37 @@ export default function App() {
           </Card>
           <div style={{ display: "grid", gap: 24 }}>
             <Card>
-              <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: COLORS.ice }}>Revenue by State</h3>
+              <ChartTitle>Revenue by State</ChartTitle>
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={STATES} margin={{ left: 10, right: 20 }}>
-                  <XAxis dataKey="st" tick={{ fill: COLORS.text, fontSize: 11 }} />
-                  <YAxis tick={{ fill: COLORS.muted, fontSize: 10 }} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(0)}M`} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="rev" fill={COLORS.ice} radius={[4, 4, 0, 0]} name="Revenue" />
+                  <XAxis dataKey="st" tick={{ fill: C.muted, fontSize: 11 }} axisLine={{ stroke: C.border }} tickLine={false} />
+                  <YAxis tick={{ fill: C.faint, fontSize: 10 }} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(0)}M`} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
+                  <Bar dataKey="rev" radius={[4, 4, 0, 0]} name="Revenue">
+                    {STATES.map((_: any, i: number) => <Cell key={i} fill={i === 0 ? GREEN : GREY_BAR} />)}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
-              <p style={{ color: COLORS.muted, fontSize: 11, marginTop: 6 }}>East coast = 66% of shipped revenue. A further $2.3M has no shipping state recorded.</p>
+              <p style={{ color: C.muted, fontSize: 11, marginTop: 6 }}>East coast = 66% of shipped revenue. A further $2.3M has no shipping state recorded.</p>
             </Card>
             <Card>
-              <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: COLORS.gold }}>Competitors Named on Calls</h3>
+              <ChartTitle>Competitors Named on Calls</ChartTitle>
               {COMPETITORS.slice(0, 6).map((c: any, i: number) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${COLORS.border}`, fontSize: 12 }}>
-                  <span>{c.name}</span><span style={{ color: COLORS.gold, fontWeight: 700 }}>{c.mentions}</span>
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${C.border}`, fontSize: 12 }}>
+                  <span>{c.name}</span><span style={{ color: C.text, fontWeight: 700 }}>{c.mentions}</span>
                 </div>
               ))}
-              <p style={{ color: COLORS.muted, fontSize: 11, marginTop: 6 }}>Alpine still leads share-of-voice, consistent with v1.</p>
+              <p style={{ color: C.muted, fontSize: 11, marginTop: 6 }}>Alpine still leads share-of-voice, consistent with v1.</p>
             </Card>
           </div>
         </div>
 
         {/* ═══ G: ACTIONS ═══ */}
-        <SectionHeader id="strategy" title="G. Strategic Actions" subtitle="What changes now that we can see conversion and revenue per archetype." />
+        <SectionHeader id="strategy" eyebrow="Section G" title="Strategic Actions" subtitle="What changes now that we can see conversion and revenue per archetype." />
         <div style={{ display: "grid", gap: 24 }}>
           {[
             {
-              title: "Sales", color: COLORS.green, items: [
+              title: "Sales", items: [
                 { t: "1. Treat Ready Buyers as a same-day SLA", b: "20% of callers are decision-stage and convert at 48%, typically ordering within days. Every hour of quote delay is measurable revenue risk. Flag decision-stage callers in the CRM and mandate same-day quote turnaround.", d: "248 callers · 48% conv" },
                 { t: "2. Give Owners their own lane", b: "14% of calls are existing customers (support, delivery, add-ons) sitting in the same queue as new buyers. Route them separately: faster service, and a scripted add-on conversation — they still spend at 42% conversion (rocks, backrests, chillers, second units).", d: "179 callers · $742K traced" },
                 { t: "3. Sell contrast as a project, commercial included", b: "Contrast Recovery Builders (16%) buy chiller+ice+sauna combos; most commercial buyers are this archetype with a business card. One consultative motion with bundle pricing and commercial warranty options covers both.", d: "198 callers · top combo CHL+ICE" },
@@ -548,7 +588,7 @@ export default function App() {
               ]
             },
             {
-              title: "Marketing", color: COLORS.accent, items: [
+              title: "Marketing", items: [
                 { t: "1. Health outcomes remain the master message", b: "Health/Detox + Sleep + Recovery = 48% of stated functional jobs, and the Health-Seeker archetype alone is 30% of callers and $1.1M traced revenue. Lead with transformation, not spectrums and panels.", d: "674 callers health-led" },
                 { t: "2. Attack the confidence barrier, not just the electrical one", b: "Confidence ('which one is right for me?') is now the #2 barrier (16%), ahead of electrical (16%) and space (12%). Comparison guides, quiz-style selectors and the AI designer pattern directly serve it.", d: "228 confidence-blocked callers" },
                 { t: "3. Keep the electrical pre-qualification push", b: "Electrical friction hits the Health-Seeker hardest (29% of their barriers) and hasn't moved since v1. PDP specs, a 'Revel Ready' electrician referral, and pre-purchase checklists remain high-ROI.", d: "220 callers blocked" },
@@ -556,7 +596,7 @@ export default function App() {
               ]
             },
             {
-              title: "Product & Digital", color: COLORS.teal, items: [
+              title: "Product & Digital", items: [
                 { t: "1. Bundle builder for the recovery station", b: "The most common multi-line purchase is chiller + ice bath, and sauna+ice combos follow. A 'build your recovery station' configurator with bundle pricing converts the Contrast Builder without a phone call.", d: "CHL+ICE = #1 combo" },
                 { t: "2. Selector tools to close the confidence gap", b: "Traditional vs infrared indecision shows up in 62 callers' product interest and in the confidence barrier. A guided chooser (space, power, goals → recommendation) removes the #2 conversion blocker.", d: "confidence = #2 barrier" },
                 { t: "3. Phone-number hygiene at order entry", b: "One in three callers can't be traced to their order because manually-keyed sales often skip the phone field. Make it mandatory in NetSuite order entry — it's the difference between guessing and knowing marketing ROI on a $4M+ channel.", d: "match rate 31.8% (floor)" },
@@ -564,14 +604,15 @@ export default function App() {
               ]
             },
           ].map((sec, i) => (
-            <Card key={i} style={{ borderLeft: `4px solid ${sec.color}`, padding: 28 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: sec.color }}>{sec.title}</h3>
+            <Card key={i} style={{ padding: 28 }}>
+              <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 6 }}>{`0${i + 1}`}</div>
+              <h3 style={{ ...UPPER, fontSize: 18, fontWeight: 700, marginBottom: 16 }}>{sec.title}</h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
                 {sec.items.map((item, j) => (
-                  <div key={j} style={{ background: "rgba(128,128,128,0.06)", borderRadius: 10, padding: 16 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>{item.t}</div>
-                    <p style={{ fontSize: 13, color: COLORS.muted, lineHeight: 1.6, marginBottom: 8 }}>{item.b}</p>
-                    <Tag color={sec.color}>{item.d}</Tag>
+                  <div key={j} style={{ background: "var(--color-bg-subtle)", border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
+                    <div style={{ ...UPPER, fontWeight: 700, fontSize: 13, marginBottom: 8, lineHeight: 1.35 }}>{item.t}</div>
+                    <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, marginBottom: 10 }}>{item.b}</p>
+                    <Chip tone="green">{item.d}</Chip>
                   </div>
                 ))}
               </div>
@@ -580,16 +621,19 @@ export default function App() {
         </div>
 
         {/* ═══ H: METHODOLOGY ═══ */}
-        <div id="method" style={{ marginTop: 64, padding: 24, background: COLORS.card, borderRadius: 12, border: `1px solid ${COLORS.border}` }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Methodology & Data Notes</h3>
-          <div style={{ fontSize: 12, color: COLORS.muted, lineHeight: 1.8 }}>
-            <p><strong>Call data:</strong> 2,043 AI-analysed pre-sale calls (Should_Analyze tab), 18 Nov 2025 – 8 Jul 2026, deduplicated to 1,392 unique callers by phone. v1 used 1,161 calls to 5 Apr 2026.</p>
-            <p><strong>Sales data:</strong> NetSuite sales orders, Revel departments, trailing 12 months to 8 Jul 2026. Closed/cancelled orders excluded (957 orders, $3.7M). Topline revenue is GST-inclusive order totals; category revenue and margins are ex-GST item lines; GP is NetSuite estimated gross profit. v1's 36.1% margin was GP ÷ inc-GST revenue; the ex-GST equivalent is {META.marginPct}%.</p>
-            <p><strong>Caller→order join:</strong> phone numbers normalised to last 9 digits and matched against customer phone/mobile fields. 443/1,392 matched. This undercounts: some purchasers' customer records hold no phone (verified on recorded calls), so caller conversion and traced revenue are floors.</p>
-            <p><strong>Archetypes v2:</strong> k-means (k=6, one-hot, missingness down-weighted) on 12 need/intent fields over 1,262 callers with sufficient data; 130 sparse callers excluded. Purchase outcomes were held out of clustering and measured afterwards. k selected by silhouette + interpretability; cluster separation is modest (silhouette ≈ 0.10), normal for categorical survey-style data — treat archetypes as strong tendencies, not hard walls.</p>
-            <p><strong>v1 comparison:</strong> v1 archetypes were approximated from their published definitions (segment × location × theme × barrier rules) and applied to the same callers, then cross-tabulated against v2 clusters.</p>
-            <p><strong>Privacy:</strong> aggregate data only; no names or contact details are included in this dashboard. Quotes are verbatim but anonymised.</p>
-            <p style={{ marginTop: 8 }}>Generated 9 Jul 2026 by Gary · sources: Revel_Transcript_Insights sheet + NetSuite (both read-only).</p>
+        <div id="method" style={{ marginTop: 64, padding: 28, background: "var(--revel-forest)", borderRadius: 16, color: "#fff" }}>
+          <h3 style={{ ...UPPER, fontSize: 14, fontWeight: 700, marginBottom: 14, color: "#fff" }}>Methodology & Data Notes</h3>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 1.8 }}>
+            <p><strong style={{ color: "#fff" }}>Call data:</strong> 2,043 AI-analysed pre-sale calls (Should_Analyze tab), 18 Nov 2025 – 8 Jul 2026, deduplicated to 1,392 unique callers by phone. v1 used 1,161 calls to 5 Apr 2026.</p>
+            <p><strong style={{ color: "#fff" }}>Sales data:</strong> NetSuite sales orders, Revel departments, trailing 12 months to 8 Jul 2026. Closed/cancelled orders excluded (957 orders, $3.7M). Topline revenue is GST-inclusive order totals; category revenue and margins are ex-GST item lines; GP is NetSuite estimated gross profit. v1's 36.1% margin was GP ÷ inc-GST revenue; the ex-GST equivalent is {META.marginPct}%.</p>
+            <p><strong style={{ color: "#fff" }}>Caller→order join:</strong> phone numbers normalised to last 9 digits and matched against customer phone/mobile fields. 443/1,392 matched. This undercounts: some purchasers' customer records hold no phone (verified on recorded calls), so caller conversion and traced revenue are floors.</p>
+            <p><strong style={{ color: "#fff" }}>Archetypes v2:</strong> k-means (k=6, one-hot, missingness down-weighted) on 12 need/intent fields over 1,262 callers with sufficient data; 130 sparse callers excluded. Purchase outcomes were held out of clustering and measured afterwards. k selected by silhouette + interpretability; cluster separation is modest (silhouette ≈ 0.10), normal for categorical survey-style data — treat archetypes as strong tendencies, not hard walls.</p>
+            <p><strong style={{ color: "#fff" }}>v1 comparison:</strong> v1 archetypes were approximated from their published definitions (segment × location × theme × barrier rules) and applied to the same callers, then cross-tabulated against v2 clusters.</p>
+            <p><strong style={{ color: "#fff" }}>Privacy:</strong> aggregate data only; no names or contact details are included in this dashboard. Quotes are verbatim but anonymised.</p>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.25)" }}>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>Generated 9 Jul 2026 by Gary · sources read-only · LIVE LONGER, LIVE BETTER.</span>
+            <img src={LOGO_WHITE} alt="Revel" style={{ height: 28 }} />
           </div>
         </div>
 
