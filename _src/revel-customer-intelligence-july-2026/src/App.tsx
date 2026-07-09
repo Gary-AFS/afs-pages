@@ -156,7 +156,7 @@ const VERDICTS = [
   { v1: "Commercial Operator", verdict: "VALIDATED", color: "#2E8B4A", note: "77% cohesion into the Commercial Recovery Operator — gyms, studios, developers fitting out recovery spaces. v1 had this right. (Our own first rerun briefly merged it away; with journey-stage noise removed, it separates cleanly.)" },
   { v1: "Cautious Researcher", verdict: "MOSTLY AN ARTIFACT", color: "#C23B22", note: "52% are simply Quiet Shoppers — callers who revealed little on the phone. 'Caution' was largely missing data plus no timeline, not a customer identity. The real insight is a needs-discovery gap on calls, which is a coaching opportunity, not a persona." },
   { v1: "Home Renovator", verdict: "DISSOLVED", color: "#C23B22", note: "Renovators spread across the four archetypes roughly in proportion to their size (60% land in the Home Health-Seeker — which is half of everyone). Renovation is a trigger and a timing signal — build it into campaign timing and PDP content, but don't market to 'renovators' as a who." },
-  { v1: "— (new in v2)", verdict: "FOUND: THE QUIET SHOPPER", color: "#2F6BAF", note: "23% of callers disclose almost nothing — yet they still convert at 26% and buy full-price saunas. Every point of needs-discovery improvement on these calls is measurable revenue. This is a sales-coaching archetype, not a marketing one." },
+  { v1: "— (new in v2)", verdict: "FOUND: THE QUIET SHOPPER", color: "#2F6BAF", note: "23% of callers disclose almost nothing — yet they still convert at 26% and buy full-price saunas. Not a true archetype: it's the catch-all for everyone we don't know much about. Every point of needs-discovery improvement on these calls is measurable revenue — and shrinks this bucket into the real archetypes." },
 ];
 
 export default function App() {
@@ -195,7 +195,8 @@ export default function App() {
 
   const radarData = Object.entries(arch.radar).map(([axis, val]) => ({ axis, val }));
   const boughtData = Object.entries(arch.bought).map(([k, v]) => ({ name: prettyCats(k), count: v }));
-  const ARCH_SORTED = [2, 1, 0, 4].map(i => ARCHETYPES.find((a: any) => a.id === i));
+  // Quiet Shopper (id 1) deliberately last — it's the low-disclosure catch-all, not a true identity.
+  const ARCH_SORTED = [2, 0, 4, 1].map(i => ARCHETYPES.find((a: any) => a.id === i));
 
   return (
     <MotionConfig reducedMotion="user">
@@ -261,7 +262,7 @@ export default function App() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
             {[
               { n: "01", t: "Callers Are Worth $4M+, and They Buy Fast", b: <>At least <strong style={{ color: C.text }}>{JOIN.convPct}% of phone callers become customers</strong> (a floor — phone-keyed orders often lack a stored number), worth {fmtM(JOIN.callerRevenue)}. Of those who buy after calling, 65% order within a week of the first call.</> },
-              { n: "02", t: "Who You Are ≠ Where You Are", b: <>Four stable identity archetypes describe WHO customers are. Readiness (WHERE they are in the journey) is a separate overlay that <strong style={{ color: C.text }}>roughly doubles conversion inside every archetype</strong> — 46-55% at decision stage vs ~20-25% earlier.</> },
+              { n: "02", t: "Who You Are ≠ Where You Are", b: <>Three true identity archetypes describe WHO customers are (a fourth bucket — the Quiet Shopper — is simply everyone who reveals too little to classify). Readiness (WHERE they are in the journey) is a separate overlay that <strong style={{ color: C.text }}>roughly doubles conversion inside every archetype</strong> — 46-55% at decision stage vs ~20-25% earlier.</> },
               { n: "03", t: "One Flagship Buyer, Two Pathways", b: <>The Home Health-Seeker is half of all prospects — one archetype with a near 50/50 <strong style={{ color: C.text }}>product-philosophy fork</strong> (infrared science vs traditional ritual, mirrored 617 vs 694 in the customer base). Same why; different language, placement and barriers.</> },
               { n: "04", t: "Contrast Buyers Are the Value Segment", b: <>Sauna + ice customers average <strong style={{ color: C.text }}>$12.9K (2.2× a single-modality buyer)</strong> and 39% place another paid order within the year — 4× the single-modality repeat rate, even after stripping out $0 warranty orders that inflate naive repeat metrics.</> },
             ].map((h, i) => (
@@ -389,7 +390,7 @@ export default function App() {
         </div>
 
         {/* ═══ D: WHO — IDENTITY ARCHETYPES ═══ */}
-        <SectionHeader id="who" eyebrow="Section D · Who" title="Customer Archetypes (Identity Only)" subtitle="Four archetypes, from k-means on nine identity and need fields — segment, jobs, barriers, location, experience, price posture. Journey-stage fields were excluded from clustering, post-purchase service callers were set aside, and the two raw clusters that differed only on product preference are presented as one archetype with two pathways. Conversion and spend are real NetSuite outcomes, shown as results, not inputs." />
+        <SectionHeader id="who" eyebrow="Section D · Who" title="Customer Archetypes (Identity Only)" subtitle="Three true archetypes plus a catch-all, from k-means on nine identity and need fields — segment, jobs, barriers, location, experience, price posture. Journey-stage fields were excluded from clustering, post-purchase service callers were set aside, and the two raw clusters that differed only on product preference are presented as one archetype with two pathways. The Quiet Shopper sits last deliberately: it's the bucket for callers who reveal too little to classify, and the play there is better needs-discovery on the phone, not a marketing persona. Conversion and spend are real NetSuite outcomes, shown as results, not inputs." />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 24 }}>
           {ARCH_SORTED.map((a: any) => {
             const active = activeArchetype === a.id;
@@ -399,7 +400,7 @@ export default function App() {
                 <img src={ARCH_IMAGES[a.id]} alt="" style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${active ? ARCH_COLORS[a.id] : C.border}`, filter: active ? "none" : "saturate(0.6)", transition: "border-color 120ms, filter 200ms" }} />
                 <div>
                   <div style={{ ...UPPER, fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 4 }}>{a.name.replace("The ", "")}</div>
-                  <div style={{ fontSize: 11, color: C.muted }}>{a.pct_of_callers}% · conv {a.conversion_pct}%</div>
+                  <div style={{ fontSize: 11, color: C.muted }}>{a.pct_of_callers}% · conv {a.conversion_pct}%{a.id === 1 && " · catch-all"}</div>
                 </div>
               </button>
             );
@@ -417,10 +418,10 @@ export default function App() {
                   <div style={{ fontSize: 9, color: C.faint, textAlign: "center", marginTop: 5, textTransform: "uppercase", letterSpacing: "0.06em" }}>Illustrative persona</div>
                 </motion.div>
               <div style={{ maxWidth: 480 }}>
-                <h3 style={{ ...UPPER, fontSize: 24, fontWeight: 700, marginBottom: 6 }}>{arch.name}</h3>
+                <h3 style={{ ...UPPER, fontSize: 24, fontWeight: 700, marginBottom: 6 }}>{arch.name}{arch.id === 1 && <span style={{ verticalAlign: "middle", marginLeft: 10 }}><Chip tone="plain">Catch-all — not a true archetype</Chip></span>}</h3>
                 <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5 }}>
                   {arch.id === 0 && "Defined by the job, not the gear: 90% carry a recovery job (perform, recover, manage pain). Contrast equipment (sauna + ice) is how they buy it — enthusiasts, not athletes (4% sport language)"}
-                  {arch.id === 1 && "Reveals little on the phone but buys full-price saunas — the needs-discovery opportunity"}
+                  {arch.id === 1 && "Not really a 'who' at all — this is everyone we don't know much about. 23% of callers reveal almost nothing on the phone, yet still buy full-price saunas. The opportunity isn't marketing to them; it's better needs-discovery on every call, which would shrink this bucket and sort its callers into the real archetypes"}
                   {arch.id === 2 && "Health transformation at home — one archetype, two product pathways: infrared science or traditional ritual"}
                   {arch.id === 4 && "Gyms, studios, developers and workplaces buying recovery as a service or amenity"}
                 </p>
