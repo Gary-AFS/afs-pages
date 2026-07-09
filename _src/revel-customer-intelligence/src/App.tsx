@@ -29,8 +29,8 @@ const C = {
 };
 const GREEN = "#25B34B";
 const GREY_BAR = "#C4C4C4";
-// WHO archetype colours: 0 Contrast Athlete, 1 Quiet Shopper, 2 Infrared Health-Seeker, 3 Traditional Purist, 4 Commercial
-const ARCH_COLORS: Record<number, string> = { 0: "#2F6BAF", 1: "#9E9E9E", 2: "#25B34B", 3: "#485D4D", 4: "#D99100" };
+// WHO archetype colours: 0 Contrast Athlete, 1 Quiet Shopper, 2 Home Health-Seeker, 4 Commercial
+const ARCH_COLORS: Record<number, string> = { 0: "#2F6BAF", 1: "#9E9E9E", 2: "#25B34B", 4: "#D99100" };
 
 const LOGO_WHITE = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-White-02.png?v=1691241102";
 const LOGO_BLACK = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-Black-01.png?v=1691024664";
@@ -115,10 +115,10 @@ const NAV_ITEMS = [
 ];
 
 const V1_ORDER = ["Sanctuary Seeker", "Home Renovator", "Performance Biohacker", "Commercial Operator", "Cautious Researcher", "Unclassified"];
-const V2_ORDER = ["The Infrared Health-Seeker", "The Traditional Purist", "The Contrast Athlete", "The Commercial Recovery Operator", "The Quiet Shopper"];
+const V2_ORDER = ["The Home Health-Seeker", "The Contrast Athlete", "The Commercial Recovery Operator", "The Quiet Shopper"];
 
 const VERDICTS = [
-  { v1: "Sanctuary Seeker", verdict: "SPLIT BY PRODUCT PHILOSOPHY", color: "#D99100", note: "The health-first home buyer is real — but it's two archetypes, not one. 40% are Infrared Health-Seekers (tech-lean, indoor-friendly, electrical friction) and 37% are Traditional Purists (ritual, outdoor, 99% traditional product intent). They want different messages, different pages, different proof." },
+  { v1: "Sanctuary Seeker", verdict: "VALIDATED — NOW THE HOME HEALTH-SEEKER", color: "#2E8B4A", note: "77% of Sanctuary Seekers land in the Home Health-Seeker — v1's core archetype was right. What v1 missed is the fork inside it: a near 50/50 infrared-vs-traditional pathway split (mirrored 617 vs 694 in the actual customer base) that changes the creative language, PDP content and barrier handling, without being a separate 'who'." },
   { v1: "Performance Biohacker", verdict: "VALIDATED", color: "#2E8B4A", note: "57% land together as the Contrast Athlete — home recovery enthusiasts running sauna + ice as a protocol. Drop the 'biohacker' persona framing; these are everyday athletes and tradies, and they carry the second-highest basket ($10.7K)." },
   { v1: "Commercial Operator", verdict: "VALIDATED", color: "#2E8B4A", note: "77% cohesion into the Commercial Recovery Operator — gyms, studios, developers fitting out recovery spaces. v1 had this right. (Our own first rerun briefly merged it away; with journey-stage noise removed, it separates cleanly.)" },
   { v1: "Cautious Researcher", verdict: "MOSTLY AN ARTIFACT", color: "#C23B22", note: "52% are simply Quiet Shoppers — callers who revealed little on the phone. 'Caution' was largely missing data plus no timeline, not a customer identity. The real insight is a needs-discovery gap on calls, which is a coaching opportunity, not a persona." },
@@ -139,7 +139,7 @@ export default function App() {
 
   const radarData = Object.entries(arch.radar).map(([axis, val]) => ({ axis, val }));
   const boughtData = Object.entries(arch.bought).map(([k, v]) => ({ name: prettyCats(k), count: v }));
-  const ARCH_SORTED = [2, 3, 1, 0, 4].map(i => ARCHETYPES.find((a: any) => a.id === i));
+  const ARCH_SORTED = [2, 1, 0, 4].map(i => ARCHETYPES.find((a: any) => a.id === i));
 
   return (
     <div className={isDark ? "dark" : ""} style={{ background: C.bg, minHeight: "100vh", color: C.text, fontFamily: "var(--font-sans)", transition: "background-color 0.2s, color 0.2s" }}>
@@ -204,7 +204,7 @@ export default function App() {
             {[
               { n: "01", t: "Callers Are Worth $4M+, and They Buy Fast", b: <>At least <strong style={{ color: C.text }}>{JOIN.convPct}% of phone callers become customers</strong> (a floor — phone-keyed orders often lack a stored number), worth {fmtM(JOIN.callerRevenue)}. Of those who buy after calling, 65% order within a week of the first call.</> },
               { n: "02", t: "Who You Are ≠ Where You Are", b: <>Five stable identity archetypes describe WHO customers are. Readiness (WHERE they are in the journey) is a separate overlay that <strong style={{ color: C.text }}>roughly doubles conversion inside every archetype</strong> — 46-55% at decision stage vs ~20-25% earlier.</> },
-              { n: "03", t: "The Health Buyer Splits in Two", b: <>The core home wellness buyer divides on <strong style={{ color: C.text }}>product philosophy</strong>: Infrared Health-Seekers vs Traditional Purists — near-equal halves of both the call base and the actual customer base (619 vs 693 buyers). One range, two languages.</> },
+              { n: "03", t: "One Flagship Buyer, Two Pathways", b: <>The Home Health-Seeker is half of all prospects — one archetype with a near 50/50 <strong style={{ color: C.text }}>product-philosophy fork</strong> (infrared science vs traditional ritual, mirrored 617 vs 694 in the customer base). Same why; different language, placement and barriers.</> },
               { n: "04", t: "Contrast Buyers Are the Value Segment", b: <>Sauna + ice customers average <strong style={{ color: C.text }}>$12.9K (2.2× a single-modality buyer)</strong> and 39% place another paid order within the year — 4× the single-modality repeat rate, even after stripping out $0 warranty orders that inflate naive repeat metrics.</> },
             ].map((h, i) => (
               <div key={i}>
@@ -354,8 +354,7 @@ export default function App() {
                 <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5 }}>
                   {arch.id === 0 && "Home recovery enthusiast running hot + cold as a protocol — sauna, ice bath and chiller as one system"}
                   {arch.id === 1 && "Reveals little on the phone but buys full-price saunas — the needs-discovery opportunity"}
-                  {arch.id === 2 && "Health transformation through infrared — tech-lean, indoor-friendly, blocked by electrical questions"}
-                  {arch.id === 3 && "The authentic hot-rock ritual, outdoors — 99% traditional product intent, space and heater questions"}
+                  {arch.id === 2 && "Health transformation at home — one archetype, two product pathways: infrared science or traditional ritual"}
                   {arch.id === 4 && "Gyms, studios, developers and workplaces buying recovery as a service or amenity"}
                 </p>
               </div>
@@ -414,6 +413,35 @@ export default function App() {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            {/* pathways (product philosophy) — for the Home Health-Seeker */}
+            {arch.pathways && (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>Two Pathways, One Buyer — Product Philosophy Is a Choice, Not an Identity</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+                  {arch.pathways.map((p: any, i: number) => (
+                    <div key={i} style={{ background: "var(--color-bg-subtle)", border: `1px solid ${C.border}`, borderTop: `3px solid ${i === 0 ? GREEN : "#485D4D"}`, borderRadius: 10, padding: 18 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+                        <div style={{ ...UPPER, fontWeight: 700, fontSize: 14 }}>{p.label.replace("The ", "")}</div>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: C.greenBody }}>{p.share}%</div>
+                      </div>
+                      <div style={{ fontSize: 12, color: C.muted, fontStyle: "italic", marginBottom: 10 }}>{p.tag}</div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 14px", fontSize: 12 }}>
+                        <span style={{ color: C.muted }}>Conversion</span><span style={{ fontWeight: 700, textAlign: "right" }}>{p.conv}%</span>
+                        <span style={{ color: C.muted }}>Avg spend</span><span style={{ fontWeight: 700, textAlign: "right" }}>{fmtK(p.avg)}</span>
+                        <span style={{ color: C.muted }}>Outdoor / indoor placement</span><span style={{ fontWeight: 700, textAlign: "right" }}>{p.outdoor_pct}% / {p.indoor_pct}%</span>
+                        <span style={{ color: C.muted }}>Couple (joint) decision</span><span style={{ fontWeight: 700, textAlign: "right" }}>{p.joint_pct}%</span>
+                        <span style={{ color: C.muted }}>Top barrier</span><span style={{ fontWeight: 700, textAlign: "right" }}>{pretty(p.top_barrier)}</span>
+                        <span style={{ color: C.muted }}>Buyers in full customer base</span><span style={{ fontWeight: 700, textAlign: "right" }}>{fmt(p.base_buyers)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontSize: 12, color: C.muted, marginTop: 8 }}>
+                  Same why (health, self-care, moderate budget, ~34% conversion) — different what and how. The pathway decides the creative language, the PDP content, the barrier to pre-empt (electrical vs budget/space) and the decision dynamic (couples skew infrared).
+                </p>
+              </div>
+            )}
 
             {/* JTBD one layer deeper (GAF deep-dive style) */}
             {arch.jobs.length > 0 && (
@@ -670,7 +698,7 @@ export default function App() {
             },
             {
               title: "Marketing", items: [
-                { t: "1. Split creative by product philosophy", b: "The customer base is a near 50/50 split of traditional and infrared buyers (693 vs 619). Run distinct creative tracks: ritual/authenticity for Purists, health-tech/proof for Health-Seekers — one generic 'sauna' message under-serves both.", d: "693 vs 619 buyers" },
+                { t: "1. Split creative by pathway, not persona", b: "The Home Health-Seeker's two pathways are a near 50/50 split of the customer base (694 traditional vs 617 infrared). Run two creative tracks off one archetype brief: ritual/authenticity vs health-tech/proof — one generic 'sauna' message under-serves both.", d: "694 vs 617 buyers" },
                 { t: "2. Sell the second modality", b: "Contrast customers are worth 2.2× a single-modality buyer and 39% place another paid order within the year (vs 9-11% for single-modality). Market the upgrade path to every sauna owner (add the ice bath) and every ice-bath owner (add the sauna).", d: "$12.9K avg · 39% paid repeat" },
                 { t: "3. Health outcomes remain the master message", b: "Health/Detox + Sleep + Recovery = 48% of stated jobs across archetypes. Lead with transformation; use the archetype split to choose the vehicle (ritual vs technology).", d: "674 callers health-led" },
                 { t: "4. Protect the two peaks", b: "Black Friday and EOFY each do ~$2.3M — 30% of the year in two months. Campaign planning, stock depth and sales staffing should be built around defending these windows.", d: "Nov + Jun = 30% of revenue" },
@@ -711,7 +739,7 @@ export default function App() {
             <p><strong style={{ color: "#fff" }}>3 · The warranty trap.</strong> Warranty replacements and missing parts are raised as <em>$0 sales orders in the same Revel departments</em> (often with PART-* SKUs and negative GP — e.g. SO 17868495, $0 / −$4.5K GP). They are 19% of all orders (851 of 4,454) and silently double any naive repeat-purchase metric (774 "repeat" customers vs 396 real). <em>Always filter foreigntotal &gt; 0 for customer-behaviour metrics.</em></p>
             <p><strong style={{ color: "#fff" }}>4 · Product categories.</strong> Item class is unreliable; map SKU prefixes instead: R-FS/R-FI/R-BFS = infrared, R-TR/R-BT = traditional/barrel, R-CS = hybrid, R-ICE = ice bath, R-CHILL = chiller, R-H-/R-XEN/R-STONE = heaters & controls, PART- = parts. Revenue basis: topline = GST-inclusive order totals; category/margin = ex-GST item lines (v1's 36.1% margin divided GP by inc-GST revenue; ex-GST it is {META.marginPct}%).</p>
             <p><strong style={{ color: "#fff" }}>5 · Caller→order join.</strong> Normalise both sides to last-9-digits and match against customer phone AND mobilephone. Do <em>not</em> regex-scan the whole customer table (it times out) — scope the inner query to Revel-order customers first, then apply the IN-list. Result here: 443/1,392 matched, 435 purchasers, $4.0M traced. Treat as a floor: ~3% of customers have no phone on record and manually-keyed phone sales often skip the field.</p>
-            <p><strong style={{ color: "#fff" }}>6 · Archetypes (WHO).</strong> k-means (k=5, one-hot, "unspecified"/"Uncategorized" columns down-weighted ×0.15) on nine <em>identity</em> fields only: segment, functional theme, emotional theme, barrier, location, price sensitivity, product family, experience, decision role. Journey-stage fields (buying stage, timeline, urgency) are deliberately excluded — phone callers self-select toward the end of the funnel (66% want to buy within the month; median purchase same-day), so stage signals would just rediscover the funnel, as our first rerun proved. Exclude post-purchase callers (126) and sparse profiles (139); cluster the remaining 1,127. Purchase outcomes and readiness are measured per cluster afterwards, never clustered on. Separation is modest (silhouette ≈ 0.09) — treat archetypes as strong tendencies.</p>
+            <p><strong style={{ color: "#fff" }}>6 · Archetypes (WHO).</strong> k-means (k=5, one-hot, "unspecified"/"Uncategorized" columns down-weighted ×0.15) on nine <em>identity</em> fields only: segment, functional theme, emotional theme, barrier, location, price sensitivity, product family, experience, decision role. Journey-stage fields (buying stage, timeline, urgency) are deliberately excluded — phone callers self-select toward the end of the funnel (66% want to buy within the month; median purchase same-day), so stage signals would just rediscover the funnel, as our first rerun proved. Exclude post-purchase callers (126) and sparse profiles (139); cluster the remaining 1,127. Purchase outcomes and readiness are measured per cluster afterwards, never clustered on. Two of the five raw clusters differed only on product preference and its satellites (placement, decision role) and merged into each other when product was removed from the feature set — so they are presented as one archetype (Home Health-Seeker) with two <em>pathways</em>, per the rule that archetypes must differ on why, not on what they buy. Separation is modest (silhouette ≈ 0.09) — treat archetypes as strong tendencies.</p>
             <p><strong style={{ color: "#fff" }}>7 · Layer-2 sub-themes.</strong> The deep-dive percentages come from keyword-bucketing the raw free-text classifications (job_functional, job_emotional, motivation_primary/secondary, trigger_event_primary/secondary) within each theme cohort, per archetype. Buckets are regex keyword groups (e.g. Control/Optimization → install|setup|fit|electrical for "getting install right"); a caller can match multiple sub-themes.</p>
             <p><strong style={{ color: "#fff" }}>8 · Validation.</strong> Group ALL 12-month customers (paid orders only) by purchase composition via per-customer MAX(CASE) flags on the SKU prefixes, aggregated entirely in SuiteQL — no call data. Compare against the call-derived archetypes; agreement on the major groups is what licenses using call-based archetypes beyond the phone channel.</p>
             <p><strong style={{ color: "#fff" }}>9 · Known limitations.</strong> Call base ≠ customer base (web-only buyers never call); quiet callers depress theme coverage; keyword buckets are heuristic; the v1 comparison approximates v1's rules from its published definitions. Privacy: aggregates and anonymised quotes only — no names or contact details on this page.</p>
