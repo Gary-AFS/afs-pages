@@ -36,8 +36,16 @@ const LOGO_WHITE = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL
 const LOGO_BLACK = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-Black-01.png?v=1691024664";
 
 const fmtM = (v: number) => `$${(v / 1000000).toFixed(1)}M`;
-const fmtK = (v: number) => v >= 1000000 ? fmtM(v) : `$${(v / 1000).toFixed(0)}K`;
+const fmtK = (v: number) => v >= 1000000 ? fmtM(v) : v >= 1000 ? `$${(v / 1000).toFixed(0)}K` : `$${Math.round(v)}`;
 const fmt = (v: number) => v.toLocaleString();
+const PRETTY: Record<string, string> = {
+  residential_home_sauna: "Residential Home", residential_apartment: "Apartment",
+  other_commercial: "Other Commercial", commercial_gym_spa: "Gym / Spa",
+  commercial_recovery_center: "Recovery Centre", commercial_airbnb: "Airbnb / Short-Stay",
+  institutional_medical: "Institutional / Medical", sauna_plus_ice: "Sauna + Ice",
+  sauna_undecided: "Sauna (undecided)", ice_only: "Ice Bath / Chiller",
+};
+const pretty = (s: string) => PRETTY[s] || s.replace(/_/g, " ");
 
 const CATMAP: Record<string, string> = { INF: "Infrared", TRD: "Traditional", BAR: "Barrel", HYB: "Hybrid", ICE: "Ice Bath", CHL: "Chiller", HTC: "Heater", ACC: "Accessories", "n/a": "Other" };
 const prettyCats = (k: string) => k.split("+").map(c => CATMAP[c] || c).join(" + ");
@@ -373,13 +381,13 @@ export default function App() {
                   <div key={i} style={{ marginBottom: 10 }}>
                     <div style={{ fontSize: 10, color: C.faint, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: 4 }}>{label}</div>
                     {items.filter((x: any) => !["unspecified", "Uncategorized"].includes(x.name)).slice(0, 3).map((x: any, j: number) => (
-                      <Chip key={j} tone={j === 0 ? "green" : "plain"}>{x.name} {x.pct}%</Chip>
+                      <Chip key={j} tone={j === 0 ? "green" : "plain"}>{pretty(x.name)} {x.pct}%</Chip>
                     ))}
                   </div>
                 ))}
                 <div style={{ fontSize: 10, color: C.faint, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: 4 }}>Top barriers</div>
                 {arch.barriers.filter((x: any) => x.name !== "unspecified").slice(0, 3).map((x: any, j: number) => (
-                  <Chip key={j} tone="danger">{x.name} {x.pct}%</Chip>
+                  <Chip key={j} tone="danger">{pretty(x.name)} {x.pct}%</Chip>
                 ))}
               </div>
               <div>
