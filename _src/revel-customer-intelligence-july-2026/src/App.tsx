@@ -165,7 +165,7 @@ export default function App() {
         <div style={{ paddingTop: 64, paddingBottom: 32, borderBottom: `2px solid ${GREEN}`, marginBottom: 24 }}>
           <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>Revel Saunas · Customer Intelligence</div>
           <h1 style={{ ...UPPER, fontSize: 38, fontWeight: 700, marginBottom: 14, lineHeight: 1.15, maxWidth: 900 }}>
-            Customer Intelligence & JTBD Deep Dive — v2
+            Customer Intelligence & JTBD Deep Dive — July 2026
           </h1>
           <p style={{ color: C.muted, fontSize: 15, maxWidth: 800, lineHeight: 1.55 }}>
             {fmt(META.calls)} analysed pre-sale calls matched by phone number to NetSuite orders. Archetypes are derived from
