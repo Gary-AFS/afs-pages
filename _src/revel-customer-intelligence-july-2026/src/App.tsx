@@ -144,7 +144,7 @@ export default function App() {
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: C.navBg, backdropFilter: "blur(8px)", borderBottom: `1px solid ${C.border}`, padding: "0 24px" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", gap: 4, overflowX: "auto", padding: "12px 0" }}>
           <img src={isDark ? LOGO_WHITE : LOGO_BLACK} alt="Revel" style={{ height: 22, marginRight: 10 }} />
-          <div style={{ ...EYEBROW, color: C.muted, marginRight: 12, whiteSpace: "nowrap", fontSize: 10 }}>Customer Intelligence v2</div>
+          <div style={{ ...EYEBROW, color: C.muted, marginRight: 12, whiteSpace: "nowrap", fontSize: 10 }}>Customer Intelligence · July 2026</div>
           {NAV_ITEMS.map(n => (
             <button key={n.id} onClick={() => scrollTo(n.id)}
               style={{ background: activeSection === n.id ? GREEN : "transparent", color: activeSection === n.id ? "#fff" : C.muted, border: "none", padding: "9px 13px", borderRadius: 999, cursor: "pointer", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap", transition: "background-color 120ms" }}>
