@@ -29,7 +29,7 @@ const C = {
 };
 const GREEN = "#25B34B";
 const GREY_BAR = "#C4C4C4";
-// WHO archetype colours: 0 Contrast Athlete, 1 Quiet Shopper, 2 Home Health-Seeker, 4 Commercial
+// WHO archetype colours: 0 Contrast Enthusiast, 1 Quiet Shopper, 2 Home Health-Seeker, 4 Commercial
 const ARCH_COLORS: Record<number, string> = { 0: "#2F6BAF", 1: "#9E9E9E", 2: "#25B34B", 4: "#D99100" };
 
 const LOGO_WHITE = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-White-02.png?v=1691241102";
@@ -117,7 +117,7 @@ const NAV_ITEMS = [
 
 const VERDICTS = [
   { v1: "Sanctuary Seeker", verdict: "VALIDATED — NOW THE HOME HEALTH-SEEKER", color: "#2E8B4A", note: "77% of Sanctuary Seekers land in the Home Health-Seeker — v1's core archetype was right. What v1 missed is the fork inside it: a near 50/50 infrared-vs-traditional pathway split (mirrored 617 vs 694 in the actual customer base) that changes the creative language, PDP content and barrier handling, without being a separate 'who'." },
-  { v1: "Performance Biohacker", verdict: "VALIDATED", color: "#2E8B4A", note: "57% land together as the Contrast Athlete — home recovery enthusiasts running sauna + ice as a protocol. Drop the 'biohacker' persona framing; these are everyday athletes and tradies, and they carry the second-highest basket ($10.7K)." },
+  { v1: "Performance Biohacker", verdict: "VALIDATED", color: "#2E8B4A", note: "57% land together as the Contrast Enthusiast — home buyers running sauna + ice as a recovery ritual. Drop the 'biohacker' framing, and don't over-index on 'athlete' either: explicit sport/training language appears in only 4% of their calls. They carry the second-highest basket ($10.7K)." },
   { v1: "Commercial Operator", verdict: "VALIDATED", color: "#2E8B4A", note: "77% cohesion into the Commercial Recovery Operator — gyms, studios, developers fitting out recovery spaces. v1 had this right. (Our own first rerun briefly merged it away; with journey-stage noise removed, it separates cleanly.)" },
   { v1: "Cautious Researcher", verdict: "MOSTLY AN ARTIFACT", color: "#C23B22", note: "52% are simply Quiet Shoppers — callers who revealed little on the phone. 'Caution' was largely missing data plus no timeline, not a customer identity. The real insight is a needs-discovery gap on calls, which is a coaching opportunity, not a persona." },
   { v1: "Home Renovator", verdict: "DISSOLVED", color: "#C23B22", note: "Renovators scatter across all five identity archetypes. Renovation is a trigger and a timing signal — build it into campaign timing and PDP content, but don't market to 'renovators' as a who." },
@@ -350,7 +350,7 @@ export default function App() {
               <div style={{ maxWidth: 560 }}>
                 <h3 style={{ ...UPPER, fontSize: 24, fontWeight: 700, marginBottom: 6 }}>{arch.name}</h3>
                 <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5 }}>
-                  {arch.id === 0 && "Home recovery enthusiast running hot + cold as a protocol — sauna, ice bath and chiller as one system"}
+                  {arch.id === 0 && "Runs hot + cold as a personal recovery ritual — sauna, ice bath and chiller as one system. Enthusiasts, not athletes: their language is wellbeing and protocol, rarely sport"}
                   {arch.id === 1 && "Reveals little on the phone but buys full-price saunas — the needs-discovery opportunity"}
                   {arch.id === 2 && "Health transformation at home — one archetype, two product pathways: infrared science or traditional ritual"}
                   {arch.id === 4 && "Gyms, studios, developers and workplaces buying recovery as a service or amenity"}
@@ -530,7 +530,7 @@ export default function App() {
             <ChartTitle>What the Cross-Check Says</ChartTitle>
             <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
               <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The philosophy split is real.</strong> Traditional-only (693) and infrared-only (619) buyers are near-equal halves of the equipment base — matching the Purist / Health-Seeker divide found independently in the calls.</p>
-              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Contrast is the value segment.</strong> 213 customers bought sauna + ice: $12.9K average and a 39% paid-repeat rate — 4× the single-modality buyer. The behavioural signature of the Contrast Athlete (and the commercial fit-out).</p>
+              <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Contrast is the value segment.</strong> 213 customers bought sauna + ice: $12.9K average and a 39% paid-repeat rate — 4× the single-modality buyer. The behavioural signature of the Contrast Enthusiast (and the commercial fit-out).</p>
               <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>The owner tail is big in count, tiny in dollars.</strong> 1,063 customers bought only add-ons — heaters, stones, accessories. They're a service population, not an acquisition target.</p>
               <p style={{ marginBottom: 10 }}><strong style={{ color: C.text }}>Warranty orders inflate naive repeat metrics.</strong> 851 of 4,454 sales orders (19%) are $0 — warranty replacements and parts raised as sales orders (e.g. SO 17868495: $0 total, −$4.5K GP). Counting them, "repeat rate" reads 24%; on paid orders it's {META.repeatPct}%. All figures on this page exclude them.</p>
               <p>Where the two lenses agree — and they do on every major group — we can trust the archetypes beyond the phone channel.</p>
@@ -675,7 +675,7 @@ export default function App() {
             {
               title: "Product & Digital", items: [
                 { t: "1. Traditional vs infrared chooser", b: "The philosophy split plus the confidence barrier justify a guided selector (goals, space, power → recommendation). It serves the Quiet Shopper especially — the people who don't articulate needs on the phone.", d: "confidence = #2 barrier" },
-                { t: "2. Recovery-station bundle builder", b: "Contrast is the highest-value purchase pattern ($2.75M from 214 customers). A sauna + ice + chiller configurator with bundle pricing converts the Contrast Athlete and the commercial fit-out without a phone call.", d: "$2.75M pattern" },
+                { t: "2. Recovery-station bundle builder", b: "Contrast is the highest-value purchase pattern ($2.75M from 214 customers). A sauna + ice + chiller configurator with bundle pricing converts the Contrast Enthusiast and the commercial fit-out without a phone call.", d: "$2.75M pattern" },
                 { t: "3. Owner self-serve for add-ons", b: "1,063 customers bought only heaters/stones/accessories this year — mostly by phone. An owners' accessories flow (and replenishment email) serves them cheaper and keeps sales lines free for buyers.", d: "1,063 add-on-only customers" },
                 { t: "4. Phone-number hygiene at order entry", b: "One in three callers can't be traced to their order because manually-keyed sales often skip the phone field. Make it mandatory in NetSuite — it's the difference between guessing and knowing ROI on a $4M+ channel.", d: "match rate 31.8% (floor)" },
               ]
