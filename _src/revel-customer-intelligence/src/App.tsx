@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, CartesianGrid, ComposedChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, CartesianGrid, ComposedChart, Line, LabelList } from "recharts";
 import { Sun, Moon } from "lucide-react";
 import { META, MONTHLY, STATES, CATEGORIES, TOP_PRODUCTS, FUNC, EMO, BARRIERS, STAGE, TIMELINE, COMPETITORS, JOIN, ARCHETYPES, CROSSTAB, CALLER_STATES, PATTERNS } from "./data";
 
@@ -29,7 +29,6 @@ const C = {
 };
 const GREEN = "#25B34B";
 const GREY_BAR = "#C4C4C4";
-const PIE_COLORS = ["#25B34B", "#485D4D", "#ABB99C", "#8EE0A5", "#177E33", "#9E9E9E"];
 // WHO archetype colours: 0 Contrast Athlete, 1 Quiet Shopper, 2 Infrared Health-Seeker, 3 Traditional Purist, 4 Commercial
 const ARCH_COLORS: Record<number, string> = { 0: "#2F6BAF", 1: "#9E9E9E", 2: "#25B34B", 3: "#485D4D", 4: "#D99100" };
 
@@ -222,9 +221,9 @@ export default function App() {
           <Card>
             <ChartTitle>When Do Callers Buy? (First Call → First Order)</ChartTitle>
             <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={JOIN.timing} margin={{ left: 10, right: 30, bottom: 10 }}>
+              <BarChart data={JOIN.timing} margin={{ left: 10, right: 30, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-                <XAxis dataKey="bucket" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-12} textAnchor="end" height={50} axisLine={{ stroke: C.border }} tickLine={false} />
+                <XAxis dataKey="bucket" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-14} textAnchor="end" height={62} axisLine={{ stroke: C.border }} tickLine={false} />
                 <YAxis tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
                 <Bar dataKey="count" name="Purchasing callers" radius={[4, 4, 0, 0]}>
@@ -252,27 +251,32 @@ export default function App() {
           <Card>
             <ChartTitle>Functional Job Themes</ChartTitle>
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={FUNC.filter((f: any) => f.name !== "Other")} layout="vertical" margin={{ left: 10, right: 30 }}>
+              <BarChart data={FUNC.filter((f: any) => f.name !== "Other")} layout="vertical" margin={{ left: 10, right: 52 }}>
                 <XAxis type="number" tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" width={150} tick={{ fill: C.text, fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
                 <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Callers">
                   {FUNC.filter((f: any) => f.name !== "Other").map((_: any, i: number) => <Cell key={i} fill={i === 0 ? GREEN : GREY_BAR} />)}
+                  <LabelList dataKey="pct" position="right" formatter={(v: any) => `${v}%`} style={{ fill: "var(--color-muted)", fontSize: 11, fontWeight: 700 }} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 8 }}>Share of the {fmt(META.uniqueCallers)} unique callers naming each theme.</p>
           </Card>
           <Card>
             <ChartTitle>Emotional Job Themes</ChartTitle>
             <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={EMO.filter((e: any) => e.name !== "Other")} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={85} label={({ pct }: any) => `${pct}%`} labelLine={false}>
-                  {EMO.filter((e: any) => e.name !== "Other").map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-              </PieChart>
+              <BarChart data={EMO.filter((e: any) => e.name !== "Other")} layout="vertical" margin={{ left: 10, right: 52 }}>
+                <XAxis type="number" tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={150} tick={{ fill: C.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} name="Callers">
+                  {EMO.filter((e: any) => e.name !== "Other").map((_: any, i: number) => <Cell key={i} fill={i === 0 ? GREEN : GREY_BAR} />)}
+                  <LabelList dataKey="pct" position="right" formatter={(v: any) => `${v}%`} style={{ fill: "var(--color-muted)", fontSize: 11, fontWeight: 700 }} />
+                </Bar>
+              </BarChart>
             </ResponsiveContainer>
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 8 }}>Self-Care/Sanctuary dominates — the emotional job is a personal retreat, not status.</p>
           </Card>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
@@ -281,7 +285,7 @@ export default function App() {
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={BARRIERS.filter((b: any) => b.count > 20)} margin={{ left: 10, right: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-                <XAxis dataKey="name" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-12} textAnchor="end" height={45} axisLine={{ stroke: C.border }} tickLine={false} />
+                <XAxis dataKey="name" tick={{ fill: C.muted, fontSize: 10 }} interval={0} angle={-14} textAnchor="end" height={58} axisLine={{ stroke: C.border }} tickLine={false} />
                 <YAxis tick={{ fill: C.faint, fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Callers">
@@ -381,7 +385,7 @@ export default function App() {
               <div>
                 <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 12 }}>Identity Radar (Data-Derived)</div>
                 <ResponsiveContainer width="100%" height={210}>
-                  <RadarChart data={radarData} outerRadius={75}>
+                  <RadarChart data={radarData} outerRadius={68} margin={{ left: 24, right: 24 }}>
                     <PolarGrid stroke={C.border} />
                     <PolarAngleAxis dataKey="axis" tick={{ fill: C.muted, fontSize: 10 }} />
                     <PolarRadiusAxis tick={false} axisLine={false} domain={[0, 100]} />
@@ -568,7 +572,8 @@ export default function App() {
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={MONTHLY} margin={{ left: 10, right: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
-              <XAxis dataKey="mth" tick={{ fill: C.muted, fontSize: 10 }} axisLine={{ stroke: C.border }} tickLine={false} />
+              <XAxis dataKey="mth" tick={{ fill: C.muted, fontSize: 10 }} axisLine={{ stroke: C.border }} tickLine={false}
+                tickFormatter={(m: string) => { const [y, mo] = m.split("-"); return ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][parseInt(mo)] + " " + y.slice(2); }} />
               <YAxis tick={{ fill: C.faint, fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(1)}M`} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(37,179,75,0.06)" }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -627,7 +632,7 @@ export default function App() {
                   <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}>
                     <td style={{ padding: "8px 4px" }}>{p.name}</td>
                     <td style={{ padding: "8px 4px", textAlign: "right", color: C.muted }}>{p.units}</td>
-                    <td style={{ padding: "8px 4px", textAlign: "right", fontWeight: 700, color: i === 0 ? C.greenBody : C.text }}>${fmt(p.net_rev | 0)}</td>
+                    <td style={{ padding: "8px 4px", textAlign: "right", fontWeight: 700, color: C.text }}>${fmt(p.net_rev | 0)}</td>
                   </tr>
                 ))}
               </tbody>
