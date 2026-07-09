@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, MotionConfig, useScroll, useSpring, useInView, useReducedMotion, animate } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, CartesianGrid, ComposedChart, Line, LabelList } from "recharts";
 import { Sun, Moon } from "lucide-react";
 import { META, MONTHLY, STATES, CATEGORIES, TOP_PRODUCTS, FUNC, EMO, BARRIERS, STAGE, TIMELINE, COMPETITORS, JOIN, ARCHETYPES, PATTERNS } from "./data";
@@ -35,6 +35,14 @@ const ARCH_COLORS: Record<number, string> = { 0: "#2F6BAF", 1: "#9E9E9E", 2: "#2
 const LOGO_WHITE = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-White-02.png?v=1691241102";
 const LOGO_BLACK = "https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo-Black-01.png?v=1691024664";
 
+const BASE = import.meta.env.BASE_URL;
+const ARCH_IMAGES: Record<number, string> = {
+  0: `${BASE}archetypes/recovery-seeker.jpg`,
+  1: `${BASE}archetypes/quiet-shopper.jpg`,
+  2: `${BASE}archetypes/home-health-seeker.jpg`,
+  4: `${BASE}archetypes/commercial-operator.jpg`,
+};
+
 const fmtM = (v: number) => `$${(v / 1000000).toFixed(1)}M`;
 const fmtK = (v: number) => v >= 1000000 ? fmtM(v) : v >= 1000 ? `$${(v / 1000).toFixed(0)}K` : `$${Math.round(v)}`;
 const fmt = (v: number) => v.toLocaleString();
@@ -53,21 +61,48 @@ const prettyCats = (k: string) => k.split("+").map(c => CATMAP[c] || c).join(" +
 const UPPER: React.CSSProperties = { textTransform: "uppercase", letterSpacing: "0.02em" };
 const EYEBROW: React.CSSProperties = { fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" };
 
+// Counts a formatted stat ("$4.0M", "31.2%", "2,043") up from zero when it scrolls into view.
+const AnimatedValue = ({ value }: { value: string }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-30px" });
+  const reduce = useReducedMotion();
+  const [display, setDisplay] = useState(value);
+  useEffect(() => {
+    if (!inView || reduce) return;
+    const m = value.match(/^([^0-9]*)([0-9,]+(?:\.[0-9]+)?)(.*)$/);
+    if (!m) return;
+    const [, pre, numStr, suf] = m;
+    const target = parseFloat(numStr.replace(/,/g, ""));
+    const decimals = (numStr.split(".")[1] || "").length;
+    const grouped = numStr.includes(",");
+    const controls = animate(0, target, {
+      duration: 1.1,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setDisplay(pre + (grouped ? Math.round(v).toLocaleString() : v.toFixed(decimals)) + suf),
+    });
+    return () => controls.stop();
+  }, [inView, reduce, value]);
+  return <span ref={ref}>{display}</span>;
+};
+
 const StatCard = ({ label, value, sub, hero }: { label: string; value: string; sub?: string; hero?: boolean }) => (
   <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
     style={{ background: C.card, borderRadius: 10, padding: "22px 24px", border: `1px solid ${C.border}`, boxShadow: C.shadow }}>
     <div style={{ ...EYEBROW, color: C.muted, marginBottom: 8 }}>{label}</div>
-    <div style={{ color: hero ? C.green : C.text, fontSize: 30, fontWeight: 700, letterSpacing: "-0.01em" }}>{value}</div>
+    <div style={{ color: hero ? C.green : C.text, fontSize: 30, fontWeight: 700, letterSpacing: "-0.01em" }}><AnimatedValue value={value} /></div>
     {sub && <div style={{ color: C.muted, fontSize: 13, marginTop: 6, lineHeight: 1.4 }}>{sub}</div>}
   </motion.div>
 );
 
 const SectionHeader = ({ eyebrow, title, subtitle, id }: { eyebrow: string; title: string; subtitle?: string; id: string }) => (
   <div id={id} style={{ marginBottom: 28, paddingTop: 56 }}>
-    <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 8 }}>{eyebrow}</div>
-    <h2 style={{ ...UPPER, color: C.text, fontSize: 26, fontWeight: 700, marginBottom: 12 }}>{title}</h2>
-    <div style={{ width: 64, borderTop: `2px solid ${GREEN}`, marginBottom: 12 }} />
-    {subtitle && <p style={{ color: C.muted, fontSize: 14, maxWidth: 780, lineHeight: 1.55 }}>{subtitle}</p>}
+    <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.5, ease: "easeOut" }}>
+      <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 8 }}>{eyebrow}</div>
+      <h2 style={{ ...UPPER, color: C.text, fontSize: 26, fontWeight: 700, marginBottom: 12 }}>{title}</h2>
+      <motion.div initial={{ width: 0 }} whileInView={{ width: 64 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+        style={{ borderTop: `2px solid ${GREEN}`, marginBottom: 12 }} />
+      {subtitle && <p style={{ color: C.muted, fontSize: 14, maxWidth: 780, lineHeight: 1.55 }}>{subtitle}</p>}
+    </motion.div>
   </div>
 );
 
@@ -130,9 +165,32 @@ export default function App() {
   const [isDark, setIsDark] = useState(false);
   const arch = ARCHETYPES.find((a: any) => a.id === activeArchetype)!;
 
+  const { scrollYProgress } = useScroll();
+  const progressX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 });
+
+  // Scroll-spy: keep the nav pill tracking the section in view, not just the last click.
+  const clickScrollLock = useRef(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (clickScrollLock.current) return;
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length) setActiveSection(visible[0].target.id);
+      },
+      { rootMargin: "-15% 0px -75% 0px" }
+    );
+    NAV_ITEMS.forEach(n => {
+      const el = document.getElementById(n.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
   const scrollTo = (id: string) => {
     setActiveSection(id);
+    clickScrollLock.current = true;
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => { clickScrollLock.current = false; }, 900);
   };
 
   const radarData = Object.entries(arch.radar).map(([axis, val]) => ({ axis, val }));
@@ -140,7 +198,9 @@ export default function App() {
   const ARCH_SORTED = [2, 1, 0, 4].map(i => ARCHETYPES.find((a: any) => a.id === i));
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className={isDark ? "dark" : ""} style={{ background: C.bg, minHeight: "100vh", color: C.text, fontFamily: "var(--font-sans)", transition: "background-color 0.2s, color 0.2s" }}>
+      <motion.div style={{ scaleX: progressX, transformOrigin: "0%", position: "fixed", top: 0, left: 0, right: 0, height: 3, background: GREEN, zIndex: 60 }} />
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: C.navBg, backdropFilter: "blur(8px)", borderBottom: `1px solid ${C.border}`, padding: "0 24px" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", gap: 4, overflowX: "auto", padding: "12px 0" }}>
           <img src={isDark ? LOGO_WHITE : LOGO_BLACK} alt="Revel" style={{ height: 22, marginRight: 10 }} />
@@ -335,9 +395,12 @@ export default function App() {
             const active = activeArchetype === a.id;
             return (
               <button key={a.id} onClick={() => setActiveArchetype(a.id)}
-                style={{ background: active ? C.greenSoft : C.card, border: `2px solid ${active ? GREEN : C.border}`, borderRadius: 10, padding: 14, cursor: "pointer", textAlign: "left", transition: "border-color 120ms" }}>
-                <div style={{ ...UPPER, fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 4 }}>{a.name.replace("The ", "")}</div>
-                <div style={{ fontSize: 11, color: C.muted }}>{a.pct_of_callers}% · conv {a.conversion_pct}%</div>
+                style={{ background: active ? C.greenSoft : C.card, border: `2px solid ${active ? GREEN : C.border}`, borderRadius: 10, padding: 12, cursor: "pointer", textAlign: "left", transition: "border-color 120ms", display: "flex", alignItems: "center", gap: 10 }}>
+                <img src={ARCH_IMAGES[a.id]} alt="" style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${active ? ARCH_COLORS[a.id] : C.border}`, filter: active ? "none" : "saturate(0.6)", transition: "border-color 120ms, filter 200ms" }} />
+                <div>
+                  <div style={{ ...UPPER, fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 4 }}>{a.name.replace("The ", "")}</div>
+                  <div style={{ fontSize: 11, color: C.muted }}>{a.pct_of_callers}% · conv {a.conversion_pct}%</div>
+                </div>
               </button>
             );
           })}
@@ -347,7 +410,13 @@ export default function App() {
           <motion.div key={arch.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
             style={{ background: C.card, borderRadius: 16, padding: 32, marginBottom: 32, border: `1px solid ${C.border}`, boxShadow: C.shadow, borderTop: `4px solid ${ARCH_COLORS[arch.id]}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-              <div style={{ maxWidth: 560 }}>
+              <div style={{ display: "flex", gap: 20, maxWidth: 640, alignItems: "flex-start" }}>
+                <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35, ease: "easeOut" }} style={{ flexShrink: 0 }}>
+                  <img src={ARCH_IMAGES[arch.id]} alt={`${arch.name} — illustrative persona`}
+                    style={{ width: 128, height: 128, borderRadius: 12, objectFit: "cover", border: `3px solid ${ARCH_COLORS[arch.id]}`, display: "block" }} />
+                  <div style={{ fontSize: 9, color: C.faint, textAlign: "center", marginTop: 5, textTransform: "uppercase", letterSpacing: "0.06em" }}>Illustrative persona</div>
+                </motion.div>
+              <div style={{ maxWidth: 480 }}>
                 <h3 style={{ ...UPPER, fontSize: 24, fontWeight: 700, marginBottom: 6 }}>{arch.name}</h3>
                 <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5 }}>
                   {arch.id === 0 && "Defined by the job, not the gear: 90% carry a recovery job (perform, recover, manage pain). Contrast equipment (sauna + ice) is how they buy it — enthusiasts, not athletes (4% sport language)"}
@@ -355,6 +424,7 @@ export default function App() {
                   {arch.id === 2 && "Health transformation at home — one archetype, two product pathways: infrared science or traditional ritual"}
                   {arch.id === 4 && "Gyms, studios, developers and workplaces buying recovery as a service or amenity"}
                 </p>
+              </div>
               </div>
               <div style={{ display: "flex", gap: 28, textAlign: "right", flexWrap: "wrap" }}>
                 {[[`${arch.pct_of_callers}%`, `of prospects (${arch.n})`], [`${arch.conversion_pct}%`, "bought (observed)"], [fmtK(arch.avg_spend), "avg spend"], [fmtK(arch.total_revenue), "traced revenue"]].map(([v, l], i) => (
@@ -720,5 +790,6 @@ export default function App() {
 
       </div>
     </div>
+    </MotionConfig>
   );
 }
