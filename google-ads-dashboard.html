@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Google Ads Performance Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='9' y='3' width='6' height='15' rx='3' fill='%234285F4' transform='rotate(-30 12 3)'/%3E%3Crect x='9' y='3' width='6' height='15' rx='3' fill='%23FBBC04' transform='rotate(30 12 3)'/%3E%3Ccircle cx='5.2' cy='16.4' r='3' fill='%2334A853'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -114,7 +115,9 @@ function KpiCard({ label, value, delta, metric, sub, primary }) {
 }
 
 // ---- SVG trend chart ----
+const TREND_LABELS = { spend:'Spend', roas:'ROAS', ctr:'CTR' };
 function TrendChart({ daily, metric, primary }) {
+  const [hover, setHover] = useState(null);
   const W=900, H=220, pad={l:44,r:16,t:16,b:26};
   const pts = daily.map(d=>({ x:d.date, y:Number(d[metric])||0 }));
   const ys = pts.map(p=>p.y);
@@ -129,6 +132,7 @@ function TrendChart({ daily, metric, primary }) {
   const fmt = metric==='spend'?(v=>'$'+Math.round(v).toLocaleString()):metric==='roas'?(v=>v.toFixed(1)+'x'):(v=>v.toFixed(1)+'%');
   const gid = 'grad_'+metric;
   const ticks=[0,Math.floor(pts.length/2),pts.length-1];
+  const band = pts.length>1 ? iw/(pts.length-1) : iw;
   return (
     <div>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
@@ -142,6 +146,24 @@ function TrendChart({ daily, metric, primary }) {
         <path d={area} fill={`url(#${gid})`}/>
         <path d={line} fill="none" stroke={primary} strokeWidth="2.5" strokeLinejoin="round"/>
         {ticks.map(i=><text key={i} x={X(i)} y={H-8} textAnchor="middle" fontSize="10" fill="#9ca3af">{pts[i]&&pts[i].x.slice(5)}</text>)}
+        {pts.map((p,i)=><rect key={'h'+i} x={X(i)-band/2} y={pad.t} width={band} height={ih}
+          fill="transparent" onMouseEnter={()=>setHover(i)} onMouseLeave={()=>setHover(null)}/>)}
+        {hover!==null && (()=>{
+          const p=pts[hover], hx=X(hover), hy=Y(p.y);
+          const dateStr=new Date(p.x+'T00:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+          const boxW=138, boxH=40;
+          const bx=Math.min(Math.max(hx-boxW/2, pad.l), W-pad.r-boxW);
+          const by=Math.max(pad.t, hy-boxH-10);
+          return (
+            <g style={{pointerEvents:'none'}}>
+              <line x1={hx} y1={pad.t} x2={hx} y2={pad.t+ih} stroke={primary} strokeWidth="1" opacity="0.3"/>
+              <circle cx={hx} cy={hy} r="4" fill={primary} stroke="white" strokeWidth="2"/>
+              <rect x={bx} y={by} width={boxW} height={boxH} rx="7" fill="#1f2937" opacity="0.95"/>
+              <text x={bx+boxW/2} y={by+15} textAnchor="middle" fill="#9ca3af" fontSize="9">{dateStr}</text>
+              <text x={bx+boxW/2} y={by+31} textAnchor="middle" fill="white" fontSize="11" fontWeight="700">{(TREND_LABELS[metric]||metric)+' · '+fmt(p.y)}</text>
+            </g>
+          );
+        })()}
       </svg>
       <div className="flex gap-6 mt-2 px-1 text-xs">
         <span className="text-gray-500">Avg <b className="text-gray-800">{fmt(avg)}</b></span>

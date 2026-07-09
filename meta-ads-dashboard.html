@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Social Performance Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='m' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230082FB'/%3E%3Cstop offset='1' stop-color='%230064E0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 12 C9 6.5 3.2 6.5 3.2 12 C3.2 17.5 9 17.5 12 12 C15 6.5 20.8 6.5 20.8 12 C20.8 17.5 15 17.5 12 12 Z' fill='none' stroke='url(%23m)' stroke-width='3.1' stroke-linejoin='round'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -882,14 +883,22 @@ function TrendChart({ dailyData, brand, datePreset }) {
                 </g>
               );
             })}
-            {hover !== null && monthlyPoints[hover] && (
-              <g>
-                <rect x={getBarX(hover) + barWidth / 2 - 50} y={Math.max(PAD.top, getBarY(monthlyPoints[hover][metric]) - 28)} width="100" height="22" rx="6" fill="#1f2937" opacity="0.9" />
-                <text x={getBarX(hover) + barWidth / 2} y={Math.max(PAD.top + 14, getBarY(monthlyPoints[hover][metric]) - 14)} textAnchor="middle" fill="white" fontSize="10" fontFamily="Open Sans" fontWeight="600">
-                  {fmtFn(monthlyPoints[hover][metric])}
-                </text>
-              </g>
-            )}
+            {hover !== null && monthlyPoints[hover] && (() => {
+              const hp = monthlyPoints[hover];
+              const cx = getBarX(hover) + barWidth / 2;
+              const monthStr = new Date(hp.month + '-01T00:00:00').toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+              const metricLabel = metricDefs.find(m => m.key === metric)?.label || metric;
+              const boxW = 150, boxH = 40;
+              const bx = Math.min(Math.max(cx - boxW / 2, PAD.left), PAD.left + chartW - boxW);
+              const by = Math.max(PAD.top, getBarY(hp[metric]) - boxH - 8);
+              return (
+                <g style={{pointerEvents: 'none'}}>
+                  <rect x={bx} y={by} width={boxW} height={boxH} rx="7" fill="#1f2937" opacity="0.95" />
+                  <text x={bx + boxW / 2} y={by + 15} textAnchor="middle" fill="#9ca3af" fontSize="9" fontFamily="Open Sans">{monthStr}</text>
+                  <text x={bx + boxW / 2} y={by + 31} textAnchor="middle" fill="white" fontSize="11" fontFamily="Open Sans" fontWeight="700">{metricLabel} · {fmtFn(hp[metric])}</text>
+                </g>
+              );
+            })()}
           </svg>
         </div>
         <div className="flex items-center gap-6 mt-3 pt-3 border-t" style={{borderColor: '#f0f0f2'}}>
@@ -950,13 +959,23 @@ function TrendChart({ dailyData, brand, datePreset }) {
             <rect key={'h'+i} x={getX(i) - chartW / points.length / 2} y={PAD.top} width={chartW / points.length} height={chartH}
               fill="transparent" onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} />
           ))}
-          {hover !== null && (
-            <g>
-              <line x1={getX(hover)} y1={PAD.top} x2={getX(hover)} y2={PAD.top + chartH} stroke={b.primary} strokeWidth="1" opacity="0.3" />
-              <rect x={getX(hover) - 45} y={getY(points[hover][metric]) - 28} width="90" height="22" rx="6" fill="#1f2937" opacity="0.9" />
-              <text x={getX(hover)} y={getY(points[hover][metric]) - 14} textAnchor="middle" fill="white" fontSize="10" fontFamily="Open Sans" fontWeight="600">{fmtFn(points[hover][metric])}</text>
-            </g>
-          )}
+          {hover !== null && (() => {
+            const hp = points[hover];
+            const hx = getX(hover), hy = getY(hp[metric]);
+            const dateStr = new Date(hp.date + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+            const metricLabel = metricDefs.find(m => m.key === metric)?.label || metric;
+            const boxW = 138, boxH = 40;
+            const bx = Math.min(Math.max(hx - boxW / 2, PAD.left), PAD.left + chartW - boxW);
+            const by = Math.max(PAD.top, hy - boxH - 10);
+            return (
+              <g style={{pointerEvents: 'none'}}>
+                <line x1={hx} y1={PAD.top} x2={hx} y2={PAD.top + chartH} stroke={b.primary} strokeWidth="1" opacity="0.3" />
+                <rect x={bx} y={by} width={boxW} height={boxH} rx="7" fill="#1f2937" opacity="0.95" />
+                <text x={bx + boxW / 2} y={by + 15} textAnchor="middle" fill="#9ca3af" fontSize="9" fontFamily="Open Sans">{dateStr}</text>
+                <text x={bx + boxW / 2} y={by + 31} textAnchor="middle" fill="white" fontSize="11" fontFamily="Open Sans" fontWeight="700">{metricLabel} · {fmtFn(hp[metric])}</text>
+              </g>
+            );
+          })()}
         </svg>
       </div>
       <div className="flex items-center gap-6 mt-3 pt-3 border-t" style={{borderColor: '#f0f0f2'}}>
