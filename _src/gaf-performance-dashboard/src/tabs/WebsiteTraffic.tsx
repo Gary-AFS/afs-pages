@@ -53,6 +53,23 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Shopify bag mark — the funnel's orders/revenue come from Shopify.
+function ShopifyMark() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="inline-block align-[-2px]">
+      <path
+        d="M14.5 3.2c-.4-.3-.9-.5-1.4-.4 0 0-.3.1-.7.2C11.9 1.9 11.1 1 9.9 1 7.7 1 6.6 3.8 6.3 5.2l-1.9.6c-.6.2-.6.2-.7.8L2 19.6 13.6 22l6.4-1.4S15 3.6 14.9 3.5c0-.2-.2-.3-.4-.3zM12 3.4l-1.6.5c.3-1 .8-2 1.6-2.2v1.7zm-2.1-1.3c.2 0 .3 0 .5.1-.9.5-1.4 1.6-1.7 2.2l-1.3.4c.4-1.2 1.2-2.7 2.5-2.7z"
+        fill="#95BF47"
+      />
+      <path d="M14.9 3.5c-.1 0-1.3-.1-1.3-.1s-.9-.9-1-1v19.5l6.4-1.4S15 3.6 14.9 3.5z" fill="#5E8E3E" />
+      <path
+        d="M11.6 8.5l-.8 2.4s-.7-.4-1.6-.4c-1.3 0-1.4.8-1.4 1 0 1.1 2.9 1.5 2.9 4.1 0 2-1.3 3.3-3 3.3-2.1 0-3.1-1.3-3.1-1.3l.6-1.8s1.1.9 2 .9c.6 0 .8-.5.8-.8 0-1.4-2.4-1.5-2.4-3.9 0-2 1.4-3.9 4.3-3.9 1.1 0 1.7.4 1.7.4z"
+        fill="#fff"
+      />
+    </svg>
+  );
+}
+
 // ---- Component ----
 
 export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
@@ -168,7 +185,7 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
 
       {/* Top Products funnel */}
       <section aria-label="Top products funnel">
-        <SectionTitle>Top Products (Sessions &rarr; ATC &rarr; Orders)</SectionTitle>
+        <SectionTitle><ShopifyMark /> Top Products (Sessions &rarr; ATC &rarr; Orders)</SectionTitle>
         <DataTable<ProductRow>
           columns={PRODUCT_COLS}
           rows={products}
