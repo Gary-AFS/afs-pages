@@ -14,19 +14,32 @@ const PAD = { top: 20, right: 20, bottom: 32, left: 52 };
 const VIEW_W = 800;
 const VIEW_H = 220;
 
-function fmt(v: number, label: string): string {
-  if (label.includes("ROAS")) return `${v.toFixed(2)}x`;
-  if (label.includes("%") || label.includes("CTR")) return `${v.toFixed(1)}%`;
-  if (Math.abs(v) >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(v) >= 1_000) return `$${(v / 1_000).toFixed(1)}K`;
-  if (v < 10 && v !== Math.round(v)) return v.toFixed(2);
-  return v.toLocaleString("en-AU");
+// Fallback formatter when the series doesn't provide one. Series keys are
+// lowercase feed fields, so match case-insensitively — and NEVER assume a
+// bare number is currency (the audit found "$8.7K sessions").
+function defaultFmt(v: number, key: string): string {
+  const k = key.toLowerCase();
+  if (k.includes("roas")) return `${v.toFixed(2)}x`;
+  if (k.includes("ctr") || k.includes("rate")) return `${v.toFixed(1)}%`;
+  const isCurrency = k.includes("spend") || k.includes("value") || k.includes("revenue") || k.includes("cp");
+  const prefix = isCurrency ? "$" : "";
+  if (Math.abs(v) >= 1_000_000) return `${prefix}${(v / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(v) >= 1_000) return `${prefix}${(v / 1_000).toFixed(1)}K`;
+  if (v < 10 && v !== Math.round(v)) return `${prefix}${v.toFixed(2)}`;
+  return `${prefix}${v.toLocaleString("en-AU")}`;
+}
+
+/** ISO "2026-07-10" → "07-10" for axis labels; leaves other formats alone. */
+function fmtDateLabel(d: string): string {
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.slice(5) : d;
 }
 
 interface AreaSeries {
   key: string;
   color: string;
   label: string;
+  /** Value formatter for axis/stats/tooltip (falls back to a key-based heuristic) */
+  format?: (v: number) => string;
 }
 
 interface LineSeries {
@@ -57,10 +70,13 @@ export function TrendChart({ data, series }: TrendChartProps) {
   }
 
   // Use primary series key for the main line/area
-  const primaryKey = series.areas[0]?.key ?? series.line?.key;
-  const secondaryKey = series.line?.key !== primaryKey ? series.line?.key : undefined;
+  const primary = series.areas[0];
+  const primaryKey = primary?.key ?? series.line?.key;
 
   if (!primaryKey) return null;
+
+  const fmt = (v: number) =>
+    primary?.format ? primary.format(v) : defaultFmt(v, primaryKey);
 
   const values = data.map(d => (d[primaryKey] as number) ?? 0);
   const maxVal = Math.max(...values, 0.001);
@@ -92,14 +108,14 @@ export function TrendChart({ data, series }: TrendChartProps) {
   // Y-axis ticks (5 levels)
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map(f => {
     const v = minVal + f * (maxVal - minVal);
-    return { y: yOf(v), label: fmt(v, primaryKey) };
+    return { y: yOf(v), label: fmt(v) };
   });
 
   // X-axis ticks (up to 8 evenly spaced)
   const xTickCount = Math.min(data.length, 8);
   const xTicks = Array.from({ length: xTickCount }, (_, i) => {
     const idx = Math.round((i / (xTickCount - 1 || 1)) * (data.length - 1));
-    return { x: xOf(idx), label: data[idx]?.date ?? "" };
+    return { x: xOf(idx), label: fmtDateLabel(String(data[idx]?.date ?? "")) };
   });
 
   // Hover tooltip
@@ -126,7 +142,7 @@ export function TrendChart({ data, series }: TrendChartProps) {
               className="text-sm font-bold"
               style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
             >
-              {fmt(stat.val, primaryKey)}
+              {fmt(stat.val)}
             </span>
           </div>
         ))}
@@ -255,7 +271,7 @@ export function TrendChart({ data, series }: TrendChartProps) {
         {hoverPt !== null && hoverD !== null && (() => {
           const tv = (hoverD[primaryKey] as number) ?? 0;
           const dateLabel = String(hoverD.date ?? "");
-          const valLabel = fmt(tv, primaryKey);
+          const valLabel = fmt(tv);
           const tooltipX = hoverPt.x + 12;
           const tooltipY = Math.max(PAD.top, hoverPt.y - 28);
           const clampedX = Math.min(tooltipX, VIEW_W - 100);

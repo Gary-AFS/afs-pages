@@ -80,7 +80,7 @@ interface NavItem {
   Icon: () => ReactNode;
 }
 
-const NAV_ITEMS: NavItem[] = [
+export const NAV_ITEMS: NavItem[] = [
   { id: "overview",  label: "Overview",        Icon: IconOverview },
   { id: "meta",      label: "Meta Ads",         Icon: IconMeta },
   { id: "google",    label: "Google Ads",       Icon: IconGoogleAds },
@@ -99,7 +99,7 @@ interface SidebarProps {
 export function Sidebar({ active, onSelect }: SidebarProps) {
   return (
     <aside
-      className="flex flex-col w-56 shrink-0 min-h-screen"
+      className="hidden md:flex flex-col w-56 shrink-0 min-h-screen"
       style={{
         background: "#ffffff",
         borderRight: "1px solid var(--gaf-row-border)",
@@ -170,7 +170,7 @@ export function Sidebar({ active, onSelect }: SidebarProps) {
           className="text-xs"
           style={{ color: "var(--gaf-text-muted)", fontFamily: "var(--font-body)" }}
         >
-          GAF Group
+          AFS Group
         </p>
       </div>
     </aside>

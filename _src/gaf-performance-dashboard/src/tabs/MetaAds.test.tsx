@@ -66,7 +66,8 @@ test("Video sub-tab renders retention data", () => {
 test("Breakdowns sub-tab renders a platform segment", () => {
   renderTab();
   fireEvent.click(screen.getByRole("tab", { name: "Breakdowns" }));
-  expect(screen.getByText("facebook")).toBeInTheDocument();
+  // "facebook" appears in both the spend-by-segment panel and the table
+  expect(screen.getAllByText("facebook").length).toBeGreaterThanOrEqual(1);
 });
 
 test("Organic sub-tab renders IG KPIs and snapshot label", () => {

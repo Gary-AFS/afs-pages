@@ -43,27 +43,31 @@ export interface MetaLiveResult {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-/** Map the dashboard Window slug to a { since, until } date pair. */
+/** Today's date in Australia/Adelaide as a Date at UTC midnight. */
+function adelaideToday(): Date {
+  // en-CA locale formats as YYYY-MM-DD
+  const iso = new Date().toLocaleDateString("en-CA", { timeZone: "Australia/Adelaide" });
+  return new Date(`${iso}T00:00:00Z`);
+}
+
+/**
+ * Map the dashboard Window slug to a { since, until } date pair.
+ *
+ * Anchored to Australia/Adelaide and ending YESTERDAY, matching the nightly
+ * snapshot's windows — otherwise a live refresh silently swaps in a
+ * different date range (UTC, including today) and the numbers jump.
+ */
 function windowToDates(win: Window): { since: string; until: string } {
-  const today = new Date();
+  const today = adelaideToday();
   const pad = (d: Date) => d.toISOString().slice(0, 10);
   const daysAgo = (n: number) => {
     const d = new Date(today);
-    d.setDate(d.getDate() - n);
+    d.setUTCDate(d.getUTCDate() - n);
     return d;
   };
-  switch (win) {
-    case "yesterday":
-      return { since: pad(daysAgo(1)), until: pad(daysAgo(1)) };
-    case "7d":
-      return { since: pad(daysAgo(6)), until: pad(today) };
-    case "30d":
-      return { since: pad(daysAgo(29)), until: pad(today) };
-    case "90d":
-      return { since: pad(daysAgo(89)), until: pad(today) };
-    default:
-      return { since: pad(daysAgo(29)), until: pad(today) };
-  }
+  const spans: Record<Window, number> = { yesterday: 1, "7d": 7, "30d": 30, "90d": 90 };
+  const span = spans[win] ?? 30;
+  return { since: pad(daysAgo(span)), until: pad(daysAgo(1)) };
 }
 
 /** Sum the value of a given action_type from an actions / action_values list. */
@@ -157,6 +161,20 @@ async function fetchAllPages(path: string, params: Record<string, string>): Prom
  * - No Meta token is present anywhere in this file.
  * - Throws on network/HTTP error so the UI can catch and show a fallback.
  */
+/**
+ * Fetch a playable video source URL for a Meta video ID via the Worker —
+ * the same mechanism the reference dashboard uses for inline playback.
+ * Returns null when the video has no accessible source.
+ */
+export async function fetchVideoSource(videoId: string): Promise<string | null> {
+  if (!videoId) return null;
+  const qs = new URLSearchParams({ fields: "source", access_token: PROXY_TOKEN });
+  const res = await fetch(`${WORKER_BASE}/${videoId}?${qs.toString()}`);
+  if (!res.ok) return null;
+  const json = await res.json();
+  return typeof json.source === "string" && json.source ? json.source : null;
+}
+
 export async function refreshMeta(win: Window): Promise<MetaLiveResult> {
   const { since, until } = windowToDates(win);
 

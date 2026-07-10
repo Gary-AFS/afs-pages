@@ -1,6 +1,6 @@
 // src/tabs/meta/MetaDecisionPanels.tsx
 import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
-import type { MetaEntityRow, MetaKpis } from "../../lib/data";
+import type { MetaEntityRow } from "../../lib/data";
 
 // ---- Objective/Tier logic (matches meta-ads-dashboard.html) ----
 
@@ -15,6 +15,40 @@ const OBJECTIVE_MAP: Record<string, string> = {
 
 type Tier = 'win' | 'watch' | 'waste';
 
+const TIER_TOOLTIPS: Record<Tier, string> = {
+  win: "Performing above the campaign median for its objective. Strong candidate for scaling.",
+  watch: "Near median performance or low spend. Monitor before making changes.",
+  waste: "Performing well below the campaign median for its objective. Consider pausing or reallocating budget.",
+};
+
+/**
+ * Median of the positive values in a list (zeros excluded), matching the
+ * reference dashboard's benchmark. The mean — especially with zeros included —
+ * lets one 30x ROAS outlier drag every normal campaign into "waste".
+ */
+export function medianPositive(values: number[]): number {
+  const positives = values.filter(v => v > 0).sort((a, b) => a - b);
+  if (!positives.length) return 0;
+  const mid = Math.floor(positives.length / 2);
+  return positives.length % 2
+    ? positives[mid]
+    : (positives[mid - 1] + positives[mid]) / 2;
+}
+
+interface Benchmarks {
+  roas: number;
+  ctr: number;
+  cpm: number;
+}
+
+export function campaignBenchmarks(campaigns: MetaEntityRow[]): Benchmarks {
+  return {
+    roas: medianPositive(campaigns.map(c => Number(c.roas ?? 0))),
+    ctr: medianPositive(campaigns.map(c => Number(c.ctr ?? 0))),
+    cpm: medianPositive(campaigns.map(c => Number(c.cpm ?? 0))),
+  };
+}
+
 interface CampaignClassification {
   tier: Tier;
   metric: string;
@@ -22,7 +56,7 @@ interface CampaignClassification {
   lowerBetter: boolean;
 }
 
-function classifyCampaign(c: MetaEntityRow, avgRoas: number, avgCtr: number, avgCpm: number): CampaignClassification {
+export function classifyCampaign(c: MetaEntityRow, bench: Benchmarks): CampaignClassification {
   const goal = OBJECTIVE_MAP[c.objective ?? ''] ?? null;
   let metric = 'CTR';
   let val = 0;
@@ -30,15 +64,15 @@ function classifyCampaign(c: MetaEntityRow, avgRoas: number, avgCtr: number, avg
   let lowerBetter = false;
 
   if (goal === 'conversion' || goal === 'leads') {
-    metric = 'ROAS'; val = Number(c.roas ?? 0); avg = avgRoas;
+    metric = 'ROAS'; val = Number(c.roas ?? 0); avg = bench.roas;
   } else if (goal === 'traffic' || goal === 'engagement') {
-    metric = 'CTR'; val = Number(c.ctr ?? 0); avg = avgCtr;
+    metric = 'CTR'; val = Number(c.ctr ?? 0); avg = bench.ctr;
   } else if (goal === 'awareness') {
-    metric = 'CPM'; val = Number(c.cpm ?? 0); avg = avgCpm; lowerBetter = true;
+    metric = 'CPM'; val = Number(c.cpm ?? 0); avg = bench.cpm; lowerBetter = true;
   } else if (Number(c.conversions ?? 0) > 0) {
-    metric = 'ROAS'; val = Number(c.roas ?? 0); avg = avgRoas;
+    metric = 'ROAS'; val = Number(c.roas ?? 0); avg = bench.roas;
   } else {
-    metric = 'CTR'; val = Number(c.ctr ?? 0); avg = avgCtr;
+    metric = 'CTR'; val = Number(c.ctr ?? 0); avg = bench.ctr;
   }
 
   let tier: Tier = 'watch';
@@ -58,100 +92,96 @@ function classifyCampaign(c: MetaEntityRow, avgRoas: number, avgCtr: number, avg
   return { tier, metric, val, lowerBetter };
 }
 
-// ---- CampaignTierPanel ----
+const TIER_STYLE: Record<Tier, { label: string; color: string; bg: string; border: string }> = {
+  win:   { label: "Win",   color: "#059669", bg: "#ecfdf5", border: "#a7f3d0" },
+  watch: { label: "Watch", color: "#d97706", bg: "#fffbeb", border: "#fde68a" },
+  waste: { label: "Waste", color: "#dc2626", bg: "#fef2f2", border: "#fecaca" },
+};
 
-interface TierGroup {
-  tier: Tier;
-  label: string;
-  color: string;
-  bg: string;
-  campaigns: MetaEntityRow[];
+function TierBadge({ tier, metric, val }: { tier: Tier; metric: string; val: number }) {
+  const s = TIER_STYLE[tier];
+  const valText = metric === 'ROAS' ? fmtRoas(val) : metric === 'CPM' ? fmtCurrency(val) : fmtPct(val);
+  return (
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap"
+      style={{ color: s.color, background: s.bg, border: `1px solid ${s.border}`, cursor: "help" }}
+      title={TIER_TOOLTIPS[tier]}
+    >
+      {s.label} ({valText})
+    </span>
+  );
 }
+
+// ---- CampaignTierPanel — per-campaign list, reference-style ----
 
 export function CampaignTierPanel({ campaigns }: { campaigns: MetaEntityRow[] }) {
   if (!campaigns.length) return null;
 
-  const spend = campaigns.map(c => Number(c.spend ?? 0));
-  const totalSpend = spend.reduce((a, b) => a + b, 0);
-  const roas = campaigns.map(c => Number(c.roas ?? 0));
-  const avgRoas = roas.length ? roas.reduce((a, b) => a + b, 0) / roas.length : 0;
-  const ctr = campaigns.map(c => Number(c.ctr ?? 0));
-  const avgCtr = ctr.length ? ctr.reduce((a, b) => a + b, 0) / ctr.length : 0;
-  const cpm = campaigns.map(c => Number(c.cpm ?? 0)).filter(v => v > 0);
-  const avgCpm = cpm.length ? cpm.reduce((a, b) => a + b, 0) / cpm.length : 0;
+  const bench = campaignBenchmarks(campaigns);
+  const classified = campaigns
+    .map(c => ({ campaign: c, cl: classifyCampaign(c, bench) }))
+    .sort((a, b) => Number(b.campaign.spend ?? 0) - Number(a.campaign.spend ?? 0));
 
-  const classified = campaigns.map(c => ({
-    campaign: c,
-    cl: classifyCampaign(c, avgRoas, avgCtr, avgCpm),
-  }));
-
-  const groups: TierGroup[] = [
-    {
-      tier: 'win',
-      label: 'Win',
-      color: 'var(--gaf-delta-pos)',
-      bg: '#f0fdf4',
-      campaigns: classified.filter(x => x.cl.tier === 'win').map(x => x.campaign),
-    },
-    {
-      tier: 'watch',
-      label: 'Watch',
-      color: '#d97706',
-      bg: '#fffbeb',
-      campaigns: classified.filter(x => x.cl.tier === 'watch').map(x => x.campaign),
-    },
-    {
-      tier: 'waste',
-      label: 'Waste',
-      color: 'var(--gaf-delta-neg)',
-      bg: '#fff1f2',
-      campaigns: classified.filter(x => x.cl.tier === 'waste').map(x => x.campaign),
-    },
-  ];
+  const maxSpend = Math.max(...classified.map(x => Number(x.campaign.spend ?? 0)), 1);
+  const counts: Record<Tier, number> = { win: 0, watch: 0, waste: 0 };
+  classified.forEach(x => { counts[x.cl.tier] += 1; });
 
   return (
-    <section className="dash-card p-4 sm:p-5" aria-label="Campaign tier breakdown">
-      <h4
-        className="text-sm font-bold mb-3"
-        style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
-      >
-        Campaign Tiers
-      </h4>
-      <div className="flex flex-col gap-3">
-        {groups.map(g => {
-          const groupSpend = g.campaigns.reduce((a, c) => a + Number(c.spend ?? 0), 0);
-          const pct = totalSpend > 0 ? (groupSpend / totalSpend) * 100 : 0;
+    <section className="dash-card p-4 sm:p-5" aria-label="Campaign performance tiers">
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+        <h4
+          className="text-sm font-bold"
+          style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+        >
+          Campaign Performance
+        </h4>
+        <div className="flex items-center gap-3 text-xs">
+          {(Object.keys(TIER_STYLE) as Tier[]).map(t => (
+            <span key={t} className="inline-flex items-center gap-1" style={{ color: TIER_STYLE[t].color, cursor: "help" }} title={TIER_TOOLTIPS[t]}>
+              <span className="w-2 h-2 rounded-full inline-block" style={{ background: TIER_STYLE[t].color }} />
+              {TIER_STYLE[t].label} ({counts[t]})
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col">
+        {classified.map(({ campaign: c, cl }, i) => {
+          const spend = Number(c.spend ?? 0);
+          const conv = Number(c.conversions ?? 0);
+          const roasVal = Number(c.roas ?? 0);
           return (
-            <div key={g.tier} className="flex items-center gap-3">
-              <div
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ background: g.color }}
-                aria-hidden="true"
-              />
-              <span
-                className="text-xs font-semibold w-12 shrink-0"
-                style={{ color: g.color }}
-              >
-                {g.label}
-              </span>
-              <span
-                className="text-xs w-6 shrink-0"
-                style={{ color: "var(--gaf-text-muted)" }}
-              >
-                {g.campaigns.length}
-              </span>
-              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "var(--gaf-row-border)" }}>
+            <div
+              key={String(c.campaignId ?? i)}
+              className="py-2"
+              style={{ borderBottom: i < classified.length - 1 ? "1px solid var(--gaf-row-border)" : "none" }}
+            >
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: TIER_STYLE[cl.tier].color }} aria-hidden="true" />
+                <span
+                  className="text-sm font-medium truncate flex-1 min-w-[140px]"
+                  style={{ color: "var(--gaf-text-primary)" }}
+                  title={String(c.campaign ?? "")}
+                >
+                  {String(c.campaign ?? "Unnamed")}
+                </span>
+                <TierBadge tier={cl.tier} metric={cl.metric} val={cl.val} />
+                <span className="text-xs tabular-nums w-20 text-right" style={{ color: "var(--gaf-text-secondary)" }}>
+                  {fmtCurrency(spend)}
+                </span>
+                <span className="text-xs tabular-nums w-16 text-right hidden sm:inline" style={{ color: "var(--gaf-text-muted)" }}>
+                  {conv > 0 ? `${fmtInt(conv)} conv.` : "–"}
+                </span>
+                <span className="text-xs tabular-nums w-16 text-right hidden sm:inline" style={{ color: "var(--gaf-text-muted)" }}>
+                  {roasVal > 0 ? fmtRoas(roasVal) : "–"}
+                </span>
+              </div>
+              <div className="mt-1.5 h-0.5 rounded-full overflow-hidden ml-4" style={{ background: "var(--gaf-row-border)" }}>
                 <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${pct}%`, background: g.color }}
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${(spend / maxSpend) * 100}%`, background: TIER_STYLE[cl.tier].color }}
                 />
               </div>
-              <span
-                className="text-xs tabular-nums w-20 text-right shrink-0"
-                style={{ color: "var(--gaf-text-secondary)" }}
-              >
-                {fmtCurrency(groupSpend)}
-              </span>
             </div>
           );
         })}
@@ -165,16 +195,8 @@ export function CampaignTierPanel({ campaigns }: { campaigns: MetaEntityRow[] })
 export function BudgetAtRiskPanel({ campaigns }: { campaigns: MetaEntityRow[] }) {
   if (!campaigns.length) return null;
 
-  const roas = campaigns.map(c => Number(c.roas ?? 0));
-  const avgRoas = roas.length ? roas.reduce((a, b) => a + b, 0) / roas.length : 0;
-  const ctrs = campaigns.map(c => Number(c.ctr ?? 0));
-  const avgCtr = ctrs.length ? ctrs.reduce((a, b) => a + b, 0) / ctrs.length : 0;
-  const cpms = campaigns.map(c => Number(c.cpm ?? 0)).filter(v => v > 0);
-  const avgCpm = cpms.length ? cpms.reduce((a, b) => a + b, 0) / cpms.length : 0;
-
-  const wasteCampaigns = campaigns.filter(c =>
-    classifyCampaign(c, avgRoas, avgCtr, avgCpm).tier === 'waste'
-  );
+  const bench = campaignBenchmarks(campaigns);
+  const wasteCampaigns = campaigns.filter(c => classifyCampaign(c, bench).tier === 'waste');
   const wasteSpend = wasteCampaigns.reduce((a, c) => a + Number(c.spend ?? 0), 0);
 
   if (wasteSpend <= 0) return null;
@@ -194,7 +216,7 @@ export function BudgetAtRiskPanel({ campaigns }: { campaigns: MetaEntityRow[] })
       {wasteCampaigns.length > 0 && (
         <ul className="mt-2 space-y-1">
           {wasteCampaigns.map((c, i) => (
-            <li key={c.campaignId ?? i} className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
+            <li key={String(c.campaignId ?? i)} className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
               {String(c.campaign ?? "Unnamed")} – {fmtCurrency(Number(c.spend ?? 0))} spend
             </li>
           ))}
@@ -208,7 +230,8 @@ export function BudgetAtRiskPanel({ campaigns }: { campaigns: MetaEntityRow[] })
 
 interface ScaleWinnersPanelProps {
   adsets: MetaEntityRow[];
-  kpis: MetaKpis;
+  /** Snapshot campaigns — the median campaign ROAS is the scaling benchmark */
+  campaigns: MetaEntityRow[];
 }
 
 function MiniStat({ label, value }: { label: string; value: string }) {
@@ -227,12 +250,14 @@ function MiniStat({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function ScaleWinnersPanel({ adsets, kpis }: ScaleWinnersPanelProps) {
-  const accountAvgRoas = Number(kpis.roas ?? 0);
+export function ScaleWinnersPanel({ adsets, campaigns }: ScaleWinnersPanelProps) {
+  // Reference benchmark: MEDIAN campaign ROAS (not the blended account ROAS,
+  // which a single outlier campaign can inflate past every real ad set).
+  const benchmarkRoas = medianPositive((campaigns ?? []).map(c => Number(c.roas ?? 0)));
 
   const winners = (adsets ?? [])
     .filter(a =>
-      Number(a.roas ?? 0) > accountAvgRoas &&
+      Number(a.roas ?? 0) > benchmarkRoas &&
       Number(a.conversions ?? 0) >= 2 &&
       Number(a.spend ?? 0) >= 200
     )
@@ -250,22 +275,27 @@ export function ScaleWinnersPanel({ adsets, kpis }: ScaleWinnersPanelProps) {
         Scale Winners
       </h4>
       <p className="text-xs mb-3" style={{ color: "var(--gaf-text-muted)" }}>
-        Ad sets with ROAS above account average, 2+ conversions, and $200+ spend
+        Ad sets above the median campaign ROAS with 2+ conversions and $200+ spend
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {winners.map((a, i) => (
           <div
-            key={a.adsetId ?? i}
+            key={String(a.adsetId ?? i)}
             className="rounded-lg p-3 border"
             style={{ background: "#f0fdf4", borderColor: "#bbf7d0" }}
           >
             <p
-              className="text-xs font-semibold leading-snug line-clamp-2 mb-2"
+              className="text-xs font-semibold leading-snug line-clamp-2 mb-0.5"
               style={{ color: "#14532d" }}
               title={String(a.adset ?? "")}
             >
               {String(a.adset ?? "Unnamed Ad Set")}
             </p>
+            {Boolean(a.campaign) && (
+              <p className="text-[10px] truncate mb-1.5" style={{ color: "#166534" }} title={String(a.campaign)}>
+                {String(a.campaign)}
+              </p>
+            )}
             <p
               className="text-2xl font-bold tabular-nums mb-2"
               style={{ color: "var(--gaf-delta-pos)", fontFamily: "var(--font-display)" }}

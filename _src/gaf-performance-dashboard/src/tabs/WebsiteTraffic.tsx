@@ -4,7 +4,7 @@ import { KpiCard } from "../components/KpiCard";
 import { DataTable } from "../components/DataTable";
 import { TrendChart } from "../components/TrendChart";
 import { AustraliaMap } from "../components/AustraliaMap";
-import { fmtInt, fmtPct, fmtCurrency } from "../lib/format";
+import { fmtCompact, fmtInt, fmtPct, fmtCurrency } from "../lib/format";
 import type { PerfData } from "../lib/data";
 
 interface WebsiteTrafficProps {
@@ -28,7 +28,8 @@ const PAGE_COLS = [
   { key: "sessions",           label: "Sessions",       align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "views",              label: "Page Views",     align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "avgEngagementTime",  label: "Avg. Time (s)",  align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
-  { key: "bounceRate",         label: "Bounce Rate",    align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
+  // Feed sends bounceRate as a FRACTION (0.0683) — display as 6.8%, not 0.1%
+  { key: "bounceRate",         label: "Bounce Rate",    align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0) * 100) },
 ];
 
 const PRODUCT_COLS = [
@@ -37,8 +38,20 @@ const PRODUCT_COLS = [
   { key: "atc",      label: "Add-to-Carts",  align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "orders",   label: "Orders",        align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "revenue",  label: "Revenue",       align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
-  { key: "cvr",      label: "CVR",           align: "right" as const, format: (v: unknown) => `${Number(v ?? 0).toFixed(1)}%` },
+  // null CVR = GA4 has no session data for the page — show a dash, not 0.0%
+  { key: "cvr",      label: "CVR",           align: "right" as const, format: (v: unknown) => (v == null ? "–" : `${Number(v).toFixed(1)}%`) },
 ];
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h3
+      className="text-lg font-bold mb-3"
+      style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+    >
+      {children}
+    </h3>
+  );
+}
 
 // ---- Component ----
 
@@ -50,7 +63,7 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
 
   if (!ga4Win) {
     return (
-      <div className="p-6 text-gray-500 text-sm">
+      <div className="dash-card p-8 text-center text-sm" style={{ color: "var(--gaf-text-muted)" }}>
         No website traffic data available for this window.
       </div>
     );
@@ -71,69 +84,65 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
       : `${Math.round(avgEngSec)}s`;
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-6 fade-in">
       {/* GA4 KPI row */}
       <section aria-label="Website traffic key metrics">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 stagger">
           <KpiCard
             label="Sessions"
             value={fmtInt(kpis?.sessions ?? 0)}
             delta={deltas.sessions ?? null}
+            tooltip="GA4 sessions in the selected window."
           />
           <KpiCard
             label="Active Users"
             value={fmtInt(kpis?.activeUsers ?? 0)}
             delta={deltas.activeUsers ?? null}
+            tooltip="Users with an engaged session."
           />
           <KpiCard
             label="New Users"
             value={fmtInt(kpis?.newUsers ?? 0)}
             delta={deltas.newUsers ?? null}
+            tooltip="First-time visitors."
           />
           <KpiCard
             label="Engagement Rate"
             value={fmtPct((kpis?.engagementRate ?? 0) * 100)}
             delta={deltas.engagementRate ?? null}
+            tooltip="Engaged sessions ÷ total sessions."
           />
           <KpiCard
             label="Avg. Engagement"
             value={engTimeLabel}
             delta={deltas.avgEngagementTime ?? null}
+            tooltip="Average session duration."
           />
           <KpiCard
             label="Conversions"
             value={fmtInt(kpis?.conversions ?? 0)}
             delta={deltas.conversions ?? null}
+            tooltip="GA4 key events (conversions) in the window."
           />
         </div>
       </section>
 
       {/* Daily sessions trend */}
       {hasDailyData && (
-        <section
-          className="bg-gray-800/50 border border-gray-700 rounded-xl p-4"
-          aria-label="Daily sessions trend"
-        >
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
-            Daily Sessions
-          </h3>
+        <section className="dash-card p-5" aria-label="Daily sessions trend">
+          <SectionTitle>Daily Sessions</SectionTitle>
           <TrendChart
             data={daily}
             series={{
-              areas: [{ key: "sessions", color: "#F97316", label: "Sessions" }],
+              areas: [{ key: "sessions", color: "var(--gaf-primary)", label: "Sessions", format: fmtCompact }],
             }}
           />
         </section>
       )}
 
       {/* Source / Channel table */}
-      <section
-        className="bg-gray-800/50 border border-gray-700 rounded-xl p-4"
-        aria-label="Traffic channels"
-      >
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
-          Source / Channel
-        </h3>
+      <section aria-label="Traffic channels">
+        <SectionTitle>Source / Channel</SectionTitle>
         <DataTable<ChannelRow>
           columns={CHANNEL_COLS}
           rows={channelRows}
@@ -142,13 +151,8 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
       </section>
 
       {/* Top Pages table */}
-      <section
-        className="bg-gray-800/50 border border-gray-700 rounded-xl p-4"
-        aria-label="Top pages"
-      >
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
-          Top Pages
-        </h3>
+      <section aria-label="Top pages">
+        <SectionTitle>Top Pages</SectionTitle>
         <DataTable<PageRow>
           columns={PAGE_COLS}
           rows={pageRows}
@@ -157,29 +161,22 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
       </section>
 
       {/* Australia geo map */}
-      <section
-        className="bg-gray-800/50 border border-gray-700 rounded-xl p-4"
-        aria-label="Sessions by Australian state"
-      >
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
-          Sessions by State
-        </h3>
+      <section className="dash-card p-5" aria-label="Sessions by Australian state">
+        <SectionTitle>Sessions by State</SectionTitle>
         <AustraliaMap geo={geo} />
       </section>
 
       {/* Top Products funnel */}
-      <section
-        className="bg-gray-800/50 border border-gray-700 rounded-xl p-4"
-        aria-label="Top products funnel"
-      >
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
-          Top Products (Sessions &rarr; ATC &rarr; Orders)
-        </h3>
+      <section aria-label="Top products funnel">
+        <SectionTitle>Top Products (Sessions &rarr; ATC &rarr; Orders)</SectionTitle>
         <DataTable<ProductRow>
           columns={PRODUCT_COLS}
           rows={products}
           sortable
         />
+        <p className="text-xs mt-2" style={{ color: "var(--gaf-text-muted)" }}>
+          Sessions and add-to-carts join from GA4's top pages; a dash means GA4 recorded no page-level data for that product in this window.
+        </p>
       </section>
     </div>
   );

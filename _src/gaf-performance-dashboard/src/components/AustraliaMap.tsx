@@ -11,15 +11,19 @@ interface AustraliaMapProps {
   geo: GeoEntry[];
 }
 
-/** Interpolate GAF orange intensity by session share (0..1) */
+/**
+ * GAF brand-orange choropleth ramp (#f26422 ≈ hsl(21, 89%, 54%)).
+ * share 0 → pale tint, share 1 → deep brand orange. Light-theme page.
+ */
 function sessionColour(share: number): string {
-  // From dark grey (no sessions) to GAF orange (#F97316)
-  const minL = 25;
-  const maxL = 65;
-  const l = Math.round(minL + share * (maxL - minL));
-  // Hue 24 = orange, saturation drops at low share
-  const s = Math.round(30 + share * 65);
-  return `hsl(24,${s}%,${l}%)`;
+  const l = Math.round(94 - share * 44);   // 94% (near-white tint) → 50% (deep orange)
+  const s = Math.round(60 + share * 30);   // 60% → 90%
+  return `hsl(21,${s}%,${l}%)`;
+}
+
+/** Label colour flips to white once the fill gets dark enough to need it. */
+function labelColour(share: number): string {
+  return share > 0.45 ? "#ffffff" : "#374151";
 }
 
 export function AustraliaMap({ geo }: AustraliaMapProps) {
@@ -32,10 +36,11 @@ export function AustraliaMap({ geo }: AustraliaMapProps) {
     sessionMap[entry.region] = (sessionMap[entry.region] ?? 0) + entry.sessions;
     totalSessions += entry.sessions;
   }
+  const maxSessions = Math.max(...Object.values(sessionMap), 1);
 
   if (geo.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
+      <div className="flex items-center justify-center h-48 text-sm" style={{ color: "var(--gaf-text-muted)" }}>
         No geographic data available.
       </div>
     );
@@ -51,7 +56,9 @@ export function AustraliaMap({ geo }: AustraliaMapProps) {
       >
         {Object.entries(AU_STATES).map(([regionName, shape]) => {
           const sessions = sessionMap[regionName] ?? 0;
-          const share = totalSessions > 0 ? sessions / totalSessions : 0;
+          // Normalise against the BUSIEST state so the ramp uses its full
+          // range (share-of-total left every state pale).
+          const share = sessions / maxSessions;
           const fill = sessionColour(share);
 
           return (
@@ -59,8 +66,8 @@ export function AustraliaMap({ geo }: AustraliaMapProps) {
               <path
                 d={shape.d}
                 fill={fill}
-                stroke="#1F2937"
-                strokeWidth={1.5}
+                stroke="#ffffff"
+                strokeWidth={2}
                 style={{ cursor: "pointer", transition: "opacity 0.15s" }}
                 onMouseEnter={(e) => {
                   const rect = (e.currentTarget.closest("svg") as SVGSVGElement).getBoundingClientRect();
@@ -84,9 +91,10 @@ export function AustraliaMap({ geo }: AustraliaMapProps) {
                 y={shape.cy}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fontSize={10}
-                fontFamily="sans-serif"
-                fill="#E5E7EB"
+                fontSize={11}
+                fontFamily="var(--font-body), sans-serif"
+                fontWeight={600}
+                fill={labelColour(share)}
                 pointerEvents="none"
               >
                 {shape.label}
@@ -96,25 +104,25 @@ export function AustraliaMap({ geo }: AustraliaMapProps) {
         })}
       </svg>
 
-      {/* Hover tooltip */}
+      {/* Hover tooltip — dark pill, matches chart tooltips */}
       {tooltip && (
         <div
-          className="absolute pointer-events-none z-10 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200 shadow-lg"
-          style={{ left: tooltip.x + 8, top: tooltip.y - 28 }}
+          className="absolute pointer-events-none z-10 rounded-md px-2.5 py-1.5 text-xs shadow-lg"
+          style={{ left: tooltip.x + 8, top: tooltip.y - 32, background: "#1f2937", color: "#fff" }}
         >
           <span className="font-semibold">{tooltip.region}</span>
-          {" – "}
+          {" — "}
           {tooltip.sessions.toLocaleString("en-AU")} sessions
         </div>
       )}
 
       {/* Colour scale legend */}
-      <div className="flex items-center justify-center gap-2 mt-2 text-xs text-gray-400">
+      <div className="flex items-center justify-center gap-2 mt-3 text-xs" style={{ color: "var(--gaf-text-muted)" }}>
         <span>Fewer sessions</span>
         <div
           className="h-2 w-24 rounded"
           style={{
-            background: "linear-gradient(to right, hsl(24,30%,25%), hsl(24,95%,65%))",
+            background: "linear-gradient(to right, hsl(21,60%,94%), hsl(21,90%,50%))",
           }}
         />
         <span>More sessions</span>

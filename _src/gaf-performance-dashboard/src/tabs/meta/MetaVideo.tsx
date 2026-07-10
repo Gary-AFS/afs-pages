@@ -1,5 +1,5 @@
 // src/tabs/meta/MetaVideo.tsx
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { fmtCurrency, fmtInt, fmtPct } from "../../lib/format";
 import { DataTable } from "../../components/DataTable";
 import type { MetaWindow, MetaVideoRow } from "../../lib/data";
@@ -67,6 +67,9 @@ const TABLE_COLS = [
   { key: "videoPlays",   label: "Plays",           align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "thruPlays",    label: "ThruPlays",       align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "thumbStopRate",label: "Thumb Stop %",    align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
+  { key: "p25Rate",      label: "25% Played",      align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
+  { key: "p50Rate",      label: "50% Played",      align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
+  { key: "p75Rate",      label: "75% Played",      align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
   { key: "p100Rate",     label: "Completion %",    align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
   { key: "avgWatchTime", label: "Avg Watch (s)",   align: "right" as const, format: (v: unknown) => `${Number(v ?? 0).toFixed(1)}s` },
   { key: "impressions",  label: "Impr.",           align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
@@ -80,6 +83,16 @@ export function MetaVideo({ metaWin }: Props) {
 
   const video = (metaWin.video ?? []) as MetaVideoRow[];
   const withPlays = video.filter((v) => Number(v.videoPlays ?? 0) > 0);
+
+  // Thumbnails live on the creative rows — join by adId.
+  const thumbByAd = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const c of metaWin.creative ?? []) {
+      const url = String(c.thumbnailUrl || c.imageUrl || "");
+      if (c.adId && url) map.set(String(c.adId), url);
+    }
+    return map;
+  }, [metaWin.creative]);
 
   const sorted = useMemo(() => {
     return [...withPlays].sort((a, b) => Number(b[sortKey] ?? 0) - Number(a[sortKey] ?? 0));
@@ -165,16 +178,28 @@ export function MetaVideo({ metaWin }: Props) {
 
       {/* Video preview note */}
       <p className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
-        Video preview unavailable via Ads API – the feed does not contain video source URLs.
+        Open an ad on the Creative tab to play its video inline.
       </p>
 
       {/* Cards view */}
       {viewMode === "cards" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-          {sorted.map((v, i) => (
+          {sorted.map((v, i) => {
+            const thumb = thumbByAd.get(String(v.adId ?? ""));
+            return (
             <div key={v.adId ?? i} className="dash-card p-4 flex flex-col gap-3 min-w-0">
               <div className="flex items-start justify-between gap-2 min-w-0">
-                <div className="min-w-0">
+                {thumb && (
+                  <img
+                    src={thumb}
+                    alt=""
+                    loading="lazy"
+                    className="w-14 h-14 rounded-lg object-cover shrink-0"
+                    style={{ background: "var(--gaf-primary-light)" }}
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                  />
+                )}
+                <div className="min-w-0 flex-1">
                   <p
                     className="text-sm font-semibold leading-snug line-clamp-1"
                     style={{ color: "var(--gaf-text-primary)" }}
@@ -244,7 +269,8 @@ export function MetaVideo({ metaWin }: Props) {
                 <RetentionBar label="Completion" pct={Number(v.p100Rate ?? 0)} />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

@@ -1,7 +1,8 @@
 // src/tabs/meta/MetaCreativeModal.tsx
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import { fmtCurrency, fmtInt, fmtPct, fmtRoas, fmtCpc } from "../../lib/format";
+import { fetchVideoSource } from "../../lib/meta-live";
 import type { MetaCreativeRow } from "../../lib/data";
 
 export interface MetaCreativeModalProps {
@@ -49,7 +50,15 @@ function ModalThumbnail({ url, alt }: { url?: string; alt: string }) {
   );
 }
 
+type VideoState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "ready"; src: string }
+  | { status: "unavailable" };
+
 export function MetaCreativeModal({ creative, onClose }: MetaCreativeModalProps) {
+  const [videoState, setVideoState] = useState<VideoState>({ status: "idle" });
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -60,8 +69,33 @@ export function MetaCreativeModal({ creative, onClose }: MetaCreativeModalProps)
   useEffect(() => {
     if (!creative) return;
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    // Body scroll lock while the modal is open (reference parity)
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [creative, handleKeyDown]);
+
+  // Lazily fetch a playable source for video ads via the Worker proxy.
+  useEffect(() => {
+    const vid = creative?.videoId ? String(creative.videoId) : "";
+    if (!vid) {
+      setVideoState({ status: "idle" });
+      return;
+    }
+    let cancelled = false;
+    setVideoState({ status: "loading" });
+    fetchVideoSource(vid)
+      .then(src => {
+        if (!cancelled) setVideoState(src ? { status: "ready", src } : { status: "unavailable" });
+      })
+      .catch(() => {
+        if (!cancelled) setVideoState({ status: "unavailable" });
+      });
+    return () => { cancelled = true; };
+  }, [creative?.videoId]);
 
   if (!creative) return null;
 
@@ -96,13 +130,29 @@ export function MetaCreativeModal({ creative, onClose }: MetaCreativeModalProps)
         </button>
 
         <div className="flex flex-col gap-4">
-          {/* Thumbnail */}
-          <ModalThumbnail url={creative.thumbnailUrl || creative.imageUrl} alt={name} />
+          {/* Media: inline video when a source is available, else thumbnail */}
+          {isVideo && videoState.status === "ready" ? (
+            <video
+              src={videoState.src}
+              controls
+              autoPlay
+              muted
+              playsInline
+              className="w-full rounded-lg"
+              style={{ maxHeight: "50vh", background: "#000" }}
+            />
+          ) : (
+            <ModalThumbnail url={creative.thumbnailUrl || creative.imageUrl} alt={name} />
+          )}
 
-          {/* Video note */}
-          {isVideo && (
+          {isVideo && videoState.status === "loading" && (
             <p className="text-xs text-center" style={{ color: "var(--gaf-text-muted)" }}>
-              Video preview unavailable via Ads API
+              Loading video…
+            </p>
+          )}
+          {isVideo && videoState.status === "unavailable" && (
+            <p className="text-xs text-center" style={{ color: "var(--gaf-text-muted)" }}>
+              Video source unavailable for this ad
             </p>
           )}
 
@@ -114,6 +164,11 @@ export function MetaCreativeModal({ creative, onClose }: MetaCreativeModalProps)
             >
               {name}
             </h3>
+            {(creative.campaign || creative.adset) && (
+              <p className="text-xs mb-1" style={{ color: "var(--gaf-text-muted)" }}>
+                {[creative.campaign, creative.adset].filter(Boolean).join(" › ")}
+              </p>
+            )}
             {creative.title && creative.title !== name && (
               <p className="text-sm font-medium mb-1" style={{ color: "var(--gaf-text-secondary)" }}>
                 {String(creative.title)}

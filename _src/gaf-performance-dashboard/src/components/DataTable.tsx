@@ -10,6 +10,10 @@ interface Column<T extends Record<string, unknown>> {
   align?: Align;
   /** Mark this column as the primary name/label column — bolder, darker text */
   isName?: boolean;
+  /** Hover definition shown on the column header (native title tooltip) */
+  tooltip?: string;
+  /** Secondary muted line under the cell value (e.g. "BROAD · Campaign name") */
+  sub?: (row: T) => string;
 }
 
 interface DataTableProps<T extends Record<string, unknown>> {
@@ -37,25 +41,35 @@ export function DataTable<T extends Record<string, unknown>>({
   function handleHeaderClick(key: string) {
     if (!sortable) return;
 
-    const firstVal = rows.find(r => r[key] !== null && r[key] !== undefined)?.[key];
-    if (typeof firstVal !== "number") return;
-
     if (sortKey === key) {
-      const next: SortDir = sortDir === "asc" ? "desc" : sortDir === "desc" ? null : "asc";
+      // desc → asc → off (metrics tables: biggest-first is the useful default)
+      const next: SortDir = sortDir === "desc" ? "asc" : sortDir === "asc" ? null : "desc";
       setSortDir(next);
       if (next === null) setSortKey(null);
     } else {
       setSortKey(key);
-      setSortDir("asc");
+      setSortDir("desc");
     }
   }
 
   const sortedRows = [...rows];
   if (sortable && sortKey && sortDir) {
     sortedRows.sort((a, b) => {
-      const av = a[sortKey] as number;
-      const bv = b[sortKey] as number;
-      return sortDir === "asc" ? av - bv : bv - av;
+      const av = a[sortKey];
+      const bv = b[sortKey];
+      // Numbers sort numerically (null/undefined treated as smallest);
+      // everything else falls back to string compare.
+      const an = typeof av === "number" ? av : av == null ? null : Number.NaN;
+      const bn = typeof bv === "number" ? bv : bv == null ? null : Number.NaN;
+      if ((an !== null && !Number.isNaN(an)) || (bn !== null && !Number.isNaN(bn))) {
+        const x = an ?? Number.NEGATIVE_INFINITY;
+        const y = bn ?? Number.NEGATIVE_INFINITY;
+        const xs = Number.isNaN(x) ? Number.NEGATIVE_INFINITY : x;
+        const ys = Number.isNaN(y) ? Number.NEGATIVE_INFINITY : y;
+        return sortDir === "asc" ? xs - ys : ys - xs;
+      }
+      const cmp = String(av ?? "").localeCompare(String(bv ?? ""));
+      return sortDir === "asc" ? cmp : -cmp;
     });
   }
 
@@ -70,24 +84,22 @@ export function DataTable<T extends Record<string, unknown>>({
             <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
               {columns.map(col => {
                 const isActiveSort = sortKey === col.key;
-                const isNumericSortable =
-                  sortable &&
-                  typeof (rows.find(r => r[col.key] !== null && r[col.key] !== undefined)?.[col.key]) === "number";
-
                 return (
                   <th
                     key={col.key}
+                    title={col.tooltip}
                     className={[
                       "py-2.5 px-3 text-[11px] uppercase tracking-wide font-semibold whitespace-nowrap select-none",
                       alignClass(col.align),
-                      isNumericSortable ? "cursor-pointer" : "",
+                      sortable ? "cursor-pointer" : "",
                     ].join(" ")}
                     style={{
                       color: isActiveSort ? "var(--gaf-primary)" : "var(--gaf-text-muted)",
+                      cursor: col.tooltip && !sortable ? "help" : undefined,
                     }}
                     onClick={() => handleHeaderClick(col.key)}
                     onMouseEnter={e => {
-                      if (isNumericSortable && !isActiveSort) {
+                      if (sortable && !isActiveSort) {
                         (e.currentTarget as HTMLElement).style.color = "#374151";
                       }
                     }}
@@ -122,6 +134,7 @@ export function DataTable<T extends Record<string, unknown>>({
                   const raw = row[col.key];
                   const cell = col.format ? col.format(raw) : String(raw ?? "");
                   const isName = col.isName ?? colIdx === 0;
+                  const sub = col.sub ? col.sub(row) : "";
                   return (
                     <td
                       key={col.key}
@@ -133,6 +146,15 @@ export function DataTable<T extends Record<string, unknown>>({
                       }}
                     >
                       {cell}
+                      {sub && (
+                        <div
+                          className="text-[11px] font-normal truncate max-w-[280px]"
+                          style={{ color: "var(--gaf-text-muted)" }}
+                          title={sub}
+                        >
+                          {sub}
+                        </div>
+                      )}
                     </td>
                   );
                 })}

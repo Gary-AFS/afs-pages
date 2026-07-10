@@ -50,7 +50,7 @@ export function fmtRoas(n: number): string {
   return `${n.toFixed(2)}x`;
 }
 
-/** Compact integer with K/M suffixes: 1234 -> 1.2K, 1200000 -> 1.2M */
+/** Compact integer with K/M suffixes above 10K: 9500 -> 9,500, 12345 -> 12.3K, 1200000 -> 1.2M */
 export function fmtCompact(n: number): string {
   const abs = Math.abs(n);
   if (abs >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -72,10 +72,14 @@ export function fmtCurrencyCompact(n: number): string {
  * positive      -> { text: "+12.3%", dir: "up" }
  * negative      -> { text: "-12.3%", dir: "down" }
  * zero          -> { text: "0.0%", dir: "flat" }
+ * |n| > 999     -> capped display ">999%" (matches reference dashboards)
  */
 export function fmtDelta(n: number | null | undefined): DeltaResult {
   if (n === null || n === undefined) {
     return { text: "–", dir: "flat" };
+  }
+  if (Math.abs(n) > 999) {
+    return { text: ">999%", dir: n > 0 ? "up" : "down" };
   }
   if (n > 0) {
     return { text: `+${fmtPct(n)}`, dir: "up" };

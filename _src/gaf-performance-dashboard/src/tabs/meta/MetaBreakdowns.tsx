@@ -2,7 +2,58 @@
 import { useState } from "react";
 import { DataTable } from "../../components/DataTable";
 import { META_BREAKDOWN_COLS } from "./columns";
+import { fmtCurrency, fmtRoas } from "../../lib/format";
 import type { MetaWindow, MetaBreakdownRow, MetaBreakdowns as MetaBreakdownsData } from "../../lib/data";
+
+// "Spend by {dimension}" panel — top 10 segments with share % + ROAS + brand bar
+function SpendBySegmentPanel({ rows, dimLabel, hideRoas }: { rows: MetaBreakdownRow[]; dimLabel: string; hideRoas: boolean }) {
+  if (!rows.length) return null;
+  const sorted = [...rows].sort((a, b) => Number(b.spend ?? 0) - Number(a.spend ?? 0)).slice(0, 10);
+  const total = rows.reduce((s, r) => s + Number(r.spend ?? 0), 0) || 1;
+  const max = Number(sorted[0]?.spend ?? 0) || 1;
+
+  return (
+    <div className="dash-card p-5">
+      <h4
+        className="text-sm font-bold mb-3"
+        style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+      >
+        Spend by {dimLabel}
+      </h4>
+      <div className="space-y-3">
+        {sorted.map((r, i) => {
+          const spend = Number(r.spend ?? 0);
+          const share = (spend / total) * 100;
+          const roasVal = Number(r.roas ?? 0);
+          return (
+            <div key={String(r.segment ?? i)} className="space-y-1">
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="font-medium truncate" style={{ color: "var(--gaf-text-primary)" }}>
+                  {String(r.segment ?? "Unknown")}
+                </span>
+                <span className="flex items-center gap-3 tabular-nums shrink-0" style={{ color: "var(--gaf-text-secondary)" }}>
+                  {!hideRoas && roasVal > 0 && <span>{fmtRoas(roasVal)}</span>}
+                  <span style={{ color: "var(--gaf-text-muted)" }}>({share.toFixed(0)}%)</span>
+                  <span className="font-semibold" style={{ color: "var(--gaf-text-primary)" }}>{fmtCurrency(spend)}</span>
+                </span>
+              </div>
+              <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "var(--gaf-row-border)" }}>
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${(spend / max) * 100}%`,
+                    background: "var(--gaf-primary)",
+                    opacity: 1 - i * 0.03,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 const REGION_HIDDEN = new Set(["purchases", "purchaseValue", "roas", "cpa", "costPerAtc", "landingPageViews", "addToCart"]);
 
@@ -93,6 +144,12 @@ export function MetaBreakdowns({ metaWin }: Props) {
           {REGION_NOTE}
         </p>
       )}
+
+      <SpendBySegmentPanel
+        rows={rows as MetaBreakdownRow[]}
+        dimLabel={DIMS.find(d => d.key === active)?.label ?? ""}
+        hideRoas={active === "region"}
+      />
 
       <DataTable<Row> columns={active === "region" ? REGION_BREAKDOWN_COLS : META_BREAKDOWN_COLS} rows={displayRows} sortable />
     </div>

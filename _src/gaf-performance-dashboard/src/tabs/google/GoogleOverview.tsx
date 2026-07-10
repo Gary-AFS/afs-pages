@@ -3,7 +3,7 @@ import { useState } from "react";
 import { KpiCard } from "../../components/KpiCard";
 import { TrendChart } from "../../components/TrendChart";
 import { CaveatBanner } from "../../components/CaveatBanner";
-import { fmtCpc, fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { fmtCpc, fmtCurrency, fmtCurrencyCompact, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
 
 const CHANNEL_LABELS: Record<string, string> = {
   SEARCH: "Search",
@@ -59,18 +59,30 @@ export function GoogleOverview({ googleWin }: Props) {
       {/* KPI grid */}
       <section aria-label="Google Ads key metrics">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 stagger">
-          <KpiCard label="Spend"              value={fmtCurrency(kpis.spend ?? 0)}           delta={deltas.spend ?? null} />
-          <KpiCard label="Impressions"        value={fmtInt(kpis.impressions ?? 0)}           delta={deltas.impressions ?? null} />
-          <KpiCard label="Clicks"             value={fmtInt(kpis.clicks ?? 0)}               delta={deltas.clicks ?? null} />
-          <KpiCard label="CTR"                value={fmtPct(kpis.ctr ?? 0)}                  delta={deltas.ctr ?? null} />
-          <KpiCard label="Avg CPC"            value={fmtCpc(kpis.avgCpc ?? 0)}              delta={deltas.avgCpc ?? null}          invertDelta />
-          <KpiCard label="Conversions"        value={(kpis.conversions ?? 0).toFixed(1)}     delta={deltas.conversions ?? null} />
-          <KpiCard label="Conv. Value"        value={fmtCurrency(kpis.convValue ?? 0)}       delta={deltas.convValue ?? null} />
-          <KpiCard label="ROAS"               value={fmtRoas(kpis.roas ?? 0)}               delta={deltas.roas ?? null} />
-          <KpiCard label="CPA"                value={fmtCurrency(kpis.cpa ?? 0)}            delta={deltas.cpa ?? null}             invertDelta />
-          <KpiCard label="Add to Cart"        value={fmtInt(kpis.atc ?? 0)}                 delta={deltas.atc ?? null} />
-          <KpiCard label="ATC Rate"           value={fmtPct(kpis.atcRate ?? 0)}             delta={deltas.atcRate ?? null} />
-          <KpiCard label="Search Impr. Share" value={fmtPct(kpis.searchImprShare ?? 0)}     delta={null} />
+          <KpiCard label="Spend"              value={fmtCurrency(kpis.spend ?? 0)}           delta={deltas.spend ?? null}
+                   tooltip="Total amount spent on Google Ads in the selected window." />
+          <KpiCard label="Impressions"        value={fmtInt(kpis.impressions ?? 0)}           delta={deltas.impressions ?? null}
+                   tooltip="Number of times your ads were shown." />
+          <KpiCard label="Clicks"             value={fmtInt(kpis.clicks ?? 0)}               delta={deltas.clicks ?? null}
+                   tooltip="Number of clicks on your ads." />
+          <KpiCard label="CTR"                value={fmtPct(kpis.ctr ?? 0)}                  delta={deltas.ctr ?? null}
+                   tooltip="Click-through rate — clicks ÷ impressions." />
+          <KpiCard label="Avg CPC"            value={fmtCpc(kpis.avgCpc ?? 0)}              delta={deltas.avgCpc ?? null}          invertDelta
+                   tooltip="Average cost per click — spend ÷ clicks. Lower is better." />
+          <KpiCard label="Conversions"        value={(kpis.conversions ?? 0).toFixed(1)}     delta={deltas.conversions ?? null}
+                   tooltip="Primary conversions (purchases) Google Ads attributes to your ads." />
+          <KpiCard label="Conv. Value"        value={fmtCurrency(kpis.convValue ?? 0)}       delta={deltas.convValue ?? null}
+                   tooltip="Total revenue value of those primary conversions." />
+          <KpiCard label="ROAS"               value={fmtRoas(kpis.roas ?? 0)}               delta={deltas.roas ?? null}
+                   tooltip="Return on ad spend — conversion value ÷ spend. Directional only: many GAF sales close offline." />
+          <KpiCard label="CPA"                value={fmtCurrency(kpis.cpa ?? 0)}            delta={deltas.cpa ?? null}             invertDelta
+                   tooltip="Cost per acquisition — spend ÷ conversions. Lower is better." />
+          <KpiCard label="Add to Cart"        value={fmtInt(kpis.atc ?? 0)}                 delta={deltas.atc ?? null}
+                   tooltip="Add-to-cart events attributed to Google Ads. A secondary conversion — not counted in ROAS." />
+          <KpiCard label="ATC Rate"           value={fmtPct(kpis.atcRate ?? 0)}             delta={deltas.atcRate ?? null}
+                   tooltip="Add-to-cart rate — add-to-carts ÷ clicks." />
+          <KpiCard label="Search Impr. Share" value={kpis.searchImprShare == null ? "n/a" : fmtPct(kpis.searchImprShare)} delta={null}
+                   tooltip="The % of available Search impressions your ads actually received. Low = you're missing reachable demand." />
         </div>
 
         {/* Offline disclaimer */}
@@ -114,7 +126,15 @@ export function GoogleOverview({ googleWin }: Props) {
           </div>
           <TrendChart
             data={daily}
-            series={{ areas: [{ key: activeMetric, color: "var(--gaf-primary)", label: metricLabel }] }}
+            series={{ areas: [{
+              key: activeMetric,
+              color: "var(--gaf-primary)",
+              label: metricLabel,
+              format:
+                activeMetric === "roas" ? (v: number) => `${v.toFixed(2)}x`
+                : activeMetric === "ctr" ? (v: number) => `${v.toFixed(1)}%`
+                : fmtCurrencyCompact,
+            }] }}
           />
         </div>
       )}

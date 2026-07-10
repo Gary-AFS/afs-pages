@@ -25,11 +25,11 @@ const SENDS_COLS = [
 export function Email({ data }: EmailProps) {
   const { window } = useDateRange();
 
-  const hubspotWin = (data as any).hubspot?.[window];
+  const hubspotWin = data.hubspot?.[window];
 
   if (!hubspotWin) {
     return (
-      <div className="p-6 text-gray-500 text-sm">
+      <div className="dash-card p-8 text-center text-sm" style={{ color: "var(--gaf-text-muted)" }}>
         No HubSpot email data available for this window.
       </div>
     );
@@ -43,31 +43,37 @@ export function Email({ data }: EmailProps) {
   });
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-6 fade-in">
       {/* KPI row */}
       <section aria-label="Email key metrics">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 stagger">
           <KpiCard
             label="Total Sends"
             value={fmtInt(kpis.totalSends ?? 0)}
+            tooltip="Marketing emails sent in the selected window."
           />
           <KpiCard
             label="Avg Open Rate"
             value={fmtPct(kpis.avgOpenRate ?? 0)}
+            tooltip="Sends-weighted: total opens ÷ total delivered across all sends in the window."
           />
           <KpiCard
             label="Avg CTR"
             value={fmtPct(kpis.avgCtr ?? 0)}
+            tooltip="Sends-weighted: total clicks ÷ total delivered across all sends in the window."
           />
         </div>
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-2 text-xs" style={{ color: "var(--gaf-text-muted)" }}>
           Revenue not tracked in HubSpot for this portal.
         </p>
       </section>
 
       {/* Sends table */}
       <section aria-label="Email sends">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+        <h3
+          className="text-lg font-bold mb-3"
+          style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+        >
           Sends
         </h3>
         <DataTable<SendRow>

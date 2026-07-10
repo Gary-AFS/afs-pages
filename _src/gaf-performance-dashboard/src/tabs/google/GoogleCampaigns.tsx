@@ -33,7 +33,7 @@ const COLUMNS = [
   { key: "convValue" as const, label: "Conv. Value", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "roas" as const, label: "ROAS", align: "right" as const, format: (v: unknown) => fmtRoas(Number(v ?? 0)) },
   { key: "cpa" as const, label: "CPA", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
-] satisfies { key: keyof Row & string; label: string; align: "left" | "right"; format?: (v: unknown) => string; isName?: boolean }[];
+] satisfies { key: keyof Row & string; label: string; align: "left" | "right"; format?: (v: unknown) => string; isName?: boolean; tooltip?: string; sub?: (row: Row) => string }[];
 
 interface Props {
   googleWin: Record<string, any>;
@@ -88,7 +88,7 @@ export function GoogleCampaigns({ googleWin }: Props) {
       <DataTable<Row> columns={COLUMNS} rows={filtered} sortable />
 
       <p className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
-        Breakdown tables reflect the last 90 days. KPI cards and campaign figures reflect the selected window.
+        All figures reflect the selected window.
       </p>
     </div>
   );

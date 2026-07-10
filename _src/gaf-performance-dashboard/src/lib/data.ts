@@ -97,7 +97,7 @@ export interface Anomaly {
 
 // ----- Meta Ads shapes (per shape doc 2026-07-11) -----
 
-/** 19-key KPI set for a Meta window. All fields optional/guarded. */
+/** 22-key KPI set for a Meta window. All fields optional/guarded. */
 export interface MetaKpis {
   spend?: number;
   impressions?: number;
@@ -106,6 +106,7 @@ export interface MetaKpis {
   ctr?: number;
   cpc?: number;
   cpm?: number;
+  frequency?: number;
   conversions?: number;
   convValue?: number;
   purchases?: number;
@@ -118,6 +119,8 @@ export interface MetaKpis {
   atcRate?: number;
   cpa?: number;
   costPerAtc?: number;
+  engagements?: number;
+  engagementRate?: number;
 }
 
 /** Row in campaigns / adsets / ads arrays — all KPI fields plus identity. */
@@ -145,6 +148,8 @@ export interface MetaDailyPoint {
 export interface MetaCreativeRow {
   adId?: string;
   adName?: string;
+  campaign?: string;
+  adset?: string;
   thumbnailUrl?: string;
   imageUrl?: string;
   videoId?: string;
@@ -209,11 +214,84 @@ export interface MetaWindow {
   deltas?: Record<string, number | null>;
   campaigns?: MetaEntityRow[];
   adsets?: MetaEntityRow[];
-  ads?: MetaEntityRow[];
   daily?: MetaDailyPoint[];
   creative?: MetaCreativeRow[];
   video?: MetaVideoRow[];
   breakdowns?: MetaBreakdowns;
+}
+
+// ----- Google Ads shapes -----
+
+export interface GoogleKpis {
+  spend?: number;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+  avgCpc?: number;
+  conversions?: number;
+  convValue?: number;
+  roas?: number;
+  cpa?: number;
+  atc?: number;
+  atcRate?: number;
+  searchImprShare?: number | null;
+}
+
+export interface GoogleRow extends Record<string, unknown> {
+  spend?: number;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+  avgCpc?: number;
+  conversions?: number;
+  convValue?: number;
+  roas?: number;
+  cpa?: number;
+  atc?: number;
+  atcRate?: number;
+  name?: string;
+  channel?: string;
+  adGroup?: string;
+  keyword?: string;
+  matchType?: string;
+  searchTerm?: string;
+  ad?: string;
+  campaign?: string;
+  searchImprShare?: number | null;
+  spendDelta?: number | null;
+  roasDelta?: number | null;
+}
+
+export interface GoogleWindow {
+  kpis?: GoogleKpis;
+  deltas?: Record<string, number | null>;
+  campaigns?: GoogleRow[];
+  adGroups?: GoogleRow[];
+  keywords?: GoogleRow[];
+  searchTerms?: GoogleRow[];
+  ads?: GoogleRow[];
+  daily?: DailyPoint[];
+}
+
+// ----- Axon shapes -----
+
+export interface AxonKpis {
+  spend?: number;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+  conversions?: number;
+  sales?: number;
+  roas?: number;
+  cpa?: number;
+}
+
+export interface AxonWindow {
+  kpis?: AxonKpis;
+  deltas?: Record<string, number | null>;
+  campaigns?: Record<string, unknown>[];
+  creativeSets?: Record<string, unknown>[];
+  daily?: DailyPoint[];
 }
 
 // ----- Organic (top-level, NOT window-keyed; 30d snapshot) -----
@@ -259,8 +337,8 @@ export interface PerfData {
   windows: Window[];
   // Per-channel paid media
   meta: WindowedRecord<MetaWindow>;
-  google: WindowedRecord<Record<string, any>>;
-  axon: WindowedRecord<Record<string, any>>;
+  google: WindowedRecord<GoogleWindow>;
+  axon: WindowedRecord<AxonWindow>;
   // Organic social — top-level, not window-keyed (30d snapshot)
   organic?: OrganicData;
   // Typed sections used by dashboard tabs
@@ -279,25 +357,32 @@ export interface UseDataResult {
   data: PerfData | null;
   loading: boolean;
   error: unknown;
+  /** Re-fetch the snapshot feed, bypassing any HTTP cache */
+  reload: () => void;
 }
 
 export function useData(): UseDataResult {
   const [data, setData] = useState<PerfData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
+  const [nonce, setNonce] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchData() {
+      setLoading(true);
       try {
-        const res = await fetch(FEED_URL);
+        // Cache-bust on manual reload only; first load uses the plain URL.
+        const url = nonce === 0 ? FEED_URL : `${FEED_URL}?t=${Date.now()}`;
+        const res = await fetch(url);
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
         const json: PerfData = await res.json();
         if (!cancelled) {
           setData(json);
+          setError(null);
         }
       } catch (err) {
         if (!cancelled) {
@@ -314,7 +399,7 @@ export function useData(): UseDataResult {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [nonce]);
 
-  return { data, loading, error };
+  return { data, loading, error, reload: () => setNonce(n => n + 1) };
 }

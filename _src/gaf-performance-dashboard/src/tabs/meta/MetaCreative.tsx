@@ -9,15 +9,26 @@ interface Props {
   metaWin: MetaWindow;
 }
 
-type SortKey = "spend" | "roas" | "ctr" | "purchases";
 type TypeFilter = "All" | "Video" | "Image";
 type ViewMode = "cards" | "table";
 
-const SORT_LABELS: { key: SortKey; label: string }[] = [
-  { key: "spend", label: "Spend" },
-  { key: "roas", label: "ROAS" },
-  { key: "ctr", label: "CTR" },
-  { key: "purchases", label: "Purchases" },
+// Rank-by options — lower-is-better metrics sort ascending (reference parity).
+const SORT_OPTIONS: { key: string; label: string; lowerBetter?: boolean }[] = [
+  { key: "spend",           label: "Spend" },
+  { key: "roas",            label: "ROAS" },
+  { key: "purchaseValue",   label: "Revenue" },
+  { key: "purchases",       label: "Purchases" },
+  { key: "cpa",             label: "CPA (low is better)", lowerBetter: true },
+  { key: "addToCart",       label: "Add to Cart" },
+  { key: "atcRate",         label: "ATC Rate" },
+  { key: "engagements",     label: "Engagements" },
+  { key: "engagementRate",  label: "Engagement Rate" },
+  { key: "ctr",             label: "CTR" },
+  { key: "cpc",             label: "CPC (low is better)", lowerBetter: true },
+  { key: "cpm",             label: "CPM (low is better)", lowerBetter: true },
+  { key: "impressions",     label: "Impressions" },
+  { key: "reach",           label: "Reach" },
+  { key: "clicks",          label: "Clicks" },
 ];
 
 // Small labelled stat used in the card footer grid.
@@ -79,18 +90,30 @@ const TABLE_COLS = [
 export function MetaCreative({ metaWin }: Props) {
   const [selectedCreative, setSelectedCreative] = useState<MetaCreativeRow | null>(null);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("All");
-  const [sortKey, setSortKey] = useState<SortKey>("spend");
+  const [campaignFilter, setCampaignFilter] = useState<string>("");
+  const [sortKey, setSortKey] = useState<string>("spend");
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
   const creative = (metaWin.creative ?? []) as MetaCreativeRow[];
+
+  const campaignNames = useMemo(
+    () => Array.from(new Set(creative.map(c => String(c.campaign ?? "")).filter(Boolean))).sort(),
+    [creative]
+  );
 
   const filtered = useMemo(() => {
     let rows = [...creative];
     if (typeFilter === "Video") rows = rows.filter(c => Boolean(c.videoId));
     if (typeFilter === "Image") rows = rows.filter(c => !Boolean(c.videoId));
-    rows.sort((a, b) => Number(b[sortKey] ?? 0) - Number(a[sortKey] ?? 0));
+    if (campaignFilter) rows = rows.filter(c => String(c.campaign ?? "") === campaignFilter);
+    const lowerBetter = SORT_OPTIONS.find(o => o.key === sortKey)?.lowerBetter ?? false;
+    rows.sort((a, b) => {
+      const av = Number(a[sortKey] ?? 0);
+      const bv = Number(b[sortKey] ?? 0);
+      return lowerBetter ? av - bv : bv - av;
+    });
     return rows;
-  }, [creative, typeFilter, sortKey]);
+  }, [creative, typeFilter, campaignFilter, sortKey]);
 
   const tableRows = useMemo(
     () => filtered.map(c => ({ ...c, _type: c.videoId ? "Video" : "Image" })),
@@ -139,12 +162,32 @@ export function MetaCreative({ metaWin }: Props) {
           ))}
         </div>
 
+        {/* Campaign filter */}
+        {campaignNames.length > 0 && (
+          <select
+            value={campaignFilter}
+            onChange={e => setCampaignFilter(e.target.value)}
+            className="text-xs rounded border px-2 py-1 max-w-[240px]"
+            style={{
+              borderColor: "var(--gaf-input-border)",
+              color: "var(--gaf-text-primary)",
+              background: "var(--gaf-card-bg)",
+            }}
+            aria-label="Filter by campaign"
+          >
+            <option value="">All Campaigns</option>
+            {campaignNames.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        )}
+
         {/* Sort by */}
         <div className="flex items-center gap-2">
           <span className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>Rank by:</span>
           <select
             value={sortKey}
-            onChange={e => setSortKey(e.target.value as SortKey)}
+            onChange={e => setSortKey(e.target.value)}
             className="text-xs rounded border px-2 py-1"
             style={{
               borderColor: "var(--gaf-card-border)",
@@ -152,7 +195,7 @@ export function MetaCreative({ metaWin }: Props) {
               background: "var(--gaf-card-bg)",
             }}
           >
-            {SORT_LABELS.map(s => (
+            {SORT_OPTIONS.map(s => (
               <option key={s.key} value={s.key}>{s.label}</option>
             ))}
           </select>
@@ -212,13 +255,20 @@ export function MetaCreative({ metaWin }: Props) {
                 </div>
 
                 <div className="p-3 flex flex-col gap-2 min-w-0">
-                  <p
-                    className="text-xs font-semibold leading-snug line-clamp-2"
-                    style={{ color: "var(--gaf-text-primary)" }}
-                    title={String(name)}
-                  >
-                    {String(name)}
-                  </p>
+                  <div className="min-w-0">
+                    <p
+                      className="text-xs font-semibold leading-snug line-clamp-2"
+                      style={{ color: "var(--gaf-text-primary)" }}
+                      title={String(name)}
+                    >
+                      {String(name)}
+                    </p>
+                    {Boolean(c.campaign) && (
+                      <p className="text-[10px] truncate mt-0.5" style={{ color: "var(--gaf-text-muted)" }} title={String(c.campaign)}>
+                        {String(c.campaign)}
+                      </p>
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     <Stat label="Spend" value={fmtCurrency(Number(c.spend ?? 0))} />
                     <Stat label="ROAS" value={fmtRoas(Number(c.roas ?? 0))} />

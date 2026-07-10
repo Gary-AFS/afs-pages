@@ -2,7 +2,8 @@
 import { useState, useCallback } from "react";
 import { KpiCard } from "../../components/KpiCard";
 import { TrendChart } from "../../components/TrendChart";
-import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { fmtCurrency, fmtCpc, fmtCurrencyCompact, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { METRIC_TOOLTIPS } from "./columns";
 import { refreshMeta } from "../../lib/meta-live";
 import type { MetaLiveKpis } from "../../lib/meta-live";
 import type { MetaWindow, MetaKpis, Window } from "../../lib/data";
@@ -40,25 +41,34 @@ interface KpiDef {
   invert?: boolean;
 }
 
+// Cost-per metrics use fmtCpc — fmtCurrency rounds a $0.45 CPC to "$0".
 const KPI_DEFS: KpiDef[] = [
   { key: "spend",            label: "Total Spend",   fmt: fmtCurrency },
   { key: "impressions",      label: "Impressions",   fmt: fmtInt },
   { key: "reach",            label: "Reach",         fmt: fmtInt },
   { key: "clicks",           label: "Clicks",        fmt: fmtInt },
   { key: "ctr",              label: "CTR",           fmt: fmtPct },
-  { key: "cpc",              label: "CPC",           fmt: fmtCurrency, invert: true },
-  { key: "cpm",              label: "CPM",           fmt: fmtCurrency, invert: true },
+  { key: "cpc",              label: "CPC",           fmt: fmtCpc, invert: true },
+  { key: "cpm",              label: "CPM",           fmt: fmtCpc, invert: true },
   { key: "outboundClicks",   label: "Outbound Clicks", fmt: fmtInt },
   { key: "outboundCtr",      label: "Outbound CTR",  fmt: fmtPct },
   { key: "landingPageViews", label: "Landing Page Views", fmt: fmtInt },
   { key: "addToCart",        label: "Add to Cart",   fmt: fmtInt },
   { key: "atcRate",          label: "ATC Rate",      fmt: fmtPct },
-  { key: "costPerAtc",       label: "Cost / ATC",    fmt: fmtCurrency, invert: true },
+  { key: "costPerAtc",       label: "Cost / ATC",    fmt: fmtCpc, invert: true },
   { key: "conversions",      label: "Conversions",   fmt: fmtInt },
-  { key: "cpa",              label: "Cost / Conv.",  fmt: fmtCurrency, invert: true },
+  { key: "cpa",              label: "Cost / Conv.",  fmt: fmtCpc, invert: true },
   { key: "convValue",        label: "Revenue",       fmt: fmtCurrency },
   { key: "roas",             label: "ROAS",          fmt: fmtRoas },
 ];
+
+const KPI_TOOLTIP_KEYS: Record<string, string> = {
+  spend: "spend", impressions: "impressions", reach: "reach", clicks: "clicks",
+  ctr: "ctr", cpc: "cpc", cpm: "cpm", outboundClicks: "outboundClicks",
+  outboundCtr: "outboundCtr", landingPageViews: "landingPageViews",
+  addToCart: "addToCart", atcRate: "atcRate", costPerAtc: "costPerAtc",
+  conversions: "conversions", cpa: "cpa", convValue: "convValue", roas: "roas",
+};
 
 export function MetaOverview({ metaWin, window }: MetaOverviewProps) {
   const [liveState, setLiveState] = useState<LiveState>({ status: "idle" });
@@ -153,7 +163,7 @@ export function MetaOverview({ metaWin, window }: MetaOverviewProps) {
         </button>
       </div>
 
-      {/* KPI grid — all 19 KPIs */}
+      {/* KPI grid */}
       <section aria-label="Meta Ads key metrics">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3 stagger">
           {KPI_DEFS.map((def) => {
@@ -168,6 +178,7 @@ export function MetaOverview({ metaWin, window }: MetaOverviewProps) {
                 value={value}
                 delta={delta}
                 invertDelta={def.invert}
+                tooltip={METRIC_TOOLTIPS[KPI_TOOLTIP_KEYS[def.key as string] ?? ""]}
               />
             );
           })}
@@ -185,7 +196,7 @@ export function MetaOverview({ metaWin, window }: MetaOverviewProps) {
           </h3>
           <TrendChart
             data={daily as Array<{ date: string; [k: string]: number | string }>}
-            series={{ areas: [{ key: "spend", color: "var(--gaf-primary)", label: "Ad Spend" }] }}
+            series={{ areas: [{ key: "spend", color: "var(--gaf-primary)", label: "Ad Spend", format: fmtCurrencyCompact }] }}
           />
         </section>
       ) : (
@@ -194,10 +205,11 @@ export function MetaOverview({ metaWin, window }: MetaOverviewProps) {
         </section>
       )}
 
-      {/* Decision panels */}
+      {/* Decision panels — always benchmarked on the SNAPSHOT campaign data,
+          never on live-merged KPIs (live refresh must not reshuffle tiers) */}
       <CampaignTierPanel campaigns={metaWin.campaigns ?? []} />
       <BudgetAtRiskPanel campaigns={metaWin.campaigns ?? []} />
-      <ScaleWinnersPanel adsets={metaWin.adsets ?? []} kpis={kpis} />
+      <ScaleWinnersPanel adsets={metaWin.adsets ?? []} campaigns={metaWin.campaigns ?? []} />
     </div>
   );
 }

@@ -10,32 +10,24 @@ interface DeltaProps {
 export function Delta({ pct, invert }: DeltaProps) {
   const { text, dir } = fmtDelta(pct);
 
-  // Resolve effective visual direction (invert flips up/down colours)
-  const effectiveDir = invert && dir !== "flat"
-    ? (dir === "up" ? "down" : "up")
-    : dir;
+  // The ARROW always shows the actual direction of movement; only the
+  // COLOUR flips for lower-is-better metrics (a falling CPA is ▼ in green).
+  const isGood = dir !== "flat" && (invert ? dir === "down" : dir === "up");
 
   const baseClass = "text-[10px] sm:text-xs font-semibold flex items-center gap-0.5 whitespace-nowrap";
 
-  if (effectiveDir === "flat") {
+  if (dir === "flat") {
     return (
       <span className={baseClass} style={{ color: "var(--gaf-delta-flat)" }}>{text}</span>
     );
   }
 
-  if (effectiveDir === "up") {
-    return (
-      <span className={baseClass} style={{ color: "var(--gaf-delta-pos)" }}>
-        <span aria-hidden="true">&#9650;</span>
-        {text}
-      </span>
-    );
-  }
-
-  // down
   return (
-    <span className={baseClass} style={{ color: "var(--gaf-delta-neg)" }}>
-      <span aria-hidden="true">&#9660;</span>
+    <span
+      className={baseClass}
+      style={{ color: isGood ? "var(--gaf-delta-pos)" : "var(--gaf-delta-neg)" }}
+    >
+      <span aria-hidden="true">{dir === "up" ? "▲" : "▼"}</span>
       {text}
     </span>
   );
