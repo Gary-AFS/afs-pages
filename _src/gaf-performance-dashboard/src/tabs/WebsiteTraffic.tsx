@@ -109,7 +109,7 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
             label="Sessions"
             value={fmtInt(kpis?.sessions ?? 0)}
             delta={deltas.sessions ?? null}
-            tooltip="GA4 sessions in the selected window."
+            tooltip="GA4 sessions in the selected window (Australian traffic only)."
           />
           <KpiCard
             label="Active Users"
@@ -193,6 +193,9 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
         />
         <p className="text-xs mt-2" style={{ color: "var(--gaf-text-muted)" }}>
           Sessions and add-to-carts join from GA4's top pages; a dash means GA4 recorded no page-level data for that product in this window.
+        </p>
+        <p className="text-xs mt-1" style={{ color: "var(--gaf-text-muted)" }}>
+          All GA4 metrics on this dashboard cover Australian traffic only.
         </p>
       </section>
     </div>

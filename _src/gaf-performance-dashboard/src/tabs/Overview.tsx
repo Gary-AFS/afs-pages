@@ -139,14 +139,14 @@ export function Overview({ data }: OverviewProps) {
             label="Sessions"
             value={fmtInt(kpis.sessions ?? 0)}
             delta={deltas.sessions ?? null}
-            tooltip="GA4 website sessions."
+            tooltip="GA4 website sessions (Australian traffic only)."
           />
           {kpis.onlineRevenue != null && kpis.onlineRevenue > 0 && (
             <KpiCard
               label="Online Revenue"
               value={fmtCurrency(kpis.onlineRevenue)}
               delta={deltas.onlineRevenue ?? null}
-              tooltip="GA4 online-attributed revenue, shown for reference against total Shopify revenue."
+              tooltip="GA4 online-attributed revenue (Australian traffic only), shown for reference against total Shopify revenue."
             />
           )}
         </div>
