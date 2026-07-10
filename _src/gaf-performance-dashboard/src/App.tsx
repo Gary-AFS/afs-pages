@@ -8,9 +8,9 @@ import { Overview } from "./tabs/Overview";
 import { MetaAds } from "./tabs/MetaAds";
 import { GoogleAds } from "./tabs/GoogleAds";
 import { WebsiteTraffic } from "./tabs/WebsiteTraffic";
+import { Axon } from "./tabs/Axon";
 
 // ---- Placeholder tab panels (replaced by subsequent tasks) ----
-function TabAxon()            { return <div className="p-6 text-gray-400">Axon</div>; }
 function TabEmail()           { return <div className="p-6 text-gray-400">Email</div>; }
 
 function makePanels(data: PerfData): Record<TabId, () => JSX.Element> {
@@ -19,7 +19,7 @@ function makePanels(data: PerfData): Record<TabId, () => JSX.Element> {
     meta:     () => <MetaAds data={data} />,
     google:   () => <GoogleAds data={data} />,
     website:  () => <WebsiteTraffic data={data} />,
-    axon:     TabAxon,
+    axon:     () => <Axon data={data} />,
     email:    TabEmail,
   };
 }
