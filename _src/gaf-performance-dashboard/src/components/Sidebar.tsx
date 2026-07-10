@@ -112,17 +112,16 @@ export function Sidebar({ active, onSelect }: SidebarProps) {
         borderRight: "1px solid var(--gaf-row-border)",
       }}
     >
-      {/* Brand mark */}
+      {/* Brand mark — official GAF icon logo */}
       <div
         className="flex items-center gap-2.5 px-4 py-5"
         style={{ borderBottom: "1px solid var(--gaf-row-border)" }}
       >
-        <div
-          className="w-7 h-7 rounded flex items-center justify-center font-bold text-white text-xs select-none font-display"
-          style={{ background: "var(--gaf-primary)", fontFamily: "var(--font-display)" }}
-        >
-          G
-        </div>
+        <img
+          src="https://cdn.shopify.com/s/files/1/1950/1891/files/GAF-Icon.png?v=1738497572"
+          alt="Gym and Fitness"
+          className="w-7 h-7 shrink-0"
+        />
         <span
           className="text-sm font-bold tracking-tight"
           style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
