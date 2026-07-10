@@ -51,7 +51,7 @@ export function Axon({ data }: AxonProps) {
     return (
       <div className="p-6 space-y-4">
         <div className="p-4 text-gray-500 text-sm bg-gray-800/50 border border-gray-700 rounded-xl">
-          No Axon data available for this window. Axon (AppLovin) launched 10 Jul 2026 -- the 90 day window is outside AppLovin's data retention period.
+          No Axon data available for this window. Axon (AppLovin) launched 10 Jul 2026 – the 90 day window is outside AppLovin's data retention period.
         </div>
         <CaveatBanner text={LEARNING_CAVEAT} />
       </div>
@@ -155,7 +155,7 @@ export function Axon({ data }: AxonProps) {
           />
         ) : (
           <p className="text-xs text-gray-500 italic bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2">
-            Creative set data is not yet available. Campaign Management API access is pending -- creative-level reporting will appear here once enabled.
+            Creative set data is not yet available. Campaign Management API access is pending – creative-level reporting will appear here once enabled.
           </p>
         )}
       </section>

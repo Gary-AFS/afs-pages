@@ -103,7 +103,7 @@ export function AustraliaMap({ geo }: AustraliaMapProps) {
           style={{ left: tooltip.x + 8, top: tooltip.y - 28 }}
         >
           <span className="font-semibold">{tooltip.region}</span>
-          {" — "}
+          {" – "}
           {tooltip.sessions.toLocaleString("en-AU")} sessions
         </div>
       )}
