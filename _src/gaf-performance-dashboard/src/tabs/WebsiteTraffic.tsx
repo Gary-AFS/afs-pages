@@ -46,7 +46,7 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
   const { window } = useDateRange();
 
   const ga4Win = data.ga4?.[window];
-  const products = (data.products?.[window] ?? []) as ProductRow[];
+  const products = (data.products?.[window] ?? []) as unknown as ProductRow[];
 
   if (!ga4Win) {
     return (
@@ -56,7 +56,8 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
     );
   }
 
-  const { kpis, deltas = {}, channels = [], topPages = [], geo = [], daily = [] } = ga4Win;
+  const { kpis, deltas = {}, channels = [], topPages = [], geo: geoRaw = [], daily = [] } = ga4Win;
+  const geo = geoRaw as unknown as Array<{ region: string; sessions: number }>;
 
   const channelRows = (Array.isArray(channels) ? channels : Object.values(channels)) as ChannelRow[];
   const pageRows = topPages as PageRow[];
