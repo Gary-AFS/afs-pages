@@ -6,9 +6,9 @@ import { Sidebar } from "./components/Sidebar";
 import type { TabId } from "./components/Sidebar";
 import { Overview } from "./tabs/Overview";
 import { MetaAds } from "./tabs/MetaAds";
+import { GoogleAds } from "./tabs/GoogleAds";
 
 // ---- Placeholder tab panels (replaced by subsequent tasks) ----
-function TabGoogle()          { return <div className="p-6 text-gray-400">Google Ads</div>; }
 function TabWebsite()         { return <div className="p-6 text-gray-400">Website Traffic</div>; }
 function TabAxon()            { return <div className="p-6 text-gray-400">Axon</div>; }
 function TabEmail()           { return <div className="p-6 text-gray-400">Email</div>; }
@@ -17,7 +17,7 @@ function makePanels(data: PerfData): Record<TabId, () => JSX.Element> {
   return {
     overview: () => <Overview data={data} />,
     meta:     () => <MetaAds data={data} />,
-    google:   TabGoogle,
+    google:   () => <GoogleAds data={data} />,
     website:  TabWebsite,
     axon:     TabAxon,
     email:    TabEmail,
