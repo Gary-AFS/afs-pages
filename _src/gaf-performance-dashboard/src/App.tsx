@@ -1,27 +1,29 @@
 import { useState } from "react";
 import { useData } from "./lib/data";
-import type { Window } from "./lib/data";
+import type { PerfData, Window } from "./lib/data";
 import { DateRangeProvider, useDateRange } from "./state/DateRangeContext";
 import { Sidebar } from "./components/Sidebar";
 import type { TabId } from "./components/Sidebar";
+import { Overview } from "./tabs/Overview";
 
 // ---- Placeholder tab panels (replaced by subsequent tasks) ----
 
-function TabOverview()        { return <div className="p-6 text-gray-400">Overview</div>; }
 function TabMeta()            { return <div className="p-6 text-gray-400">Meta Ads</div>; }
 function TabGoogle()          { return <div className="p-6 text-gray-400">Google Ads</div>; }
 function TabWebsite()         { return <div className="p-6 text-gray-400">Website Traffic</div>; }
 function TabAxon()            { return <div className="p-6 text-gray-400">Axon</div>; }
 function TabEmail()           { return <div className="p-6 text-gray-400">Email</div>; }
 
-const TAB_PANELS: Record<TabId, () => JSX.Element> = {
-  overview: TabOverview,
-  meta:     TabMeta,
-  google:   TabGoogle,
-  website:  TabWebsite,
-  axon:     TabAxon,
-  email:    TabEmail,
-};
+function makePanels(data: PerfData): Record<TabId, () => JSX.Element> {
+  return {
+    overview: () => <Overview data={data} />,
+    meta:     TabMeta,
+    google:   TabGoogle,
+    website:  TabWebsite,
+    axon:     TabAxon,
+    email:    TabEmail,
+  };
+}
 
 const WINDOW_LABELS: Record<Window, string> = {
   yesterday: "Yesterday",
@@ -32,10 +34,11 @@ const WINDOW_LABELS: Record<Window, string> = {
 
 // ---- Inner shell (needs access to useDateRange context) ----
 
-function DashboardShell({ generatedAt }: { generatedAt: string | null }) {
+function DashboardShell({ generatedAt, data }: { generatedAt: string | null; data: PerfData }) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const { window: selectedWindow, setWindow } = useDateRange();
 
+  const TAB_PANELS = makePanels(data);
   const Panel = TAB_PANELS[activeTab];
 
   return (
@@ -111,7 +114,7 @@ function AppInner() {
     );
   }
 
-  return <DashboardShell generatedAt={data?.generated_at ?? null} />;
+  return <DashboardShell generatedAt={data?.generated_at ?? null} data={data!} />;
 }
 
 export default function App() {
