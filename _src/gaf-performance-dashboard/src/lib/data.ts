@@ -95,6 +95,147 @@ export interface Anomaly {
   label: string;
 }
 
+// ----- Meta Ads shapes (per shape doc 2026-07-11) -----
+
+/** 19-key KPI set for a Meta window. All fields optional/guarded. */
+export interface MetaKpis {
+  spend?: number;
+  impressions?: number;
+  reach?: number;
+  clicks?: number;
+  ctr?: number;
+  cpc?: number;
+  cpm?: number;
+  conversions?: number;
+  convValue?: number;
+  purchases?: number;
+  purchaseValue?: number;
+  roas?: number;
+  outboundClicks?: number;
+  outboundCtr?: number;
+  landingPageViews?: number;
+  addToCart?: number;
+  atcRate?: number;
+  cpa?: number;
+  costPerAtc?: number;
+}
+
+/** Row in campaigns / adsets / ads arrays — all KPI fields plus identity. */
+export interface MetaEntityRow extends MetaKpis {
+  campaignId?: string;
+  campaign?: string;
+  objective?: string;
+  adsetId?: string;
+  adset?: string;
+  adId?: string;
+  ad?: string;
+  [key: string]: unknown;
+}
+
+export interface MetaDailyPoint {
+  date: string;
+  spend?: number;
+  impressions?: number;
+  clicks?: number;
+  conversions?: number;
+  convValue?: number;
+  [key: string]: number | string | undefined;
+}
+
+export interface MetaCreativeRow {
+  adId?: string;
+  adName?: string;
+  thumbnailUrl?: string;
+  imageUrl?: string;
+  videoId?: string;
+  body?: string;
+  title?: string;
+  spend?: number;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+  purchases?: number;
+  purchaseValue?: number;
+  roas?: number;
+  outboundClicks?: number;
+  addToCart?: number;
+  atcRate?: number;
+  landingPageViews?: number;
+  cpa?: number;
+  [key: string]: unknown;
+}
+
+export interface MetaVideoRow {
+  adId?: string;
+  adName?: string;
+  campaign?: string;
+  spend?: number;
+  videoPlays?: number;
+  thruPlays?: number;
+  p25Rate?: number;
+  p50Rate?: number;
+  p75Rate?: number;
+  p100Rate?: number;
+  [key: string]: unknown;
+}
+
+export interface MetaBreakdownRow extends MetaKpis {
+  segment?: string;
+  [key: string]: unknown;
+}
+
+export interface MetaBreakdowns {
+  platform?: MetaBreakdownRow[];
+  placement?: MetaBreakdownRow[];
+  age?: MetaBreakdownRow[];
+  gender?: MetaBreakdownRow[];
+  region?: MetaBreakdownRow[];
+}
+
+export interface MetaWindow {
+  kpis?: MetaKpis;
+  deltas?: Record<string, number | null>;
+  campaigns?: MetaEntityRow[];
+  adsets?: MetaEntityRow[];
+  ads?: MetaEntityRow[];
+  daily?: MetaDailyPoint[];
+  creative?: MetaCreativeRow[];
+  video?: MetaVideoRow[];
+  breakdowns?: MetaBreakdowns;
+}
+
+// ----- Organic (top-level, NOT window-keyed; 30d snapshot) -----
+
+export interface OrganicPost {
+  id?: string;
+  thumbnail?: string;
+  caption?: string;
+  mediaType?: string; // IMAGE | VIDEO | CAROUSEL_ALBUM
+  timestamp?: string;
+  likes?: number;
+  comments?: number;
+  permalink?: string;
+}
+
+export interface OrganicIg {
+  reach?: number;
+  accountsEngaged?: number;
+  totalInteractions?: number;
+  views?: number;
+  followerCount?: number;
+  posts?: OrganicPost[];
+}
+
+export interface OrganicFbPage {
+  fanCount?: number;
+  talkingAbout?: number;
+}
+
+export interface OrganicData {
+  ig?: OrganicIg;
+  fbPage?: OrganicFbPage;
+}
+
 // ----- Full feed type -----
 
 type WindowedRecord<T> = {
@@ -104,10 +245,12 @@ type WindowedRecord<T> = {
 export interface PerfData {
   generated_at: string;
   windows: Window[];
-  // Per-channel paid media (deep tables — permissive)
-  meta: WindowedRecord<Record<string, any>>;
+  // Per-channel paid media
+  meta: WindowedRecord<MetaWindow>;
   google: WindowedRecord<Record<string, any>>;
   axon: WindowedRecord<Record<string, any>>;
+  // Organic social — top-level, not window-keyed (30d snapshot)
+  organic?: OrganicData;
   // Typed sections used by dashboard tabs
   ga4: WindowedRecord<Ga4Window>;
   hubspot: WindowedRecord<HubspotWindow>;

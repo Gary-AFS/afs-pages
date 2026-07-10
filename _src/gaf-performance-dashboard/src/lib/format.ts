@@ -38,6 +38,22 @@ export function fmtRoas(n: number): string {
   return `${n.toFixed(2)}x`;
 }
 
+/** Compact integer with K/M suffixes: 1234 -> 1.2K, 1200000 -> 1.2M */
+export function fmtCompact(n: number): string {
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (abs >= 10_000) return `${(n / 1_000).toFixed(1)}K`;
+  return intFormatter.format(Math.round(n));
+}
+
+/** Compact AUD with K/M suffixes: 12345 -> $12.3K, 1200000 -> $1.2M */
+export function fmtCurrencyCompact(n: number): string {
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+  if (abs >= 10_000) return `$${(n / 1_000).toFixed(1)}K`;
+  return fmtCurrency(n);
+}
+
 /**
  * Format a delta percentage.
  * null/undefined -> { text: "–", dir: "flat" }
