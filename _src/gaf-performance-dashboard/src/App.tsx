@@ -39,23 +39,49 @@ function DashboardShell({ generatedAt, data }: { generatedAt: string | null; dat
   const Panel = TAB_PANELS[activeTab];
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-gray-100">
+    <div className="flex min-h-screen" style={{ background: "var(--gaf-page-bg)", color: "var(--gaf-text-primary)" }}>
       <Sidebar active={activeTab} onSelect={setActiveTab} />
 
-      <div className="flex-1 flex flex-col">
-        {/* Top header bar */}
-        <header className="border-b border-gray-700 px-6 py-3 flex items-center gap-4 bg-gray-900">
-          <h1 className="text-sm font-semibold tracking-tight text-gray-200 mr-auto">
-            GAF Performance Dashboard
-          </h1>
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top header bar -- white/blur, sticky */}
+        <header
+          className="sticky top-0 z-40 border-b px-6 py-3 flex items-center gap-4 h-14 sm:h-16"
+          style={{
+            background: "var(--gaf-header-bg)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            boxShadow: "var(--gaf-header-shadow)",
+            borderColor: "var(--gaf-row-border)",
+          }}
+        >
+          {/* Brand mark */}
+          <div className="flex items-center gap-2.5 mr-auto">
+            <div
+              className="w-7 h-7 rounded flex items-center justify-center font-bold text-white text-xs select-none font-display"
+              style={{ background: "var(--gaf-primary)" }}
+            >
+              G
+            </div>
+            <h1
+              className="text-sm font-bold tracking-tight font-display hidden sm:block"
+              style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+            >
+              GAF Performance Dashboard
+            </h1>
+          </div>
 
           {/* Window picker */}
-          <label className="flex items-center gap-2 text-xs text-gray-400">
+          <label className="flex items-center gap-2 text-xs" style={{ color: "var(--gaf-text-secondary)" }}>
             <span>Window</span>
             <select
               value={selectedWindow}
               onChange={(e) => setWindow(e.target.value as Window)}
-              className="bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="text-xs rounded-md px-2 py-1.5 focus:outline-none"
+              style={{
+                background: "var(--gaf-card-bg)",
+                border: "1px solid var(--gaf-input-border)",
+                color: "var(--gaf-text-primary)",
+              }}
             >
               {(["yesterday", "7d", "30d", "90d"] as Window[]).map((w) => (
                 <option key={w} value={w}>
@@ -67,15 +93,17 @@ function DashboardShell({ generatedAt, data }: { generatedAt: string | null; dat
 
           {/* Last updated stamp */}
           {generatedAt && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs hidden sm:block" style={{ color: "var(--gaf-text-muted)" }}>
               Updated {new Date(generatedAt).toLocaleString("en-AU")}
             </span>
           )}
         </header>
 
         {/* Active tab panel */}
-        <main className="flex-1">
-          <Panel />
+        <main className="flex-1 px-3 sm:px-6 py-4 sm:py-6 max-w-[1600px] w-full mx-auto">
+          <div className="fade-in">
+            <Panel />
+          </div>
         </main>
       </div>
     </div>
@@ -89,10 +117,13 @@ function AppInner() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--gaf-page-bg)" }}>
         <div className="text-center space-y-4">
-          <div className="inline-block w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-400 text-sm">Loading performance data...</p>
+          <div
+            className="inline-block w-12 h-12 border-4 border-t-transparent rounded-full animate-spin"
+            style={{ borderColor: "var(--gaf-primary)", borderTopColor: "transparent" }}
+          />
+          <p className="text-sm" style={{ color: "var(--gaf-text-muted)" }}>Loading performance data...</p>
         </div>
       </div>
     );
@@ -100,10 +131,10 @@ function AppInner() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--gaf-page-bg)" }}>
         <div className="text-center space-y-2">
-          <p className="text-red-400 font-semibold">Failed to load data</p>
-          <p className="text-gray-500 text-sm">
+          <p className="font-semibold" style={{ color: "#ef4444" }}>Failed to load data</p>
+          <p className="text-sm" style={{ color: "var(--gaf-text-muted)" }}>
             {error instanceof Error ? error.message : String(error)}
           </p>
         </div>

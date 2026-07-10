@@ -14,7 +14,6 @@ function IconOverview() {
 }
 
 function IconMeta() {
-  // Meta "infinity" / wordmark approximation
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <path
@@ -31,7 +30,6 @@ function IconMeta() {
 }
 
 function IconGoogleAds() {
-  // Google Ads three-bar chart mark
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <rect x="1" y="10" width="4" height="7" rx="1" fill="#4285F4" />
@@ -42,7 +40,6 @@ function IconGoogleAds() {
 }
 
 function IconGA4() {
-  // GA4 analytics flame / bar approximation
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <circle cx="9" cy="9" r="8" fill="#E37400" opacity="0.15" />
@@ -53,7 +50,6 @@ function IconGA4() {
 }
 
 function IconAxon() {
-  // AppLovin / Axon "A" wordmark approximation
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <path d="M9 2L15.5 15H2.5L9 2Z" fill="#0066FF" />
@@ -63,7 +59,6 @@ function IconAxon() {
 }
 
 function IconHubSpot() {
-  // HubSpot sprocket approximation
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <circle cx="9" cy="9" r="3" fill="#FF7A59" />
@@ -103,13 +98,28 @@ interface SidebarProps {
 
 export function Sidebar({ active, onSelect }: SidebarProps) {
   return (
-    <aside className="flex flex-col w-56 shrink-0 min-h-screen bg-gray-950 border-r border-gray-800">
+    <aside
+      className="flex flex-col w-56 shrink-0 min-h-screen"
+      style={{
+        background: "#ffffff",
+        borderRight: "1px solid var(--gaf-row-border)",
+      }}
+    >
       {/* Brand mark */}
-      <div className="flex items-center gap-2 px-4 py-5 border-b border-gray-800">
-        <div className="w-7 h-7 rounded bg-orange-500 flex items-center justify-center font-bold text-black text-xs select-none">
+      <div
+        className="flex items-center gap-2.5 px-4 py-5"
+        style={{ borderBottom: "1px solid var(--gaf-row-border)" }}
+      >
+        <div
+          className="w-7 h-7 rounded flex items-center justify-center font-bold text-white text-xs select-none font-display"
+          style={{ background: "var(--gaf-primary)", fontFamily: "var(--font-display)" }}
+        >
           G
         </div>
-        <span className="text-sm font-semibold text-gray-100 tracking-tight">
+        <span
+          className="text-sm font-bold tracking-tight"
+          style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+        >
           GAF Performance
         </span>
       </div>
@@ -122,15 +132,27 @@ export function Sidebar({ active, onSelect }: SidebarProps) {
             <button
               key={id}
               onClick={() => onSelect(id)}
-              className={[
-                "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-left",
-                isActive
-                  ? "bg-orange-500 text-black"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-gray-100",
-              ].join(" ")}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-colors text-left"
+              style={{
+                fontFamily: "var(--font-body)",
+                background: isActive ? "var(--gaf-primary)" : "transparent",
+                color: isActive ? "#ffffff" : "var(--gaf-text-secondary)",
+              }}
+              onMouseEnter={e => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.background = "var(--gaf-primary-light)";
+                  (e.currentTarget as HTMLElement).style.color = "var(--gaf-text-primary)";
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                  (e.currentTarget as HTMLElement).style.color = "var(--gaf-text-secondary)";
+                }
+              }}
               aria-current={isActive ? "page" : undefined}
             >
-              <span className={isActive ? "text-black" : "text-gray-500"}>
+              <span style={{ color: isActive ? "#ffffff" : "inherit" }}>
                 <Icon />
               </span>
               {label}
@@ -140,8 +162,16 @@ export function Sidebar({ active, onSelect }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-gray-800">
-        <p className="text-xs text-gray-600">GAF Group</p>
+      <div
+        className="px-4 py-3"
+        style={{ borderTop: "1px solid var(--gaf-row-border)" }}
+      >
+        <p
+          className="text-xs"
+          style={{ color: "var(--gaf-text-muted)", fontFamily: "var(--font-body)" }}
+        >
+          GAF Group
+        </p>
       </div>
     </aside>
   );

@@ -5,7 +5,15 @@ interface CaveatBannerProps {
 
 export function CaveatBanner({ text }: CaveatBannerProps) {
   return (
-    <p className="text-xs text-gray-500 italic bg-gray-900/50 border border-gray-800 rounded-lg px-3 py-2">
+    <p
+      className="text-xs rounded-lg px-3 py-2"
+      style={{
+        color: "var(--gaf-text-muted)",
+        background: "#f9fafb",
+        border: "1px solid var(--gaf-row-border)",
+        fontFamily: "var(--font-body)",
+      }}
+    >
       {text}
     </p>
   );

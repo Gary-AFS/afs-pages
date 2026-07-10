@@ -8,6 +8,8 @@ interface Column<T extends Record<string, unknown>> {
   label: string;
   format?: (value: T[keyof T & string]) => string;
   align?: Align;
+  /** Mark this column as the primary name/label column — bolder, darker text */
+  isName?: boolean;
 }
 
 interface DataTableProps<T extends Record<string, unknown>> {
@@ -35,13 +37,13 @@ export function DataTable<T extends Record<string, unknown>>({
   function handleHeaderClick(key: string) {
     if (!sortable) return;
 
-    // Determine if column is numeric (check first non-null value)
     const firstVal = rows.find(r => r[key] !== null && r[key] !== undefined)?.[key];
     if (typeof firstVal !== "number") return;
 
     if (sortKey === key) {
-      setSortDir(prev => (prev === "asc" ? "desc" : prev === "desc" ? null : "asc"));
-      if (sortDir === "desc") setSortKey(null);
+      const next: SortDir = sortDir === "asc" ? "desc" : sortDir === "desc" ? null : "asc";
+      setSortDir(next);
+      if (next === null) setSortKey(null);
     } else {
       setSortKey(key);
       setSortDir("asc");
@@ -58,71 +60,98 @@ export function DataTable<T extends Record<string, unknown>>({
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-800">
-      <table className="w-full text-sm text-gray-300 border-collapse">
-        <thead>
-          <tr className="border-b border-gray-800 bg-gray-950">
-            {columns.map(col => {
-              const isActiveSort = sortKey === col.key;
-              const isNumericSortable =
-                sortable &&
-                typeof (rows.find(r => r[col.key] !== null && r[col.key] !== undefined)?.[col.key]) === "number";
-
-              return (
-                <th
-                  key={col.key}
-                  className={[
-                    "px-4 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider whitespace-nowrap",
-                    alignClass(col.align),
-                    isNumericSortable ? "cursor-pointer select-none hover:text-orange-400" : "",
-                    isActiveSort ? "text-orange-400" : "",
-                  ].join(" ")}
-                  onClick={() => handleHeaderClick(col.key)}
-                >
-                  {col.label}
-                  {isActiveSort && sortDir === "asc" && (
-                    <span className="ml-1" aria-hidden="true">&#9650;</span>
-                  )}
-                  {isActiveSort && sortDir === "desc" && (
-                    <span className="ml-1" aria-hidden="true">&#9660;</span>
-                  )}
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedRows.map((row, rowIdx) => (
-            <tr
-              key={rowIdx}
-              className="border-b border-gray-800 last:border-0 hover:bg-gray-800/40 transition-colors"
-            >
+    <div
+      className="dash-card overflow-hidden"
+      style={{ padding: 0 }}
+    >
+      <div className="overflow-x-auto scrollbar-thin">
+        <table className="w-full border-collapse" style={{ fontFamily: "var(--font-body)" }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
               {columns.map(col => {
-                const raw = row[col.key];
-                const cell = col.format ? col.format(raw) : String(raw ?? "");
+                const isActiveSort = sortKey === col.key;
+                const isNumericSortable =
+                  sortable &&
+                  typeof (rows.find(r => r[col.key] !== null && r[col.key] !== undefined)?.[col.key]) === "number";
+
                 return (
-                  <td
+                  <th
                     key={col.key}
-                    className={["px-4 py-3", alignClass(col.align)].join(" ")}
+                    className={[
+                      "py-2.5 px-3 text-[11px] uppercase tracking-wide font-semibold whitespace-nowrap select-none",
+                      alignClass(col.align),
+                      isNumericSortable ? "cursor-pointer" : "",
+                    ].join(" ")}
+                    style={{
+                      color: isActiveSort ? "var(--gaf-primary)" : "var(--gaf-text-muted)",
+                    }}
+                    onClick={() => handleHeaderClick(col.key)}
+                    onMouseEnter={e => {
+                      if (isNumericSortable && !isActiveSort) {
+                        (e.currentTarget as HTMLElement).style.color = "#374151";
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isActiveSort) {
+                        (e.currentTarget as HTMLElement).style.color = "var(--gaf-text-muted)";
+                      }
+                    }}
                   >
-                    {cell}
-                  </td>
+                    {col.label}
+                    {isActiveSort && sortDir === "asc" && (
+                      <span className="ml-1" aria-hidden="true">&#9650;</span>
+                    )}
+                    {isActiveSort && sortDir === "desc" && (
+                      <span className="ml-1" aria-hidden="true">&#9660;</span>
+                    )}
+                  </th>
                 );
               })}
             </tr>
-          ))}
-          {sortedRows.length === 0 && (
-            <tr>
-              <td
-                colSpan={columns.length}
-                className="px-4 py-6 text-center text-gray-500 italic"
+          </thead>
+          <tbody>
+            {sortedRows.map((row, rowIdx) => (
+              <tr
+                key={rowIdx}
+                className="transition-colors last:border-0"
+                style={{ borderBottom: "1px solid var(--gaf-row-border)" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#f9fafb"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
               >
-                No data available.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+                {columns.map((col, colIdx) => {
+                  const raw = row[col.key];
+                  const cell = col.format ? col.format(raw) : String(raw ?? "");
+                  const isName = col.isName ?? colIdx === 0;
+                  return (
+                    <td
+                      key={col.key}
+                      className={["py-2.5 px-3 text-sm", alignClass(col.align)].join(" ")}
+                      style={{
+                        color: isName ? "#111827" : "var(--gaf-text-secondary)",
+                        fontWeight: isName ? 500 : 400,
+                        fontVariantNumeric: col.align === "right" ? "tabular-nums" : undefined,
+                      }}
+                    >
+                      {cell}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+            {sortedRows.length === 0 && (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="py-8 text-center text-sm"
+                  style={{ color: "var(--gaf-text-muted)" }}
+                >
+                  No data available.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
