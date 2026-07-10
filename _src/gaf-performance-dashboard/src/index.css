@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* GAF brand tokens */
+:root {
+  --gaf-orange: #f97316;
+  --gaf-orange-dark: #c2410c;
+  --gaf-orange-light: #fed7aa;
+  --gaf-black: #0a0a0a;
+  --gaf-dark: #111827;
+  --gaf-surface: #1f2937;
+  --gaf-border: #374151;
+  --gaf-text: #f9fafb;
+  --gaf-text-muted: #9ca3af;
+}
+
+body {
+  background-color: var(--gaf-dark);
+  color: var(--gaf-text);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
