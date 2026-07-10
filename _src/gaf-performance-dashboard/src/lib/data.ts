@@ -162,6 +162,12 @@ export interface MetaCreativeRow {
   atcRate?: number;
   landingPageViews?: number;
   cpa?: number;
+  reach?: number;
+  cpc?: number;
+  cpm?: number;
+  frequency?: number;
+  engagements?: number;
+  engagementRate?: number;
   [key: string]: unknown;
 }
 
@@ -176,6 +182,12 @@ export interface MetaVideoRow {
   p50Rate?: number;
   p75Rate?: number;
   p100Rate?: number;
+  impressions?: number;
+  avgWatchTime?: number;
+  atc?: number;
+  engagements?: number;
+  thumbStopRate?: number;
+  engagementRate?: number;
   [key: string]: unknown;
 }
 

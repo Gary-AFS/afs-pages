@@ -1,6 +1,6 @@
 // src/tabs/meta/columns.ts
 // Shared full-column definitions for Meta Campaigns / Ad Sets DataTables.
-import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { fmtCurrency, fmtInt, fmtPct, fmtRoas, fmtCpc } from "../../lib/format";
 
 type Align = "left" | "right";
 interface Col {
@@ -15,16 +15,24 @@ const int = (v: unknown) => fmtInt(Number(v ?? 0));
 const pct = (v: unknown) => fmtPct(Number(v ?? 0));
 const roas = (v: unknown) => fmtRoas(Number(v ?? 0));
 
+export const OBJECTIVE_LABELS: Record<string, string> = {
+  OUTCOME_SALES: 'Conversion', CONVERSIONS: 'Conversion', CATALOG_SALES: 'Conversion',
+  PRODUCT_CATALOG_SALES: 'Conversion', OUTCOME_LEADS: 'Conversion', LEAD_GENERATION: 'Conversion',
+  OUTCOME_TRAFFIC: 'Traffic', LINK_CLICKS: 'Traffic',
+  OUTCOME_AWARENESS: 'Awareness', REACH: 'Awareness', BRAND_AWARENESS: 'Awareness',
+  OUTCOME_ENGAGEMENT: 'Awareness', POST_ENGAGEMENT: 'Awareness', VIDEO_VIEWS: 'Awareness',
+};
+
 // Campaigns — full column set per spec (name + objective + 18 metrics).
 export const META_CAMPAIGN_COLS: Col[] = [
   { key: "campaign",         label: "Campaign",     align: "left" },
-  { key: "objective",        label: "Objective",    align: "left" },
+  { key: "objective",        label: "Objective",    align: "left",  format: (v: unknown) => OBJECTIVE_LABELS[String(v ?? '')] ?? String(v ?? '') },
   { key: "spend",            label: "Spend",        align: "right", format: cur },
   { key: "impressions",      label: "Impr.",        align: "right", format: int },
   { key: "reach",            label: "Reach",        align: "right", format: int },
   { key: "clicks",           label: "Clicks",       align: "right", format: int },
   { key: "ctr",              label: "CTR",          align: "right", format: pct },
-  { key: "cpc",              label: "CPC",          align: "right", format: cur },
+  { key: "cpc",              label: "CPC",          align: "right", format: (v: unknown) => fmtCpc(Number(v ?? 0)) },
   { key: "cpm",              label: "CPM",          align: "right", format: cur },
   { key: "outboundClicks",   label: "Outbound",     align: "right", format: int },
   { key: "outboundCtr",      label: "OB CTR",       align: "right", format: pct },
@@ -48,6 +56,7 @@ export const META_ADSET_COLS: Col[] = [
   { key: "clicks",           label: "Clicks",       align: "right", format: int },
   { key: "ctr",              label: "CTR",          align: "right", format: pct },
   { key: "cpc",              label: "CPC",          align: "right", format: cur },
+  { key: "cpm",              label: "CPM",          align: "right", format: cur },
   { key: "outboundClicks",   label: "Outbound",     align: "right", format: int },
   { key: "outboundCtr",      label: "OB CTR",       align: "right", format: pct },
   { key: "landingPageViews", label: "LPV",          align: "right", format: int },

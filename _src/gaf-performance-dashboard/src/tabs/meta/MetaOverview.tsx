@@ -6,6 +6,7 @@ import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
 import { refreshMeta } from "../../lib/meta-live";
 import type { MetaLiveKpis } from "../../lib/meta-live";
 import type { MetaWindow, MetaKpis, Window } from "../../lib/data";
+import { CampaignTierPanel, BudgetAtRiskPanel, ScaleWinnersPanel } from "./MetaDecisionPanels";
 
 interface MetaOverviewProps {
   metaWin: MetaWindow;
@@ -55,9 +56,7 @@ const KPI_DEFS: KpiDef[] = [
   { key: "costPerAtc",       label: "Cost / ATC",    fmt: fmtCurrency, invert: true },
   { key: "conversions",      label: "Conversions",   fmt: fmtInt },
   { key: "cpa",              label: "Cost / Conv.",  fmt: fmtCurrency, invert: true },
-  { key: "purchases",        label: "Purchases",     fmt: fmtInt },
   { key: "convValue",        label: "Revenue",       fmt: fmtCurrency },
-  { key: "purchaseValue",    label: "Purchase Value", fmt: fmtCurrency },
   { key: "roas",             label: "ROAS",          fmt: fmtRoas },
 ];
 
@@ -194,6 +193,11 @@ export function MetaOverview({ metaWin, window }: MetaOverviewProps) {
           No daily trend data in this window.
         </section>
       )}
+
+      {/* Decision panels */}
+      <CampaignTierPanel campaigns={metaWin.campaigns ?? []} />
+      <BudgetAtRiskPanel campaigns={metaWin.campaigns ?? []} />
+      <ScaleWinnersPanel adsets={metaWin.adsets ?? []} kpis={kpis} />
     </div>
   );
 }

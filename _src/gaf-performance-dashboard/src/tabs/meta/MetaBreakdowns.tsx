@@ -4,6 +4,14 @@ import { DataTable } from "../../components/DataTable";
 import { META_BREAKDOWN_COLS } from "./columns";
 import type { MetaWindow, MetaBreakdownRow, MetaBreakdowns as MetaBreakdownsData } from "../../lib/data";
 
+const REGION_HIDDEN = new Set(["purchases", "purchaseValue", "roas", "cpa", "costPerAtc", "landingPageViews", "addToCart"]);
+
+const REGION_BREAKDOWN_COLS = META_BREAKDOWN_COLS.map(col =>
+  REGION_HIDDEN.has(col.key)
+    ? { ...col, format: (v: unknown) => (v === null || v === undefined ? "n/a" : (col.format ? col.format(v) : String(v ?? ""))) }
+    : col
+);
+
 interface Props {
   metaWin: MetaWindow;
 }
@@ -29,6 +37,16 @@ export function MetaBreakdowns({ metaWin }: Props) {
   const [active, setActive] = useState<Dim>("platform");
 
   const rows = (breakdowns[active] ?? []) as MetaBreakdownRow[] as Row[];
+
+  // For region breakdown, Meta withholds conversion data — display "n/a" for affected fields.
+  const REGION_HIDDEN_FIELDS = ["purchases", "purchaseValue", "roas", "cpa", "costPerAtc", "landingPageViews", "addToCart"];
+  const displayRows: Row[] = active === "region"
+    ? rows.map(row => {
+        const masked: Row = { ...row };
+        REGION_HIDDEN_FIELDS.forEach(f => { masked[f] = null; });
+        return masked;
+      })
+    : rows;
 
   return (
     <div className="space-y-4 fade-in">
@@ -76,7 +94,7 @@ export function MetaBreakdowns({ metaWin }: Props) {
         </p>
       )}
 
-      <DataTable<Row> columns={META_BREAKDOWN_COLS} rows={rows} sortable />
+      <DataTable<Row> columns={active === "region" ? REGION_BREAKDOWN_COLS : META_BREAKDOWN_COLS} rows={displayRows} sortable />
     </div>
   );
 }
