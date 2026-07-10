@@ -1,7 +1,7 @@
 // src/tabs/google/GoogleCampaigns.tsx
 import { useState } from "react";
 import { DataTable } from "../../components/DataTable";
-import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { fmtCpc, fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
 
 const CHANNEL_LABELS: Record<string, string> = {
   SEARCH: "Search",
@@ -18,18 +18,18 @@ type Row = Record<string, unknown>;
 
 const COLUMNS = [
   {
-    key: "advertising_channel_type" as const,
+    key: "channel" as const,
     label: "Channel",
     align: "left" as const,
-    format: (v: unknown) => CHANNEL_LABELS[String(v ?? "")] || String(v ?? ""),
+    format: (v: unknown) => CHANNEL_LABELS[String(v ?? "")] || String(v ?? "") || "Other",
   },
   { key: "name" as const, label: "Campaign", align: "left" as const, isName: true },
   { key: "spend" as const, label: "Spend", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "impressions" as const, label: "Impr.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "clicks" as const, label: "Clicks", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "ctr" as const, label: "CTR", align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
-  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
-  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
+  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCpc(Number(v ?? 0)) },
+  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => Number(v ?? 0).toFixed(1) },
   { key: "convValue" as const, label: "Conv. Value", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "roas" as const, label: "ROAS", align: "right" as const, format: (v: unknown) => fmtRoas(Number(v ?? 0)) },
   { key: "cpa" as const, label: "CPA", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
@@ -42,9 +42,9 @@ interface Props {
 export function GoogleCampaigns({ googleWin }: Props) {
   const campaigns = (googleWin.campaigns ?? []) as Row[];
 
-  // Derive unique channel types
+  // Derive unique channel types from the real `channel` field
   const allChannels = Array.from(
-    new Set(campaigns.map((c) => String(c.advertising_channel_type ?? "")).filter(Boolean))
+    new Set(campaigns.map((c) => String(c.channel ?? "")).filter(Boolean))
   );
 
   const [channelFilter, setChannelFilter] = useState<string>("All");
@@ -52,7 +52,7 @@ export function GoogleCampaigns({ googleWin }: Props) {
   const filtered =
     channelFilter === "All"
       ? campaigns
-      : campaigns.filter((c) => String(c.advertising_channel_type ?? "") === channelFilter);
+      : campaigns.filter((c) => String(c.channel ?? "") === channelFilter);
 
   return (
     <div className="space-y-4 fade-in">

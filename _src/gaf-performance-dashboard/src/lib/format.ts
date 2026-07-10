@@ -23,6 +23,18 @@ export function fmtCurrency(n: number): string {
   return audCurrency.format(Math.round(n)).replace(/^A/, "");
 }
 
+const audCurrencyCpc = new Intl.NumberFormat("en-AU", {
+  style: "currency",
+  currency: "AUD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** Format as AUD with 2 decimal places for CPC/cost-per metrics: e.g. $1.65 */
+export function fmtCpc(n: number): string {
+  return audCurrencyCpc.format(n).replace(/^A/, "");
+}
+
 /** Format as an integer with thousands separators: e.g. 12,345 */
 export function fmtInt(n: number): string {
   return intFormatter.format(Math.round(n));

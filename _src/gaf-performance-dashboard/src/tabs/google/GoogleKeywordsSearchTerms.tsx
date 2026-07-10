@@ -1,20 +1,20 @@
 // src/tabs/google/GoogleKeywordsSearchTerms.tsx
 import { useState } from "react";
 import { DataTable } from "../../components/DataTable";
-import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { fmtCpc, fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
 
 type Row = Record<string, unknown>;
 
+// Feed: { keyword, spend, impressions, clicks, ctr, avgCpc, conversions, convValue, roas, cpa, atc, atcRate, searchImprShare }
+// No matchType or campaign join fields in the feed — those columns are dropped.
 const KEYWORD_COLS = [
   { key: "keyword" as const, label: "Keyword", align: "left" as const, isName: true },
-  { key: "matchType" as const, label: "Match", align: "left" as const, format: (v: unknown) => String(v ?? "") },
-  { key: "campaign" as const, label: "Campaign", align: "left" as const, format: (v: unknown) => String(v ?? "") },
   { key: "spend" as const, label: "Spend", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "impressions" as const, label: "Impr.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "clicks" as const, label: "Clicks", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "ctr" as const, label: "CTR", align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
-  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
-  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
+  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCpc(Number(v ?? 0)) },
+  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => Number(v ?? 0).toFixed(1) },
   { key: "convValue" as const, label: "Conv. Value", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "roas" as const, label: "ROAS", align: "right" as const, format: (v: unknown) => fmtRoas(Number(v ?? 0)) },
   { key: "cpa" as const, label: "CPA", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
@@ -27,16 +27,16 @@ const KEYWORD_COLS = [
   },
 ] satisfies { key: keyof Row & string; label: string; align: "left" | "right"; format?: (v: unknown) => string; isName?: boolean }[];
 
+// Feed: { searchTerm, spend, impressions, clicks, ctr, avgCpc, conversions, convValue, roas, cpa, atc, atcRate }
+// No campaign or adGroup join fields in the feed — those columns are dropped.
 const SEARCH_TERM_COLS = [
   { key: "searchTerm" as const, label: "Search Term", align: "left" as const, isName: true },
-  { key: "campaign" as const, label: "Campaign", align: "left" as const, format: (v: unknown) => String(v ?? "") },
-  { key: "adGroup" as const, label: "Ad Group", align: "left" as const, format: (v: unknown) => String(v ?? "") },
   { key: "spend" as const, label: "Spend", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "impressions" as const, label: "Impr.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "clicks" as const, label: "Clicks", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "ctr" as const, label: "CTR", align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
-  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
-  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
+  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCpc(Number(v ?? 0)) },
+  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => Number(v ?? 0).toFixed(1) },
   { key: "convValue" as const, label: "Conv. Value", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "roas" as const, label: "ROAS", align: "right" as const, format: (v: unknown) => fmtRoas(Number(v ?? 0)) },
   { key: "cpa" as const, label: "CPA", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },

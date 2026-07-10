@@ -3,7 +3,7 @@ import { useState } from "react";
 import { KpiCard } from "../../components/KpiCard";
 import { TrendChart } from "../../components/TrendChart";
 import { CaveatBanner } from "../../components/CaveatBanner";
-import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { fmtCpc, fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
 
 const CHANNEL_LABELS: Record<string, string> = {
   SEARCH: "Search",
@@ -37,10 +37,10 @@ export function GoogleOverview({ googleWin }: Props) {
   const metricLabel =
     activeMetric === "spend" ? "Ad Spend" : activeMetric === "roas" ? "ROAS" : "CTR";
 
-  // Spend by channel aggregation
+  // Spend by channel aggregation — feed field is `channel`
   const channelMap = new Map<string, { spend: number; convValue: number }>();
   for (const c of campaigns) {
-    const ch = c.advertising_channel_type ?? "UNKNOWN";
+    const ch = (c.channel as string) ?? "UNKNOWN";
     const existing = channelMap.get(ch) ?? { spend: 0, convValue: 0 };
     channelMap.set(ch, {
       spend: existing.spend + (c.spend ?? 0),
@@ -63,8 +63,8 @@ export function GoogleOverview({ googleWin }: Props) {
           <KpiCard label="Impressions"        value={fmtInt(kpis.impressions ?? 0)}           delta={deltas.impressions ?? null} />
           <KpiCard label="Clicks"             value={fmtInt(kpis.clicks ?? 0)}               delta={deltas.clicks ?? null} />
           <KpiCard label="CTR"                value={fmtPct(kpis.ctr ?? 0)}                  delta={deltas.ctr ?? null} />
-          <KpiCard label="Avg CPC"            value={fmtCurrency(kpis.avgCpc ?? 0)}          delta={deltas.avgCpc ?? null}          invertDelta />
-          <KpiCard label="Conversions"        value={fmtInt(kpis.conversions ?? 0)}          delta={deltas.conversions ?? null} />
+          <KpiCard label="Avg CPC"            value={fmtCpc(kpis.avgCpc ?? 0)}              delta={deltas.avgCpc ?? null}          invertDelta />
+          <KpiCard label="Conversions"        value={(kpis.conversions ?? 0).toFixed(1)}     delta={deltas.conversions ?? null} />
           <KpiCard label="Conv. Value"        value={fmtCurrency(kpis.convValue ?? 0)}       delta={deltas.convValue ?? null} />
           <KpiCard label="ROAS"               value={fmtRoas(kpis.roas ?? 0)}               delta={deltas.roas ?? null} />
           <KpiCard label="CPA"                value={fmtCurrency(kpis.cpa ?? 0)}            delta={deltas.cpa ?? null}             invertDelta />
@@ -91,7 +91,7 @@ export function GoogleOverview({ googleWin }: Props) {
               className="text-lg font-bold"
               style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
             >
-              Daily Trend
+              Daily trend · last 90 days
             </h3>
             <div className="inline-flex gap-1 p-1 rounded-lg bg-gray-100">
               {METRIC_OPTIONS.map((opt) => {
@@ -134,7 +134,7 @@ export function GoogleOverview({ googleWin }: Props) {
         </div>
         <div className="space-y-2">
           {topCampaigns.map((c, i) => {
-            const chKey = c.advertising_channel_type ?? "";
+            const chKey = (c.channel as string) ?? "";
             const chLabel = CHANNEL_LABELS[chKey] || chKey || "";
             return (
               <div
@@ -154,7 +154,7 @@ export function GoogleOverview({ googleWin }: Props) {
                   {c.name ?? ""}
                 </span>
                 <span className="text-xs ml-2 flex-shrink-0" style={{ color: "var(--gaf-text-muted)" }}>
-                  {fmtInt(c.conversions ?? 0)} conv
+                  {(Number(c.conversions ?? 0)).toFixed(1)} conv
                 </span>
                 <span className="text-xs ml-2 flex-shrink-0" style={{ color: "var(--gaf-text-secondary)" }}>
                   {fmtRoas(c.roas ?? 0)}

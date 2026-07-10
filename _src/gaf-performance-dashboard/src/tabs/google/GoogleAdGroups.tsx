@@ -1,18 +1,18 @@
 // src/tabs/google/GoogleAdGroups.tsx
 import { DataTable } from "../../components/DataTable";
-import { fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
+import { fmtCpc, fmtCurrency, fmtInt, fmtPct, fmtRoas } from "../../lib/format";
 
 type Row = Record<string, unknown>;
 
 const COLUMNS = [
-  { key: "name" as const, label: "Ad Group", align: "left" as const, isName: true },
-  { key: "campaign" as const, label: "Campaign", align: "left" as const, format: (v: unknown) => String(v ?? "") },
+  // Feed field is `adGroup`; no `campaign` join field exists in the feed
+  { key: "adGroup" as const, label: "Ad Group", align: "left" as const, isName: true },
   { key: "spend" as const, label: "Spend", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "impressions" as const, label: "Impr.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "clicks" as const, label: "Clicks", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "ctr" as const, label: "CTR", align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
-  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
-  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
+  { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCpc(Number(v ?? 0)) },
+  { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => Number(v ?? 0).toFixed(1) },
   { key: "convValue" as const, label: "Conv. Value", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "roas" as const, label: "ROAS", align: "right" as const, format: (v: unknown) => fmtRoas(Number(v ?? 0)) },
   { key: "cpa" as const, label: "CPA", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
