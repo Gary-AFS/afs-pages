@@ -1,4 +1,5 @@
 // src/components/KpiCard.tsx
+import { useEffect, useRef, useState } from "react";
 import { Delta } from "./Delta";
 
 interface KpiCardProps {
@@ -8,29 +9,69 @@ interface KpiCardProps {
   /** Set true for lower-is-better metrics (CPC, CPM, CPA) — inverts delta colour logic */
   invertDelta?: boolean;
   subLabel?: string;
-  /** Hover definition of the metric (native title tooltip, matches reference dashboards) */
+  /** Source/calculation note — hover on desktop, tap the ⓘ on touch devices */
   tooltip?: string;
 }
 
 export function KpiCard({ label, value, delta, invertDelta, subLabel, tooltip }: KpiCardProps) {
+  const [open, setOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Tap-anywhere-else (or Escape) dismisses the popover — native title
+  // tooltips never fire on touch devices, hence this component.
+  useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e: MouseEvent | TouchEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("click", onDocClick);
+    document.addEventListener("touchstart", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", onDocClick);
+      document.removeEventListener("touchstart", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
     <div
-      className="dash-card flex flex-col gap-1 min-w-0 p-3 sm:p-5"
-      title={tooltip}
+      ref={cardRef}
+      className="dash-card relative flex flex-col gap-1 min-w-0 p-3 sm:p-5"
+      onMouseLeave={() => setOpen(false)}
     >
-      {/* LABEL — 10px uppercase tracking-wider, gray-400; ⓘ marks a tooltip */}
+      {/* LABEL — ⓘ marks a tooltip; hover or tap to open */}
       <span
         className="text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate"
         style={{
           color: "var(--gaf-text-muted)",
           cursor: tooltip ? "help" : undefined,
         }}
+        onMouseEnter={tooltip ? () => setOpen(true) : undefined}
+        onClick={tooltip ? (e) => { e.stopPropagation(); setOpen(o => !o); } : undefined}
+        role={tooltip ? "button" : undefined}
+        aria-expanded={tooltip ? open : undefined}
+        aria-label={tooltip ? `${label} — tap for definition` : undefined}
       >
         {label}
         {tooltip && (
           <span aria-hidden="true" className="ml-1 opacity-60">&#9432;</span>
         )}
       </span>
+
+      {/* Tooltip popover — dark pill, matches chart tooltips */}
+      {tooltip && open && (
+        <div
+          className="absolute left-2 right-2 top-8 z-30 rounded-lg px-3 py-2 text-[11px] leading-relaxed shadow-lg"
+          style={{ background: "#1f2937", color: "#f9fafb" }}
+          role="tooltip"
+        >
+          {tooltip}
+        </div>
+      )}
 
       {/* KPI NUMBER + DELTA — wraps rather than clipping on narrow cards */}
       <div className="flex items-baseline justify-between gap-x-2 gap-y-0.5 mt-0.5 flex-wrap">
