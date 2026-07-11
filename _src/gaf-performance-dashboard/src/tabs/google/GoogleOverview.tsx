@@ -81,6 +81,8 @@ export function GoogleOverview({ googleWin }: Props) {
                    tooltip="Add-to-cart events attributed to Google Ads. A secondary conversion — not counted in ROAS." />
           <KpiCard label="ATC Rate"           value={fmtPct(kpis.atcRate ?? 0)}             delta={deltas.atcRate ?? null}
                    tooltip="Add-to-cart rate — add-to-carts ÷ clicks." />
+          <KpiCard label="Cost / ATC"         value={fmtCpc(kpis.costPerAtc ?? 0)}          delta={deltas.costPerAtc ?? null}      invertDelta
+                   tooltip="Spend ÷ add-to-carts. Lower is better. ATC is account-level (Shopping conversion action)." />
           <KpiCard label="Search Impr. Share" value={kpis.searchImprShare == null ? "n/a" : fmtPct(kpis.searchImprShare)} delta={null}
                    tooltip="The % of available Search impressions your ads actually received. Low = you're missing reachable demand." />
         </div>
