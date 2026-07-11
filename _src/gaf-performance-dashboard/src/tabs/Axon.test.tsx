@@ -1,5 +1,5 @@
 // src/tabs/Axon.test.tsx
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Axon } from "./Axon";
 import { DateRangeProvider } from "../state/DateRangeContext";
 
@@ -18,11 +18,17 @@ const data: any = {
   },
 };
 
-test("renders Axon campaign, creative set and learning caveat", () => {
+test("renders Axon campaign, creative set and learning caveat across sub-tabs", () => {
   render(<DateRangeProvider><Axon data={data} /></DateRangeProvider>);
+  // Overview: caveat + top-campaigns panel
+  expect(screen.getAllByText(/learning/i).length).toBeGreaterThanOrEqual(1);
   expect(screen.getByText(/GAF AU Conversion/)).toBeInTheDocument();
+  // Campaigns sub-tab
+  fireEvent.click(screen.getByRole("tab", { name: "Campaigns" }));
+  expect(screen.getByText(/GAF AU Conversion/)).toBeInTheDocument();
+  // Creative Sets sub-tab
+  fireEvent.click(screen.getByRole("tab", { name: "Creative Sets" }));
   expect(screen.getByText(/C20_Review_SocialProof/)).toBeInTheDocument();
-  expect(screen.getByText(/learning/i)).toBeInTheDocument();
 });
 
 test("shows a dash for ROAS/CPA when there are no conversions", () => {
