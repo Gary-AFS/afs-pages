@@ -135,6 +135,49 @@ function fcLabel(args: Record<string, unknown>): string {
   return bits.join(" · ");
 }
 
+/** Minimal markdown for chat bubbles: escapes HTML, then renders **bold**,
+`code`, and bullet/numbered lists. No external deps, injection-safe. */
+function mdToHtml(text: string): string {
+  const esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const inline = (t: string) =>
+    t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+     .replace(/`([^`]+)`/g, '<code style="background:#e5e7eb;border-radius:4px;padding:0 3px;">$1</code>');
+
+  const lines = esc.split("\n");
+  const out: string[] = [];
+  let list: { tag: "ul" | "ol"; items: string[] } | null = null;
+
+  const flush = () => {
+    if (list) {
+      const style = list.tag === "ul" ? "disc" : "decimal";
+      out.push(
+        `<${list.tag} style="margin:4px 0 4px 18px;list-style:${style};display:flex;flex-direction:column;gap:2px;">`
+        + list.items.map(i => `<li>${i}</li>`).join("")
+        + `</${list.tag}>`
+      );
+      list = null;
+    }
+  };
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    const bullet = line.match(/^\s*[*-]\s+(.*)$/);
+    const numbered = line.match(/^\s*\d+[.)]\s+(.*)$/);
+    if (bullet) {
+      if (!list || list.tag !== "ul") { flush(); list = { tag: "ul", items: [] }; }
+      list.items.push(inline(bullet[1]));
+    } else if (numbered) {
+      if (!list || list.tag !== "ol") { flush(); list = { tag: "ol", items: [] }; }
+      list.items.push(inline(numbered[1]));
+    } else {
+      flush();
+      out.push(line.trim() === "" ? '<div style="height:6px;"></div>' : `<div>${inline(line)}</div>`);
+    }
+  }
+  flush();
+  return out.join("");
+}
+
 function Sparkle() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -311,16 +354,20 @@ export function AiChat({ data }: { data: PerfData }) {
 
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
-                <div
-                  className="max-w-[85%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed"
-                  style={
-                    m.role === "user"
-                      ? { background: "var(--gaf-primary)", color: "#fff", borderBottomRightRadius: 6 }
-                      : { background: "#f3f4f6", color: "var(--gaf-text-primary)", borderBottomLeftRadius: 6 }
-                  }
-                >
-                  {m.text}
-                </div>
+                {m.role === "user" ? (
+                  <div
+                    className="max-w-[85%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed"
+                    style={{ background: "var(--gaf-primary)", color: "#fff", borderBottomRightRadius: 6 }}
+                  >
+                    {m.text}
+                  </div>
+                ) : (
+                  <div
+                    className="max-w-[85%] px-3 py-2 rounded-2xl text-sm leading-relaxed"
+                    style={{ background: "#f3f4f6", color: "var(--gaf-text-primary)", borderBottomLeftRadius: 6 }}
+                    dangerouslySetInnerHTML={{ __html: mdToHtml(m.text) }}
+                  />
+                )}
               </div>
             ))}
 
