@@ -144,7 +144,13 @@ export default {
         systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
         contents: fullContents,
         tools: TOOLS,
-        generationConfig: { temperature: 0.3, maxOutputTokens: 1600 },
+        // 2.5-family models spend "thinking" tokens from the same budget as the
+        // visible answer — cap thinking and leave ample room for the reply.
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 8192,
+          thinkingConfig: { thinkingBudget: 2048 },
+        },
       }),
     });
 
