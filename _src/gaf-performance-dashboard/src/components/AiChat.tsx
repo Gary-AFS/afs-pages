@@ -54,6 +54,20 @@ function buildContext(data: PerfData, window: string): string {
       kpis: data.shopify?.[w]?.kpis,
       topProducts: top(data.shopify?.[w]?.products, 15),
     },
+    seo_search_console: {
+      kpis: data.seo?.[w]?.kpis,
+      deltas: data.seo?.[w]?.deltas,
+      topQueries: top(data.seo?.[w]?.topQueries, 10),
+    },
+    ai_engine_traffic: data.ga4?.[w]?.aiTraffic
+      ? { kpis: data.ga4[w]!.aiTraffic!.kpis, sources: top(data.ga4[w]!.aiTraffic!.sources, 10) }
+      : undefined,
+    pinterest: data.pinterest?.[w]?.connected
+      ? { kpis: data.pinterest[w]!.kpis, topCampaigns: top(data.pinterest[w]!.campaigns, 8) }
+      : "not connected",
+    experiments: data.experiments
+      ? { summary: data.experiments.summary, active: (data.experiments.experiments ?? []).filter(e => ["This Sprint","Running","Analysing"].includes(String(e.section))).slice(0, 15) }
+      : undefined,
   };
   return JSON.stringify(ctx);
 }

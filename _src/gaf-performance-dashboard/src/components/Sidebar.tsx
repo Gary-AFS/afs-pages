@@ -77,9 +77,46 @@ function IconHubSpot() {
   );
 }
 
+// Pinterest badge — the "P" script mark on Pinterest red.
+function IconPinterest() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="11" fill="#E60023" />
+      <path
+        d="M12.4 5.2c-3.6 0-5.9 2.4-5.9 5 0 1.2.5 2.6 1.7 3.1.2.1.4 0 .4-.2l.2-.8c0-.2 0-.3-.1-.5-.4-.5-.7-1.2-.7-2 0-2 1.5-3.9 4.2-3.9 2.3 0 3.9 1.4 3.9 3.4 0 2.5-1.1 4.4-2.7 4.4-.9 0-1.6-.7-1.4-1.6.3-1.1.8-2.3.8-3.1 0-.7-.4-1.3-1.2-1.3-.9 0-1.7 1-1.7 2.3 0 .8.3 1.4.3 1.4l-1.1 4.6c-.3 1.4 0 3.1 0 3.2 0 .1.2.2.3.1.1-.1 1.4-1.8 1.9-3.4l.6-2.4c.3.6 1.2 1.1 2.1 1.1 2.8 0 4.7-2.6 4.7-6 0-2.6-2.2-5-5.6-5Z"
+        fill="#fff"
+      />
+    </svg>
+  );
+}
+
+// SEO/AEO — magnifier with an AI sparkle.
+function IconSeo() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="10" cy="10" r="6.5" stroke="#4285F4" strokeWidth="2.4" />
+      <line x1="15" y1="15" x2="21" y2="21" stroke="#4285F4" strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M18.6 3.2l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1Z" fill="#FBBC04" />
+    </svg>
+  );
+}
+
+// Experiments — Asana's three-dot mark in Asana coral (data source: Asana board).
+function IconExperiments() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="7.5" r="4.2" fill="#F06A6A" />
+      <circle cx="5.6" cy="16.5" r="4.2" fill="#F06A6A" />
+      <circle cx="18.4" cy="16.5" r="4.2" fill="#F06A6A" />
+    </svg>
+  );
+}
+
 // ---- Nav item config ----
 
-export type TabId = "overview" | "meta" | "google" | "website" | "axon" | "email";
+export type TabId =
+  | "overview" | "meta" | "google" | "pinterest" | "website"
+  | "seo" | "axon" | "email" | "experiments";
 
 interface NavItem {
   id: TabId;
@@ -88,12 +125,15 @@ interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: "overview",  label: "Overview",        Icon: IconOverview },
-  { id: "meta",      label: "Meta Ads",         Icon: IconMeta },
-  { id: "google",    label: "Google Ads",       Icon: IconGoogleAds },
-  { id: "website",   label: "Website Traffic",  Icon: IconGA4 },
-  { id: "axon",      label: "Axon",             Icon: IconAxon },
-  { id: "email",     label: "Email",            Icon: IconHubSpot },
+  { id: "overview",    label: "Overview",         Icon: IconOverview },
+  { id: "meta",        label: "Meta Ads",          Icon: IconMeta },
+  { id: "google",      label: "Google Ads",        Icon: IconGoogleAds },
+  { id: "pinterest",   label: "Pinterest",         Icon: IconPinterest },
+  { id: "website",     label: "Website Traffic",   Icon: IconGA4 },
+  { id: "seo",         label: "SEO / AEO",         Icon: IconSeo },
+  { id: "axon",        label: "Axon",              Icon: IconAxon },
+  { id: "email",       label: "Email",             Icon: IconHubSpot },
+  { id: "experiments", label: "Experiments",       Icon: IconExperiments },
 ];
 
 // ---- Sidebar component ----

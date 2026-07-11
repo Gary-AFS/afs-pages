@@ -67,6 +67,7 @@ export interface Ga4Window {
   geo: Record<string, any>[];
   itemAtc: Record<string, any>[];
   daily: DailyPoint[];
+  aiTraffic?: AiTraffic;
 }
 
 export interface HubspotKpis {
@@ -292,6 +293,85 @@ export interface GoogleWindow {
   daily?: DailyPoint[];
 }
 
+// ----- SEO / AEO shapes -----
+
+export interface SeoKpis {
+  clicks?: number;
+  impressions?: number;
+  ctr?: number;
+  position?: number;
+}
+
+export interface SeoRow extends Record<string, unknown> {
+  query?: string;
+  page?: string;
+  clicks?: number;
+  impressions?: number;
+  ctr?: number;
+  position?: number;
+}
+
+export interface SeoWindow {
+  kpis?: SeoKpis;
+  deltas?: Record<string, number | null>;
+  daily?: DailyPoint[];
+  topQueries?: SeoRow[];
+  topPages?: SeoRow[];
+  dataThrough?: string;
+}
+
+export interface AiTraffic {
+  kpis?: { sessions?: number; conversions?: number; revenue?: number; shareOfSessions?: number };
+  deltas?: Record<string, number | null>;
+  sources?: Array<Record<string, unknown>>;
+  daily?: DailyPoint[];
+}
+
+// ----- Pinterest shapes -----
+
+export interface PinterestWindow {
+  connected?: boolean;
+  kpis?: Record<string, number>;
+  deltas?: Record<string, number | null>;
+  campaigns?: Array<Record<string, unknown>>;
+  daily?: DailyPoint[];
+}
+
+// ----- Experiments (Asana board snapshot, not window-keyed) -----
+
+export interface ExperimentRow {
+  gid?: string;
+  name?: string;
+  section?: string;
+  owner?: string;
+  channel?: string;
+  funnelStage?: string;
+  ice?: number | null;
+  winLoss?: string;
+  completed?: boolean;
+  completedAt?: string;
+  createdAt?: string;
+  url?: string;
+}
+
+export interface ExperimentsData {
+  sections?: Array<{ name: string; count: number }>;
+  summary?: {
+    total?: number;
+    backlog?: number;
+    thisSprint?: number;
+    running?: number;
+    analysing?: number;
+    learnings?: number;
+    wins?: number;
+    losses?: number;
+    inconclusive?: number;
+    winRatePct?: number | null;
+    completedLast30d?: number;
+  };
+  experiments?: ExperimentRow[];
+}
+
 // ----- Axon shapes -----
 
 export interface AxonKpis {
@@ -369,6 +449,9 @@ export interface PerfData {
   ga4: WindowedRecord<Ga4Window>;
   hubspot: WindowedRecord<HubspotWindow>;
   shopify: WindowedRecord<ShopifyWindow>;
+  seo?: WindowedRecord<SeoWindow>;
+  pinterest?: WindowedRecord<PinterestWindow>;
+  experiments?: ExperimentsData;
   products: WindowedRecord<ProductRow[]>;
   overview: WindowedRecord<OverviewWindow>;
   anomalies: WindowedRecord<Anomaly[]>;

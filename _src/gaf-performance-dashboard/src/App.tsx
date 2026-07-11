@@ -11,6 +11,9 @@ import { GoogleAds } from "./tabs/GoogleAds";
 import { WebsiteTraffic } from "./tabs/WebsiteTraffic";
 import { Axon } from "./tabs/Axon";
 import { Email } from "./tabs/Email";
+import { SeoAeo } from "./tabs/SeoAeo";
+import { Pinterest } from "./tabs/Pinterest";
+import { Experiments } from "./tabs/Experiments";
 
 // Same white-background GAF logo the reference dashboards use.
 const GAF_LOGO_URL =
@@ -18,12 +21,15 @@ const GAF_LOGO_URL =
 
 function makePanels(data: PerfData): Record<TabId, () => JSX.Element> {
   return {
-    overview: () => <Overview data={data} />,
-    meta:     () => <MetaAds data={data} />,
-    google:   () => <GoogleAds data={data} />,
-    website:  () => <WebsiteTraffic data={data} />,
-    axon:     () => <Axon data={data} />,
-    email:    () => <Email data={data} />,
+    overview:    () => <Overview data={data} />,
+    meta:        () => <MetaAds data={data} />,
+    google:      () => <GoogleAds data={data} />,
+    pinterest:   () => <Pinterest data={data} />,
+    website:     () => <WebsiteTraffic data={data} />,
+    seo:         () => <SeoAeo data={data} />,
+    axon:        () => <Axon data={data} />,
+    email:       () => <Email data={data} />,
+    experiments: () => <Experiments data={data} />,
   };
 }
 
