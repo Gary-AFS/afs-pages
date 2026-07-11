@@ -90,6 +90,7 @@ export interface ShopifyKpis {
 
 export interface ShopifyWindow {
   kpis: ShopifyKpis;
+  deltas?: Record<string, number | null>;
   products: Record<string, any>[];
 }
 

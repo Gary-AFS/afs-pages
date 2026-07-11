@@ -1,75 +1,137 @@
 // src/components/AiChat.tsx
-// "Ask AI" — floating chat over the dashboard data. The Gemini key lives in
-// the gaf-dash-ai Cloudflare Worker (server-side); this client only sends the
-// conversation plus a distilled JSON context for the selected window.
+// "Ask AI" — agentic chat over the ENTIRE dashboard feed. The model starts
+// from a compact all-window KPI summary and calls a get_dashboard_data tool
+// for anything deeper; the tool executes HERE against the in-memory feed, so
+// every data point on the dashboard is reachable without shipping megabytes.
+// The Gemini key lives in the gaf-dash-ai Cloudflare Worker (server-side).
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useDateRange } from "../state/DateRangeContext";
-import type { PerfData } from "../lib/data";
+import type { PerfData, Window } from "../lib/data";
 
 const WORKER_URL = "https://gaf-dash-ai.josh-03c.workers.dev";
+const WINDOWS: Window[] = ["yesterday", "7d", "30d", "90d"];
+const MAX_TOOL_ROUNDS = 6;
 
 interface ChatMessage {
   role: "user" | "assistant";
   text: string;
 }
 
+// Gemini content turn (loose typing — parts carry text/functionCall/functionResponse)
+type GeminiTurn = { role: "user" | "model"; parts: Array<Record<string, unknown>> };
+
 const STARTERS = [
-  "Summarise performance this window in three sentences.",
-  "Are we on track against the GP budget?",
-  "Which channel deserves more budget right now?",
-  "What should I be worried about in this data?",
+  "Give me three genuine cross-platform insights from this data.",
+  "Which products sell well on Shopify but get little paid or SEO support?",
+  "Compare Meta vs Google efficiency across every window.",
+  "Are we on track against the GP budget, and what's driving it?",
 ];
 
-/** Distil the feed into a compact JSON context for the selected window. */
-function buildContext(data: PerfData, window: string): string {
-  const w = window as keyof PerfData["overview"];
-  const top = <T,>(rows: T[] | undefined, n: number) => (rows ?? []).slice(0, n);
+// Heavy string fields stripped from tool results to keep tokens for numbers.
+const STRIP_FIELDS = new Set(["thumbnailUrl", "imageUrl", "previewLink", "body", "permalink", "thumbnail", "url"]);
 
-  const ctx = {
-    window,
-    generatedAt: data.generated_at,
-    overview: data.overview?.[w],
-    anomalies: data.anomalies?.[w],
-    narrative: data.narrative?.[w],
-    meta: {
-      kpis: data.meta?.[w]?.kpis,
-      deltas: data.meta?.[w]?.deltas,
-      topCampaigns: top(data.meta?.[w]?.campaigns, 12),
-      topAdsets: top(data.meta?.[w]?.adsets, 8),
-    },
-    google: {
-      kpis: data.google?.[w]?.kpis,
-      deltas: data.google?.[w]?.deltas,
-      topCampaigns: top(data.google?.[w]?.campaigns, 12),
-      topKeywords: top(data.google?.[w]?.keywords, 10),
-    },
-    ga4_australia_only: {
-      kpis: data.ga4?.[w]?.kpis,
-      deltas: data.ga4?.[w]?.deltas,
-      channels: data.ga4?.[w]?.channels,
-    },
-    axon: { kpis: data.axon?.[w]?.kpis, deltas: data.axon?.[w]?.deltas },
-    email: { kpis: data.hubspot?.[w]?.kpis, recentSends: top(data.hubspot?.[w]?.sends, 8) },
-    shopify: {
-      kpis: data.shopify?.[w]?.kpis,
-      topProducts: top(data.shopify?.[w]?.products, 15),
-    },
-    seo_search_console: {
-      kpis: data.seo?.[w]?.kpis,
-      deltas: data.seo?.[w]?.deltas,
-      topQueries: top(data.seo?.[w]?.topQueries, 10),
-    },
-    ai_engine_traffic: data.ga4?.[w]?.aiTraffic
-      ? { kpis: data.ga4[w]!.aiTraffic!.kpis, sources: top(data.ga4[w]!.aiTraffic!.sources, 10) }
-      : undefined,
-    pinterest: data.pinterest?.[w]?.connected
-      ? { kpis: data.pinterest[w]!.kpis, topCampaigns: top(data.pinterest[w]!.campaigns, 8) }
-      : "not connected",
-    experiments: data.experiments
-      ? { summary: data.experiments.summary, active: (data.experiments.experiments ?? []).filter(e => ["This Sprint","Running","Analysing"].includes(String(e.section))).slice(0, 15) }
-      : undefined,
+function sanitize(value: unknown, limit: number, depth = 0): unknown {
+  if (Array.isArray(value)) {
+    return value.slice(0, limit).map(v => sanitize(v, limit, depth + 1));
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      if (STRIP_FIELDS.has(k)) continue;
+      out[k] = sanitize(v, limit, depth + 1);
+    }
+    return out;
+  }
+  return value;
+}
+
+/** Execute a get_dashboard_data call against the in-memory feed. */
+function getDashboardData(
+  data: PerfData,
+  args: Record<string, unknown>,
+  currentWindow: Window
+): unknown {
+  const section = String(args.section ?? "");
+  const window = WINDOWS.includes(args.window as Window) ? (args.window as Window) : currentWindow;
+  const keys = Array.isArray(args.keys) ? (args.keys as string[]) : null;
+  const limit = Math.min(Math.max(Number(args.limit ?? 40) || 40, 5), 120);
+
+  const snapshotSections: Record<string, unknown> = {
+    experiments: data.experiments,
+    organic: data.organic,
   };
-  return JSON.stringify(ctx);
+  let node: unknown;
+  if (section in snapshotSections) {
+    node = snapshotSections[section];
+  } else {
+    const root = (data as unknown as Record<string, unknown>)[section];
+    if (root == null) return { error: `Unknown section '${section}'` };
+    node = (root as Record<string, unknown>)[window] ?? root;
+  }
+  if (node == null) return { error: `No data for ${section} / ${window}` };
+
+  let result: unknown = node;
+  if (keys && keys.length && typeof node === "object" && !Array.isArray(node)) {
+    const picked: Record<string, unknown> = {};
+    for (const k of keys) {
+      const v = (node as Record<string, unknown>)[k];
+      if (v !== undefined) picked[k] = v;
+    }
+    result = Object.keys(picked).length ? picked : { error: `Keys ${keys.join(",")} not found in ${section}` };
+  }
+
+  let clean = sanitize(result, limit);
+  // Hard cap the serialized size; drop to a smaller row limit if needed.
+  let json = JSON.stringify(clean);
+  if (json.length > 90_000) {
+    clean = sanitize(result, 15);
+    json = JSON.stringify(clean);
+    if (json.length > 90_000) {
+      return { error: "Result too large — request specific keys or a smaller limit", truncatedPreview: json.slice(0, 2000) };
+    }
+  }
+  return { section, window: section in snapshotSections ? "snapshot" : window, data: clean };
+}
+
+/** Compact all-window KPI summary so simple questions need zero tool calls. */
+function buildSummary(data: PerfData): string {
+  const perWindow: Record<string, unknown> = {};
+  for (const w of WINDOWS) {
+    perWindow[w] = {
+      overview: { kpis: data.overview?.[w]?.kpis, deltas: data.overview?.[w]?.deltas },
+      meta: { kpis: data.meta?.[w]?.kpis, deltas: data.meta?.[w]?.deltas },
+      google: { kpis: data.google?.[w]?.kpis, deltas: data.google?.[w]?.deltas },
+      ga4: { kpis: data.ga4?.[w]?.kpis, deltas: data.ga4?.[w]?.deltas, aiTraffic: data.ga4?.[w]?.aiTraffic?.kpis },
+      axon: { kpis: data.axon?.[w]?.kpis },
+      email: { kpis: data.hubspot?.[w]?.kpis },
+      shopify: { kpis: data.shopify?.[w]?.kpis, deltas: data.shopify?.[w]?.deltas },
+      seo: { kpis: data.seo?.[w]?.kpis, deltas: data.seo?.[w]?.deltas },
+      pinterest: data.pinterest?.[w]?.connected ? { kpis: data.pinterest?.[w]?.kpis } : "not connected",
+      anomalies: (data.anomalies?.[w] ?? []).map(a => a.label),
+    };
+  }
+  return JSON.stringify({
+    generatedAt: data.generated_at,
+    gpMonth: data.overview?.["30d"]?.gpMonth,
+    windows: perWindow,
+    experimentsSummary: data.experiments?.summary,
+    organicIgTotals30d: data.organic?.ig
+      ? {
+          reach: data.organic.ig.reach,
+          views: data.organic.ig.views,
+          accountsEngaged: data.organic.ig.accountsEngaged,
+          followerCount: data.organic.ig.followerCount,
+          postsPublished: data.organic.ig.postsPublished,
+        }
+      : undefined,
+  });
+}
+
+function fcLabel(args: Record<string, unknown>): string {
+  const bits = [String(args.section ?? "")];
+  if (args.window) bits.push(String(args.window));
+  if (Array.isArray(args.keys) && args.keys.length) bits.push((args.keys as string[]).join("+"));
+  return bits.join(" · ");
 }
 
 function Sparkle() {
@@ -84,39 +146,80 @@ export function AiChat({ data }: { data: PerfData }) {
   const { window: selectedWindow } = useDateRange();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
+  const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const turnsRef = useRef<GeminiTurn[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const context = useMemo(() => buildContext(data, selectedWindow), [data, selectedWindow]);
+  const summary = useMemo(() => buildSummary(data), [data]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, busy]);
+  }, [messages, busy, progress]);
 
   async function send(text: string) {
     const question = text.trim();
     if (!question || busy) return;
     setError(null);
-    const next: ChatMessage[] = [...messages, { role: "user", text: question }];
-    setMessages(next);
+    setMessages(prev => [...prev, { role: "user", text: question }]);
     setInput("");
     setBusy(true);
+    setProgress(null);
+
+    turnsRef.current = [
+      ...turnsRef.current,
+      { role: "user", parts: [{ text: `(User is viewing the ${selectedWindow} window.) ${question}` }] },
+    ];
+
     try {
-      const res = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context, messages: next }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      setMessages([...next, { role: "assistant", text: String(json.text ?? "No answer.") }]);
+      for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ context: summary, contents: turnsRef.current }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        const calls: Array<{ name: string; args: Record<string, unknown> }> = json.functionCalls ?? [];
+        if (calls.length && round < MAX_TOOL_ROUNDS) {
+          setProgress(`Checking ${calls.map(c => fcLabel(c.args ?? {})).join(", ")}…`);
+          // Record the model's tool request, then answer it from the feed.
+          turnsRef.current = [
+            ...turnsRef.current,
+            { role: "model", parts: calls.map(fc => ({ functionCall: fc })) },
+            {
+              role: "user",
+              parts: calls.map(fc => ({
+                functionResponse: {
+                  name: fc.name,
+                  response: { result: getDashboardData(data, fc.args ?? {}, selectedWindow) },
+                },
+              })),
+            },
+          ];
+          continue;
+        }
+
+        const answer = String(json.text ?? "").trim() || "I couldn't produce an answer from the data.";
+        turnsRef.current = [...turnsRef.current, { role: "model", parts: [{ text: answer }] }];
+        setMessages(prev => [...prev, { role: "assistant", text: answer }]);
+        break;
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed");
     } finally {
       setBusy(false);
+      setProgress(null);
     }
+  }
+
+  function resetChat() {
+    setMessages([]);
+    turnsRef.current = [];
+    setError(null);
   }
 
   return (
@@ -136,11 +239,11 @@ export function AiChat({ data }: { data: PerfData }) {
       {/* Panel */}
       {open && (
         <div
-          className="fixed bottom-0 right-0 sm:bottom-5 sm:right-5 z-50 w-full sm:w-[420px] flex flex-col rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl"
+          className="fixed bottom-0 right-0 sm:bottom-5 sm:right-5 z-50 w-full sm:w-[440px] flex flex-col rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl"
           style={{
             background: "var(--gaf-card-bg)",
             border: "1px solid var(--gaf-card-border)",
-            maxHeight: "min(640px, 85vh)",
+            maxHeight: "min(660px, 85vh)",
           }}
           role="dialog"
           aria-label="AI data assistant"
@@ -156,12 +259,22 @@ export function AiChat({ data }: { data: PerfData }) {
                 Ask AI
               </p>
               <p className="text-[10px] opacity-80">
-                Answers from the {selectedWindow === "yesterday" ? "Yesterday" : `Last ${selectedWindow.replace("d", " days")}`} snapshot
+                Full dashboard access — all channels, all windows
               </p>
             </div>
+            {messages.length > 0 && (
+              <button
+                onClick={resetChat}
+                className="ml-auto text-[10px] px-2 py-1 rounded-full"
+                style={{ background: "rgba(255,255,255,0.2)" }}
+                title="Start a fresh conversation"
+              >
+                New chat
+              </button>
+            )}
             <button
               onClick={() => setOpen(false)}
-              className="ml-auto w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none"
+              className={`${messages.length > 0 ? "" : "ml-auto "}w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none shrink-0`}
               style={{ background: "rgba(255,255,255,0.2)" }}
               aria-label="Close chat"
             >
@@ -174,7 +287,8 @@ export function AiChat({ data }: { data: PerfData }) {
             {messages.length === 0 && (
               <div className="space-y-2">
                 <p className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
-                  Ask anything about the numbers on this dashboard — performance, budget, channels, products.
+                  Ask anything — the AI can pull any table on this dashboard (campaigns, keywords,
+                  products, experiments…) across every window to find cross-platform insights.
                 </p>
                 {STARTERS.map(q => (
                   <button
@@ -210,12 +324,14 @@ export function AiChat({ data }: { data: PerfData }) {
 
             {busy && (
               <div className="flex justify-start">
-                <div className="px-3 py-2 rounded-2xl text-sm" style={{ background: "#f3f4f6", color: "var(--gaf-text-muted)" }}>
-                  <span className="inline-flex gap-1">
-                    <span className="animate-bounce" style={{ animationDelay: "0ms" }}>·</span>
-                    <span className="animate-bounce" style={{ animationDelay: "120ms" }}>·</span>
-                    <span className="animate-bounce" style={{ animationDelay: "240ms" }}>·</span>
-                  </span>
+                <div className="px-3 py-2 rounded-2xl text-xs" style={{ background: "#f3f4f6", color: "var(--gaf-text-muted)" }}>
+                  {progress ?? (
+                    <span className="inline-flex gap-1 text-sm">
+                      <span className="animate-bounce" style={{ animationDelay: "0ms" }}>·</span>
+                      <span className="animate-bounce" style={{ animationDelay: "120ms" }}>·</span>
+                      <span className="animate-bounce" style={{ animationDelay: "240ms" }}>·</span>
+                    </span>
+                  )}
                 </div>
               </div>
             )}
@@ -236,7 +352,7 @@ export function AiChat({ data }: { data: PerfData }) {
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Ask about this data…"
+              placeholder="Ask across any channel or window…"
               className="flex-1 text-sm px-3 py-2 rounded-lg focus:outline-none"
               style={{
                 border: "1px solid var(--gaf-input-border)",
