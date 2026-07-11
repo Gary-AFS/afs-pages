@@ -5,6 +5,7 @@
 // every data point on the dashboard is reachable without shipping megabytes.
 // The Gemini key lives in the gaf-dash-ai Cloudflare Worker (server-side).
 import { useMemo, useRef, useState, useEffect } from "react";
+import garyAvatar from "../assets/gary.png";
 import { useDateRange } from "../state/DateRangeContext";
 import type { PerfData, Window } from "../lib/data";
 
@@ -230,9 +231,10 @@ export function AiChat({ data }: { data: PerfData }) {
           onClick={() => setOpen(true)}
           className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105"
           style={{ background: "var(--gaf-primary)", fontFamily: "var(--font-display)" }}
-          aria-label="Ask AI about this data"
+          aria-label="Ask Gary about this data"
         >
-          <Sparkle /> Ask AI
+          <img src={garyAvatar} alt="" className="w-7 h-7 rounded-full object-cover -ml-1" style={{ border: "2px solid rgba(255,255,255,0.6)" }} />
+          Ask Gary
         </button>
       )}
 
@@ -246,17 +248,17 @@ export function AiChat({ data }: { data: PerfData }) {
             maxHeight: "min(660px, 85vh)",
           }}
           role="dialog"
-          aria-label="AI data assistant"
+          aria-label="Ask Gary — AI data assistant"
         >
           {/* Header */}
           <div
             className="flex items-center gap-2 px-4 py-3 text-white shrink-0"
             style={{ background: "var(--gaf-primary)" }}
           >
-            <Sparkle />
+            <img src={garyAvatar} alt="Gary" className="w-8 h-8 rounded-full object-cover shrink-0" style={{ border: "2px solid rgba(255,255,255,0.6)" }} />
             <div className="min-w-0">
               <p className="text-sm font-bold leading-tight" style={{ fontFamily: "var(--font-display)" }}>
-                Ask AI
+                Ask Gary
               </p>
               <p className="text-[10px] opacity-80">
                 Full dashboard access — all channels, all windows
@@ -287,7 +289,7 @@ export function AiChat({ data }: { data: PerfData }) {
             {messages.length === 0 && (
               <div className="space-y-2">
                 <p className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
-                  Ask anything — the AI can pull any table on this dashboard (campaigns, keywords,
+                  Ask Gary anything — he can pull any table on this dashboard (campaigns, keywords,
                   products, experiments…) across every window to find cross-platform insights.
                 </p>
                 {STARTERS.map(q => (

@@ -4,7 +4,7 @@ import { KpiCard } from "../components/KpiCard";
 import { TrendChart } from "../components/TrendChart";
 import { CaveatBanner } from "../components/CaveatBanner";
 import { SourceLink } from "../components/SourceLink";
-import { fmtCurrency, fmtCurrencyCompact, fmtInt, fmtRoas } from "../lib/format";
+import { fmtCurrency, fmtCurrencyCompact, fmtInt, fmtPct } from "../lib/format";
 import type { PerfData, Anomaly } from "../lib/data";
 
 interface OverviewProps {
@@ -12,7 +12,7 @@ interface OverviewProps {
 }
 
 const CAVEAT =
-  "Blended MER uses total Shopify revenue against total ad spend. " +
+  "Blended MER = ad spend ÷ total Shopify revenue (lower is more efficient). " +
   "Many GAF sales close offline by phone, so treat channel-level ROAS as directional, not a verdict.";
 
 function SeverityDot({ severity }: { severity: Anomaly["severity"] }) {
@@ -132,9 +132,10 @@ export function Overview({ data }: OverviewProps) {
           />
           <KpiCard
             label="Blended MER"
-            value={fmtRoas(kpis.blendedMer ?? 0)}
+            value={fmtPct(kpis.blendedMer ?? 0)}
             delta={deltas.blendedMer ?? null}
-            tooltip="Marketing efficiency ratio — total Shopify revenue ÷ total ad spend."
+            invertDelta
+            tooltip="Marketing efficiency ratio — ad spend ÷ total Shopify revenue. Lower is more efficient."
           />
           <KpiCard
             label="Sessions"
