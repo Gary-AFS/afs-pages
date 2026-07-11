@@ -41,6 +41,7 @@ export function KpiCard({ label, value, delta, invertDelta, subLabel, tooltip }:
     <div
       ref={cardRef}
       className="dash-card relative flex flex-col gap-1 min-w-0 p-3 sm:p-5"
+      style={{ zIndex: open ? 40 : undefined }}
       onMouseLeave={() => setOpen(false)}
     >
       {/* LABEL — ⓘ marks a tooltip; hover or tap to open */}
