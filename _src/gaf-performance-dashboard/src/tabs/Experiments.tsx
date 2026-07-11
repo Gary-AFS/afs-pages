@@ -50,10 +50,14 @@ function WinLossBadge({ value }: { value?: string }) {
 
 export function Experiments({ data }: Props) {
   const exp = data.experiments;
-  const [sectionFilter, setSectionFilter] = useState<string>("Active");
-
   const experiments = useMemo(() => exp?.experiments ?? [], [exp]);
   const summary = exp?.summary ?? {};
+
+  // Default to Active, but fall back to All while nothing is committed to a
+  // sprint yet — an empty default view helps nobody.
+  const hasActive =
+    (summary.thisSprint ?? 0) + (summary.running ?? 0) + (summary.analysing ?? 0) > 0;
+  const [sectionFilter, setSectionFilter] = useState<string>(hasActive ? "Active" : "All");
 
   const filtered = useMemo(() => {
     let rows: ExperimentRow[] = [...experiments];
