@@ -69,6 +69,8 @@ export function GoogleOverview({ googleWin }: Props) {
                    tooltip="Click-through rate — clicks ÷ impressions." />
           <KpiCard label="Avg CPC"            value={fmtCpc(kpis.avgCpc ?? 0)}              delta={deltas.avgCpc ?? null}          invertDelta
                    tooltip="Average cost per click — spend ÷ clicks. Lower is better." />
+          <KpiCard label="CPM"                value={fmtCpc(kpis.cpm ?? 0)}                 delta={deltas.cpm ?? null}             invertDelta
+                   tooltip="Cost per 1,000 impressions — spend ÷ impressions × 1000. Lower is better." />
           <KpiCard label="Conversions"        value={(kpis.conversions ?? 0).toFixed(1)}     delta={deltas.conversions ?? null}
                    tooltip="Primary conversions (purchases) Google Ads attributes to your ads." />
           <KpiCard label="Conv. Value"        value={fmtCurrency(kpis.convValue ?? 0)}       delta={deltas.convValue ?? null}

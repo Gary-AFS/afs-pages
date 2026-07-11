@@ -29,6 +29,7 @@ const COLUMNS = [
   { key: "clicks" as const, label: "Clicks", align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "ctr" as const, label: "CTR", align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
   { key: "avgCpc" as const, label: "CPC", align: "right" as const, format: (v: unknown) => fmtCpc(Number(v ?? 0)) },
+  { key: "cpm" as const, label: "CPM", align: "right" as const, format: (v: unknown) => fmtCpc(Number(v ?? 0)) },
   { key: "conversions" as const, label: "Conv.", align: "right" as const, format: (v: unknown) => Number(v ?? 0).toFixed(1) },
   { key: "convValue" as const, label: "Conv. Value", align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "roas" as const, label: "ROAS", align: "right" as const, format: (v: unknown) => fmtRoas(Number(v ?? 0)) },
