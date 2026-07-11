@@ -3,6 +3,7 @@ import { useDateRange } from "../state/DateRangeContext";
 import { KpiCard } from "../components/KpiCard";
 import { TrendChart } from "../components/TrendChart";
 import { CaveatBanner } from "../components/CaveatBanner";
+import { SourceLink } from "../components/SourceLink";
 import { fmtCurrency, fmtCurrencyCompact, fmtInt, fmtRoas } from "../lib/format";
 import type { PerfData, Anomaly } from "../lib/data";
 
@@ -155,7 +156,18 @@ export function Overview({ data }: OverviewProps) {
       {/* Gross profit vs budget (finance sheet) */}
       {kpis.gpCreated != null && kpis.gpBudget != null && kpis.gpBudget > 0 && (
         <section className="dash-card p-5" aria-label="Gross profit vs budget">
-          <SectionTitle>Gross Profit vs Budget</SectionTitle>
+          <div className="flex items-center gap-2 mb-3">
+            <h3
+              className="text-lg font-bold"
+              style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+            >
+              Gross Profit vs Budget
+            </h3>
+            <SourceLink
+              href="https://docs.google.com/spreadsheets/d/17an6G2laOVcI8t0nDNsRkiax-ihYUIUqGtviyfaX9Gw/edit"
+              title="Source: FY27 daily GP budget/forecast (Google Sheet, GAF DATA tab)"
+            />
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>
