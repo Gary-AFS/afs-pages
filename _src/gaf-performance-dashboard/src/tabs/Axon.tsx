@@ -27,6 +27,7 @@ const CAMPAIGN_COLS = [
   { key: "impressions", label: "Impressions",  align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "clicks",      label: "Clicks",       align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "ctr",         label: "CTR",          align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
+  { key: "cpc",         label: "CPC",          align: "right" as const, format: (v: unknown) => (Number(v ?? 0) > 0 ? fmtCpc(Number(v)) : "–") },
   { key: "conversions", label: "Conv.",        align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "sales",       label: "Sales",        align: "right" as const, format: (v: unknown) => fmtCurrency(Number(v ?? 0)) },
   { key: "roas",        label: "ROAS",         align: "right" as const, format: (v: unknown) => (Number(v ?? 0) > 0 ? fmtRoas(Number(v)) : "–") },
@@ -39,6 +40,7 @@ const CREATIVE_SET_COLS = [
   { key: "impressions", label: "Impressions",  align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "clicks",      label: "Clicks",       align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
   { key: "ctr",         label: "CTR",          align: "right" as const, format: (v: unknown) => fmtPct(Number(v ?? 0)) },
+  { key: "cpc",         label: "CPC",          align: "right" as const, format: (v: unknown) => (Number(v ?? 0) > 0 ? fmtCpc(Number(v)) : "–") },
   { key: "conversions", label: "Conv.",        align: "right" as const, format: (v: unknown) => fmtInt(Number(v ?? 0)) },
 ];
 
@@ -83,7 +85,7 @@ export function Axon({ data }: AxonProps) {
     <div className="space-y-6 fade-in">
       {/* KPI row */}
       <section aria-label="Axon key metrics">
-        <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 stagger">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-9 gap-3 stagger">
           <KpiCard
             label="Spend"
             value={fmtCurrency(kpis.spend ?? 0)}
@@ -103,6 +105,13 @@ export function Axon({ data }: AxonProps) {
             label="CTR"
             value={fmtPct(kpis.ctr ?? 0)}
             delta={deltas.ctr ?? null}
+          />
+          <KpiCard
+            label="CPC"
+            value={fmtCpc(kpis.cpc ?? 0)}
+            delta={deltas.cpc ?? null}
+            invertDelta
+            tooltip="Spend ÷ clicks. Lower is better."
           />
           <KpiCard
             label="Conversions"

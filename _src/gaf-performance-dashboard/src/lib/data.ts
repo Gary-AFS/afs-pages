@@ -392,6 +392,7 @@ export interface AxonKpis {
   impressions?: number;
   clicks?: number;
   ctr?: number;
+  cpc?: number;
   conversions?: number;
   sales?: number;
   roas?: number;
