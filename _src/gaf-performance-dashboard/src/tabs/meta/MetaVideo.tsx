@@ -1,7 +1,11 @@
 // src/tabs/meta/MetaVideo.tsx
+// Video performance: large media cards (reference parity) that open a modal
+// with inline playback, retention bars and Preview Ad / Ads Manager links.
 import { useMemo, useState } from "react";
 import { fmtCurrency, fmtInt, fmtPct } from "../../lib/format";
 import { DataTable } from "../../components/DataTable";
+import { MetaVideoModal } from "./MetaVideoModal";
+import type { VideoModalTarget } from "./MetaVideoModal";
 import type { MetaWindow, MetaVideoRow } from "../../lib/data";
 
 interface Props {
@@ -60,6 +64,21 @@ function KpiPill({ label, value }: { label: string; value: string }) {
   );
 }
 
+function PlayOverlay() {
+  return (
+    <span className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+      <span
+        className="w-12 h-12 rounded-full flex items-center justify-center"
+        style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(2px)" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="white">
+          <path d="M4.5 2.8v10.4c0 .6.7 1 1.2.7l8.2-5.2c.5-.3.5-1 0-1.3L5.7 2.1c-.5-.3-1.2 0-1.2.7Z" />
+        </svg>
+      </span>
+    </span>
+  );
+}
+
 const TABLE_COLS = [
   { key: "adName",       label: "Ad Name",        align: "left" as const },
   { key: "campaign",     label: "Campaign",        align: "left" as const },
@@ -80,16 +99,21 @@ const TABLE_COLS = [
 export function MetaVideo({ metaWin }: Props) {
   const [sortKey, setSortKey] = useState<SortVideoKey>("spend");
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const [selected, setSelected] = useState<VideoModalTarget | null>(null);
 
   const video = (metaWin.video ?? []) as MetaVideoRow[];
   const withPlays = video.filter((v) => Number(v.videoPlays ?? 0) > 0);
 
-  // Thumbnails live on the creative rows — join by adId.
-  const thumbByAd = useMemo(() => {
-    const map = new Map<string, string>();
+  // Media + video source + preview link live on the creative rows — join by adId.
+  const creativeByAd = useMemo(() => {
+    const map = new Map<string, { thumbnailUrl: string; videoId: string; previewLink: string }>();
     for (const c of metaWin.creative ?? []) {
-      const url = String(c.thumbnailUrl || c.imageUrl || "");
-      if (c.adId && url) map.set(String(c.adId), url);
+      if (!c.adId) continue;
+      map.set(String(c.adId), {
+        thumbnailUrl: String(c.thumbnailUrl || c.imageUrl || ""),
+        videoId: String(c.videoId || ""),
+        previewLink: String(c.previewLink || ""),
+      });
     }
     return map;
   }, [metaWin.creative]);
@@ -114,6 +138,11 @@ export function MetaVideo({ metaWin }: Props) {
       </div>
     );
   }
+
+  const openModal = (v: MetaVideoRow) => {
+    const joined = creativeByAd.get(String(v.adId ?? ""));
+    setSelected({ ...v, ...joined });
+  };
 
   return (
     <div className="space-y-4 fade-in">
@@ -176,99 +205,85 @@ export function MetaVideo({ metaWin }: Props) {
         </div>
       </div>
 
-      {/* Video preview note */}
-      <p className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
-        Open an ad on the Creative tab to play its video inline.
-      </p>
-
       {/* Cards view */}
       {viewMode === "cards" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sorted.map((v, i) => {
-            const thumb = thumbByAd.get(String(v.adId ?? ""));
+            const joined = creativeByAd.get(String(v.adId ?? ""));
+            const thumb = joined?.thumbnailUrl;
             return (
-            <div key={v.adId ?? i} className="dash-card p-4 flex flex-col gap-3 min-w-0">
-              <div className="flex items-start justify-between gap-2 min-w-0">
-                {thumb && (
-                  <img
-                    src={thumb}
-                    alt=""
-                    loading="lazy"
-                    className="w-14 h-14 rounded-lg object-cover shrink-0"
-                    style={{ background: "var(--gaf-primary-light)" }}
-                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                  />
-                )}
-                <div className="min-w-0 flex-1">
-                  <p
-                    className="text-sm font-semibold leading-snug line-clamp-1"
-                    style={{ color: "var(--gaf-text-primary)" }}
-                    title={String(v.adName ?? "")}
-                  >
-                    {String(v.adName ?? "Untitled ad")}
-                  </p>
-                  {v.campaign && (
-                    <p className="text-[11px] truncate" style={{ color: "var(--gaf-text-muted)" }} title={String(v.campaign)}>
-                      {String(v.campaign)}
-                    </p>
+              <div
+                key={v.adId ?? i}
+                className="dash-card overflow-hidden flex flex-col min-w-0 cursor-pointer transition-shadow hover:shadow-lg"
+                onClick={() => openModal(v)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => { if (e.key === "Enter" || e.key === " ") openModal(v); }}
+                aria-label={`View details for ${String(v.adName ?? "video ad")}`}
+              >
+                {/* Media strip */}
+                <div className="relative" style={{ background: "#0a0a0a" }}>
+                  {thumb ? (
+                    <img
+                      src={thumb}
+                      alt=""
+                      loading="lazy"
+                      className="w-full object-contain"
+                      style={{ maxHeight: 200, minHeight: 140 }}
+                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    />
+                  ) : (
+                    <div className="w-full flex items-center justify-center text-xs" style={{ height: 140, color: "#9ca3af" }}>
+                      No preview
+                    </div>
                   )}
+                  <PlayOverlay />
+                  <span
+                    className="absolute top-2.5 left-2.5 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
+                    style={{ background: "var(--gaf-primary)" }}
+                  >
+                    {i + 1}
+                  </span>
                 </div>
-                <span
-                  className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white shrink-0"
-                  style={{ background: "var(--gaf-primary)" }}
-                >
-                  #{i + 1}
-                </span>
-              </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>Spend</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{fmtCurrency(Number(v.spend ?? 0))}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>Plays</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{fmtInt(Number(v.videoPlays ?? 0))}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>ThruPlays</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{fmtInt(Number(v.thruPlays ?? 0))}</span>
-                </div>
-              </div>
+                <div className="p-4 flex flex-col gap-3 min-w-0 flex-1">
+                  <div className="min-w-0">
+                    <p
+                      className="text-sm font-bold leading-snug line-clamp-1"
+                      style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}
+                      title={String(v.adName ?? "")}
+                    >
+                      {String(v.adName ?? "Untitled ad")}
+                    </p>
+                    {Boolean(v.campaign) && (
+                      <p className="text-[11px] truncate" style={{ color: "var(--gaf-text-muted)" }} title={String(v.campaign)}>
+                        {String(v.campaign)}
+                      </p>
+                    )}
+                  </div>
 
-              {/* Extra metrics row */}
-              <div className="grid grid-cols-3 gap-2">
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>Thumb Stop</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{fmtPct(Number(v.thumbStopRate ?? 0))}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>Avg Watch</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{Number(v.avgWatchTime ?? 0).toFixed(1)}s</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>Impr.</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{fmtInt(Number(v.impressions ?? 0))}</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>ATC</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{fmtInt(Number(v.atc ?? 0))}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>Engagements</span>
-                  <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{fmtInt(Number(v.engagements ?? 0))}</span>
-                </div>
-              </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { label: "Spend", value: fmtCurrency(Number(v.spend ?? 0)) },
+                      { label: "Plays", value: fmtInt(Number(v.videoPlays ?? 0)) },
+                      { label: "Avg Watch", value: `${Number(v.avgWatchTime ?? 0).toFixed(1)}s` },
+                    ].map(s => (
+                      <div key={s.label} className="flex flex-col">
+                        <span className="text-[9px] uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>{s.label}</span>
+                        <span className="text-sm font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>{s.value}</span>
+                      </div>
+                    ))}
+                  </div>
 
-              <div className="flex flex-col gap-1.5 mt-1">
-                <RetentionBar label="25%" pct={Number(v.p25Rate ?? 0)} />
-                <RetentionBar label="50%" pct={Number(v.p50Rate ?? 0)} />
-                <RetentionBar label="75%" pct={Number(v.p75Rate ?? 0)} />
-                <RetentionBar label="Completion" pct={Number(v.p100Rate ?? 0)} />
+                  <div className="flex flex-col gap-1.5 mt-auto">
+                    <RetentionBar label="Thumb Stop" pct={Number(v.thumbStopRate ?? 0)} />
+                    <RetentionBar label="25%" pct={Number(v.p25Rate ?? 0)} />
+                    <RetentionBar label="50%" pct={Number(v.p50Rate ?? 0)} />
+                    <RetentionBar label="75%" pct={Number(v.p75Rate ?? 0)} />
+                    <RetentionBar label="Completion" pct={Number(v.p100Rate ?? 0)} />
+                  </div>
+                </div>
               </div>
-            </div>
             );
           })}
         </div>
@@ -284,11 +299,15 @@ export function MetaVideo({ metaWin }: Props) {
       )}
 
       <p className="text-[11px]" style={{ color: "var(--gaf-text-muted)" }}>
-        Retention rates are the percentage of video plays reaching each quartile.{" "}
-        <span style={{ color: "var(--gaf-delta-pos)" }}>Green</span> &ge;50%,{" "}
+        Click a card to play the video and open Preview Ad / Ads Manager links.
+        Retention rates are the percentage of video plays reaching each quartile:{" "}
+        <span style={{ color: "var(--gaf-delta-pos)" }}>green</span> &ge;50%,{" "}
         <span style={{ color: "#d97706" }}>amber</span> &ge;25%,{" "}
         <span style={{ color: "var(--gaf-delta-neg)" }}>red</span> &lt;25%.
       </p>
+
+      {/* Modal */}
+      <MetaVideoModal video={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }

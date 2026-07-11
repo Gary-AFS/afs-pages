@@ -55,8 +55,19 @@ describe("MetaCreativeModal", () => {
 
   it("shows Ads Manager link when adId is set", () => {
     render(<MetaCreativeModal creative={mockCreative} onClose={() => {}} />);
-    const link = screen.getByRole("link", { name: /open in ads manager/i });
+    const link = screen.getByRole("link", { name: /ads manager/i });
     expect(link).toBeTruthy();
     expect((link as HTMLAnchorElement).href).toContain("123");
+  });
+
+  it("shows Preview Ad button when the feed carries a preview link", () => {
+    render(
+      <MetaCreativeModal
+        creative={{ ...mockCreative, previewLink: "https://fb.me/preview/xyz" }}
+        onClose={() => {}}
+      />
+    );
+    const link = screen.getByRole("link", { name: /preview ad/i });
+    expect((link as HTMLAnchorElement).href).toContain("fb.me/preview");
   });
 });

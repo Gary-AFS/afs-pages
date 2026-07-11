@@ -4,6 +4,7 @@ import type { PerfData, Window } from "./lib/data";
 import { DateRangeProvider, useDateRange } from "./state/DateRangeContext";
 import { Sidebar, NAV_ITEMS } from "./components/Sidebar";
 import type { TabId } from "./components/Sidebar";
+import { AiChat } from "./components/AiChat";
 import { Overview } from "./tabs/Overview";
 import { MetaAds } from "./tabs/MetaAds";
 import { GoogleAds } from "./tabs/GoogleAds";
@@ -48,19 +49,20 @@ function MobileNav({ active, onSelect }: { active: TabId; onSelect: (t: TabId) =
       style={{ background: "var(--gaf-card-bg)", borderColor: "var(--gaf-row-border)" }}
       aria-label="Dashboard sections"
     >
-      {NAV_ITEMS.map(({ id, label }) => {
+      {NAV_ITEMS.map(({ id, label, Icon }) => {
         const isActive = id === active;
         return (
           <button
             key={id}
             onClick={() => onSelect(id)}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors"
             style={{
               background: isActive ? "var(--gaf-primary)" : "transparent",
               color: isActive ? "#ffffff" : "var(--gaf-text-secondary)",
             }}
             aria-current={isActive ? "page" : undefined}
           >
+            <Icon />
             {label}
           </button>
         );
@@ -141,7 +143,7 @@ function DashboardShell({ data, onReload }: { data: PerfData; onReload: () => vo
               onClick={onReload}
               className="w-7 h-7 flex items-center justify-center rounded-md text-sm transition-colors"
               style={{ color: "var(--gaf-primary)", border: "1px solid var(--gaf-input-border)", background: "var(--gaf-card-bg)" }}
-              title="Reload the nightly snapshot (refreshed daily ~3:10am ACST)"
+              title="Reload the snapshot. Data refreshes nightly at ~3:10am ACST, so this only changes numbers after a new snapshot lands — for live Meta numbers use 'Refresh live' on the Meta tab."
               aria-label="Reload snapshot data"
             >
               &#8635;
@@ -168,6 +170,9 @@ function DashboardShell({ data, onReload }: { data: PerfData; onReload: () => vo
           <span>Snapshot refreshed daily at 3:10am ACST · Meta tab supports live refresh</span>
         </footer>
       </div>
+
+      {/* AI data assistant */}
+      <AiChat data={data} />
     </div>
   );
 }

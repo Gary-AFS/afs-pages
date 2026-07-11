@@ -77,10 +77,20 @@ export const META_CAMPAIGN_COLS: Col[] = [
   { key: "roas",             label: "ROAS",         align: "right", format: roas, tooltip: METRIC_TOOLTIPS.roas },
 ];
 
-// Ad Sets — full column set per spec. Campaign context on a sub-line.
+// Objective pill colours (reference parity: Sales emerald, Traffic blue,
+// Awareness purple, Engagement amber, Leads cyan).
+export const OBJECTIVE_BADGE: Record<string, { bg: string; color: string }> = {
+  Conversion:  { bg: "#ecfdf5", color: "#059669" },
+  Traffic:     { bg: "#eff6ff", color: "#2563eb" },
+  Awareness:   { bg: "#f5f3ff", color: "#7c3aed" },
+  Engagement:  { bg: "#fffbeb", color: "#d97706" },
+  Leads:       { bg: "#ecfeff", color: "#0891b2" },
+};
+
+// Ad Sets — full column set per spec, campaign as its own column (reference parity).
 export const META_ADSET_COLS: Col[] = [
-  { key: "adset",            label: "Ad Set",       align: "left",
-    sub: (row) => String(row.campaign ?? "") },
+  { key: "adset",            label: "Ad Set",       align: "left" },
+  { key: "campaign",         label: "Campaign",     align: "left" },
   { key: "spend",            label: "Spend",        align: "right", format: cur,  tooltip: METRIC_TOOLTIPS.spend },
   { key: "impressions",      label: "Impr.",        align: "right", format: int,  tooltip: METRIC_TOOLTIPS.impressions },
   { key: "reach",            label: "Reach",        align: "right", format: int,  tooltip: METRIC_TOOLTIPS.reach },

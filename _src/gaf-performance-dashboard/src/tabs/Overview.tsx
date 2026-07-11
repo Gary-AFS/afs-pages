@@ -152,6 +152,106 @@ export function Overview({ data }: OverviewProps) {
         </div>
       </section>
 
+      {/* Gross profit vs budget (finance sheet) */}
+      {kpis.gpCreated != null && kpis.gpBudget != null && kpis.gpBudget > 0 && (
+        <section className="dash-card p-5" aria-label="Gross profit vs budget">
+          <SectionTitle>Gross Profit vs Budget</SectionTitle>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>
+                GP Created
+              </p>
+              <p className="text-xl sm:text-2xl font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>
+                {fmtCurrency(kpis.gpCreated)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>
+                Budget (same days)
+              </p>
+              <p className="text-xl sm:text-2xl font-bold tabular-nums" style={{ color: "var(--gaf-text-secondary)", fontFamily: "var(--font-display)" }}>
+                {fmtCurrency(kpis.gpBudget)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>
+                vs Budget
+              </p>
+              {kpis.gpVariancePct != null && (
+                <p
+                  className="text-xl sm:text-2xl font-bold tabular-nums"
+                  style={{
+                    color: kpis.gpVariancePct >= 0 ? "var(--gaf-delta-pos)" : "var(--gaf-delta-neg)",
+                    fontFamily: "var(--font-display)",
+                  }}
+                >
+                  {kpis.gpVariancePct >= 0 ? "+" : ""}{kpis.gpVariancePct.toFixed(1)}%
+                </p>
+              )}
+            </div>
+            {ov.gpMonth?.runRate != null && ov.gpMonth.monthBudget != null && ov.gpMonth.monthBudget > 0 && (
+              <div>
+                <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider" style={{ color: "var(--gaf-text-muted)" }}>
+                  {ov.gpMonth.label ?? "Month"} run rate
+                </p>
+                <p className="text-xl sm:text-2xl font-bold tabular-nums" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>
+                  {fmtCurrency(ov.gpMonth.runRate)}
+                </p>
+                <p className="text-[11px] tabular-nums" style={{ color: "var(--gaf-text-muted)" }}>
+                  vs {fmtCurrency(ov.gpMonth.monthBudget)} budget
+                  {ov.gpMonth.runRateVsBudgetPct != null && (
+                    <span
+                      className="ml-1 font-semibold"
+                      style={{ color: ov.gpMonth.runRateVsBudgetPct >= 0 ? "var(--gaf-delta-pos)" : "var(--gaf-delta-neg)" }}
+                    >
+                      ({ov.gpMonth.runRateVsBudgetPct >= 0 ? "+" : ""}{ov.gpMonth.runRateVsBudgetPct.toFixed(1)}%)
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Month-to-date progress vs full month budget */}
+          {ov.gpMonth?.mtdActual != null && ov.gpMonth.monthBudget != null && ov.gpMonth.monthBudget > 0 && (
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-[11px] mb-1" style={{ color: "var(--gaf-text-muted)" }}>
+                <span>
+                  MTD {fmtCurrency(ov.gpMonth.mtdActual)} of {fmtCurrency(ov.gpMonth.monthBudget)}
+                  {" "}({ov.gpMonth.daysElapsed}/{ov.gpMonth.daysInMonth} days)
+                </span>
+                <span>marker = budget to date</span>
+              </div>
+              <div className="relative w-full h-2.5 rounded-full overflow-hidden" style={{ background: "var(--gaf-row-border)" }}>
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${Math.min(100, (ov.gpMonth.mtdActual / ov.gpMonth.monthBudget) * 100)}%`,
+                    background:
+                      (ov.gpMonth.mtdBudget ?? 0) > 0 && ov.gpMonth.mtdActual < (ov.gpMonth.mtdBudget ?? 0)
+                        ? "var(--gaf-delta-neg)"
+                        : "var(--gaf-delta-pos)",
+                  }}
+                />
+                {(ov.gpMonth.mtdBudget ?? 0) > 0 && (
+                  <div
+                    className="absolute top-0 h-full w-0.5"
+                    style={{
+                      left: `${Math.min(100, ((ov.gpMonth.mtdBudget ?? 0) / ov.gpMonth.monthBudget) * 100)}%`,
+                      background: "var(--gaf-text-secondary)",
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          <p className="text-[11px] mt-3" style={{ color: "var(--gaf-text-muted)" }}>
+            Gross profit created vs the FY daily budget (finance sheet). Budget compares only days with actuals entered; run rate projects month-to-date GP across the calendar month.
+          </p>
+        </section>
+      )}
+
       {/* Channel spend split */}
       {spendSplit && (
         <section className="dash-card p-5" aria-label="Channel spend split">

@@ -13,6 +13,21 @@ export interface OverviewKpis {
   blendedMer: number;
   sessions: number;
   onlineRevenue: number;
+  /** GP actual vs budget from the FY finance sheet (null when not yet entered) */
+  gpCreated?: number | null;
+  gpBudget?: number | null;
+  gpVariancePct?: number | null;
+}
+
+export interface GpMonth {
+  label?: string;
+  mtdActual?: number;
+  mtdBudget?: number;
+  monthBudget?: number;
+  daysElapsed?: number;
+  daysInMonth?: number;
+  runRate?: number;
+  runRateVsBudgetPct?: number | null;
 }
 
 export interface SpendSplit {
@@ -31,6 +46,7 @@ export interface OverviewWindow {
   deltas: Record<string, number | null>;
   spendSplit: SpendSplit;
   daily: DailyPoint[];
+  gpMonth?: GpMonth;
 }
 
 export interface Ga4Kpis {
@@ -149,7 +165,10 @@ export interface MetaCreativeRow {
   adId?: string;
   adName?: string;
   campaign?: string;
+  campaignId?: string;
   adset?: string;
+  objective?: string;
+  previewLink?: string;
   thumbnailUrl?: string;
   imageUrl?: string;
   videoId?: string;
@@ -304,6 +323,8 @@ export interface OrganicPost {
   timestamp?: string;
   likes?: number;
   comments?: number;
+  saves?: number;
+  shares?: number;
   permalink?: string;
 }
 
@@ -314,6 +335,9 @@ export interface OrganicIg {
   views?: number;
   followerCount?: number;
   posts?: OrganicPost[];
+  reachDaily?: Array<{ date: string; reach: number }>;
+  postsPublished?: number;
+  engagementBreakdown?: { likes?: number; comments?: number; saves?: number; shares?: number };
 }
 
 export interface OrganicFbPage {

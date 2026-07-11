@@ -1,4 +1,7 @@
 // src/tabs/WebsiteTraffic.tsx
+// GA4 tab with sub-tab navigation (same pattern as the Meta/Google tabs) —
+// the single long scroll was poor UX per Josh's 11 Jul review.
+import { useState } from "react";
 import { useDateRange } from "../state/DateRangeContext";
 import { KpiCard } from "../components/KpiCard";
 import { DataTable } from "../components/DataTable";
@@ -70,10 +73,20 @@ function ShopifyMark() {
   );
 }
 
-// ---- Component ----
+// ---- Sub-tab shell ----
+
+type SubTab = "overview" | "pages" | "geo" | "products";
+
+const SUB_TABS: { key: SubTab; label: string }[] = [
+  { key: "overview", label: "Overview" },
+  { key: "pages",    label: "Top Pages" },
+  { key: "geo",      label: "Geography" },
+  { key: "products", label: "Products" },
+];
 
 export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
   const { window } = useDateRange();
+  const [active, setActive] = useState<SubTab>("overview");
 
   const ga4Win = data.ga4?.[window];
   const products = (data.products?.[window] ?? []) as unknown as ProductRow[];
@@ -102,102 +115,138 @@ export function WebsiteTraffic({ data }: WebsiteTrafficProps) {
 
   return (
     <div className="space-y-6 fade-in">
-      {/* GA4 KPI row */}
-      <section aria-label="Website traffic key metrics">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 stagger">
-          <KpiCard
-            label="Sessions"
-            value={fmtInt(kpis?.sessions ?? 0)}
-            delta={deltas.sessions ?? null}
-            tooltip="GA4 sessions in the selected window (Australian traffic only)."
-          />
-          <KpiCard
-            label="Active Users"
-            value={fmtInt(kpis?.activeUsers ?? 0)}
-            delta={deltas.activeUsers ?? null}
-            tooltip="Users with an engaged session."
-          />
-          <KpiCard
-            label="New Users"
-            value={fmtInt(kpis?.newUsers ?? 0)}
-            delta={deltas.newUsers ?? null}
-            tooltip="First-time visitors."
-          />
-          <KpiCard
-            label="Engagement Rate"
-            value={fmtPct((kpis?.engagementRate ?? 0) * 100)}
-            delta={deltas.engagementRate ?? null}
-            tooltip="Engaged sessions ÷ total sessions."
-          />
-          <KpiCard
-            label="Avg. Engagement"
-            value={engTimeLabel}
-            delta={deltas.avgEngagementTime ?? null}
-            tooltip="Average session duration."
-          />
-          <KpiCard
-            label="Conversions"
-            value={fmtInt(kpis?.conversions ?? 0)}
-            delta={deltas.conversions ?? null}
-            tooltip="GA4 key events (conversions) in the window."
-          />
-        </div>
-      </section>
+      {/* Sub-tab pill nav */}
+      <div
+        className="inline-flex flex-wrap gap-1 p-1 rounded-xl"
+        style={{ background: "var(--gaf-card-bg)", border: "1px solid var(--gaf-card-border)", boxShadow: "0 1px 2px rgba(0,0,0,.04)" }}
+        role="tablist"
+        aria-label="Website traffic sections"
+      >
+        {SUB_TABS.map((t) => {
+          const isActive = active === t.key;
+          return (
+            <button
+              key={t.key}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => setActive(t.key)}
+              className="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors"
+              style={{
+                background: isActive ? "var(--gaf-primary)" : "transparent",
+                color: isActive ? "#fff" : "var(--gaf-text-secondary)",
+              }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
 
-      {/* Daily sessions trend */}
-      {hasDailyData && (
-        <section className="dash-card p-5" aria-label="Daily sessions trend">
-          <SectionTitle>Daily Sessions</SectionTitle>
-          <TrendChart
-            data={daily}
-            series={{
-              areas: [{ key: "sessions", color: "var(--gaf-primary)", label: "Sessions", format: fmtCompact }],
-            }}
+      {/* --- Overview: KPIs + daily sessions + channels --- */}
+      {active === "overview" && (
+        <>
+          <section aria-label="Website traffic key metrics">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 stagger">
+              <KpiCard
+                label="Sessions"
+                value={fmtInt(kpis?.sessions ?? 0)}
+                delta={deltas.sessions ?? null}
+                tooltip="GA4 sessions in the selected window (Australian traffic only)."
+              />
+              <KpiCard
+                label="Active Users"
+                value={fmtInt(kpis?.activeUsers ?? 0)}
+                delta={deltas.activeUsers ?? null}
+                tooltip="Users with an engaged session."
+              />
+              <KpiCard
+                label="New Users"
+                value={fmtInt(kpis?.newUsers ?? 0)}
+                delta={deltas.newUsers ?? null}
+                tooltip="First-time visitors."
+              />
+              <KpiCard
+                label="Engagement Rate"
+                value={fmtPct((kpis?.engagementRate ?? 0) * 100)}
+                delta={deltas.engagementRate ?? null}
+                tooltip="Engaged sessions ÷ total sessions."
+              />
+              <KpiCard
+                label="Avg. Engagement"
+                value={engTimeLabel}
+                delta={deltas.avgEngagementTime ?? null}
+                tooltip="Average session duration."
+              />
+              <KpiCard
+                label="Conversions"
+                value={fmtInt(kpis?.conversions ?? 0)}
+                delta={deltas.conversions ?? null}
+                tooltip="GA4 key events (conversions) in the window."
+              />
+            </div>
+          </section>
+
+          {hasDailyData && (
+            <section className="dash-card p-5" aria-label="Daily sessions trend">
+              <SectionTitle>Daily Sessions</SectionTitle>
+              <TrendChart
+                data={daily}
+                series={{
+                  areas: [{ key: "sessions", color: "var(--gaf-primary)", label: "Sessions", format: fmtCompact }],
+                }}
+              />
+            </section>
+          )}
+
+          <section aria-label="Traffic channels">
+            <SectionTitle>Source / Channel</SectionTitle>
+            <DataTable<ChannelRow>
+              columns={CHANNEL_COLS}
+              rows={channelRows}
+              sortable
+            />
+          </section>
+        </>
+      )}
+
+      {/* --- Top Pages --- */}
+      {active === "pages" && (
+        <section aria-label="Top pages">
+          <SectionTitle>Top Pages</SectionTitle>
+          <DataTable<PageRow>
+            columns={PAGE_COLS}
+            rows={pageRows}
+            sortable
           />
         </section>
       )}
 
-      {/* Source / Channel table */}
-      <section aria-label="Traffic channels">
-        <SectionTitle>Source / Channel</SectionTitle>
-        <DataTable<ChannelRow>
-          columns={CHANNEL_COLS}
-          rows={channelRows}
-          sortable
-        />
-      </section>
+      {/* --- Geography --- */}
+      {active === "geo" && (
+        <section className="dash-card p-5" aria-label="Sessions by Australian state">
+          <SectionTitle>Sessions by State</SectionTitle>
+          <AustraliaMap geo={geo} />
+        </section>
+      )}
 
-      {/* Top Pages table */}
-      <section aria-label="Top pages">
-        <SectionTitle>Top Pages</SectionTitle>
-        <DataTable<PageRow>
-          columns={PAGE_COLS}
-          rows={pageRows}
-          sortable
-        />
-      </section>
+      {/* --- Products funnel --- */}
+      {active === "products" && (
+        <section aria-label="Top products funnel">
+          <SectionTitle><ShopifyMark /> Top Products (Sessions &rarr; ATC &rarr; Orders)</SectionTitle>
+          <DataTable<ProductRow>
+            columns={PRODUCT_COLS}
+            rows={products}
+            sortable
+          />
+          <p className="text-xs mt-2" style={{ color: "var(--gaf-text-muted)" }}>
+            Sessions and add-to-carts join from GA4's top pages; a dash means GA4 recorded no page-level data for that product in this window.
+          </p>
+        </section>
+      )}
 
-      {/* Australia geo map */}
-      <section className="dash-card p-5" aria-label="Sessions by Australian state">
-        <SectionTitle>Sessions by State</SectionTitle>
-        <AustraliaMap geo={geo} />
-      </section>
-
-      {/* Top Products funnel */}
-      <section aria-label="Top products funnel">
-        <SectionTitle><ShopifyMark /> Top Products (Sessions &rarr; ATC &rarr; Orders)</SectionTitle>
-        <DataTable<ProductRow>
-          columns={PRODUCT_COLS}
-          rows={products}
-          sortable
-        />
-        <p className="text-xs mt-2" style={{ color: "var(--gaf-text-muted)" }}>
-          Sessions and add-to-carts join from GA4's top pages; a dash means GA4 recorded no page-level data for that product in this window.
-        </p>
-        <p className="text-xs mt-1" style={{ color: "var(--gaf-text-muted)" }}>
-          All GA4 metrics on this dashboard cover Australian traffic only.
-        </p>
-      </section>
+      <p className="text-xs" style={{ color: "var(--gaf-text-muted)" }}>
+        All GA4 metrics on this dashboard cover Australian traffic only.
+      </p>
     </div>
   );
 }

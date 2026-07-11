@@ -175,9 +175,14 @@ export function MetaCreativeModal({ creative, onClose }: MetaCreativeModalProps)
               </p>
             )}
             {creative.body && (
-              <p className="text-xs leading-relaxed line-clamp-4" style={{ color: "var(--gaf-text-muted)" }}>
-                {String(creative.body)}
-              </p>
+              <div className="mt-2">
+                <p className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: "var(--gaf-text-muted)" }}>
+                  Ad Copy
+                </p>
+                <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: "var(--gaf-text-secondary)" }}>
+                  {String(creative.body)}
+                </p>
+              </div>
             )}
           </div>
 
@@ -219,18 +224,31 @@ export function MetaCreativeModal({ creative, onClose }: MetaCreativeModalProps)
             </div>
           </div>
 
-          {/* Ads Manager link */}
-          {adsManagerUrl && (
-            <a
-              href={adsManagerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs underline"
-              style={{ color: "var(--gaf-primary)" }}
-            >
-              Open in Ads Manager
-            </a>
-          )}
+          {/* Action links — Preview Ad (filled) + Ads Manager (outline), reference parity */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {creative.previewLink && (
+              <a
+                href={String(creative.previewLink)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white inline-flex items-center gap-1.5"
+                style={{ background: "var(--gaf-primary)" }}
+              >
+                <span aria-hidden="true">&#9678;</span> Preview Ad
+              </a>
+            )}
+            {adsManagerUrl && (
+              <a
+                href={adsManagerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5"
+                style={{ color: "var(--gaf-text-secondary)", border: "1px solid var(--gaf-input-border)" }}
+              >
+                <span aria-hidden="true">&#8599;</span> Ads Manager
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>
