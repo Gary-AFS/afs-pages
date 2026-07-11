@@ -9,6 +9,9 @@ const FEED_URL =
 
 export interface OverviewKpis {
   adSpend: number;
+  /** 6% agency fee on Meta + Google media spend only */
+  agencyFees?: number;
+  adSpendInclFees?: number;
   revenue: number;
   blendedMer: number;
   sessions: number;

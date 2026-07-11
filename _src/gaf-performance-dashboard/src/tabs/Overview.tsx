@@ -12,7 +12,7 @@ interface OverviewProps {
 }
 
 const CAVEAT =
-  "Blended MER = ad spend ÷ total Shopify revenue (lower is more efficient). " +
+  "Blended MER = (ad spend + 6% agency fee on Meta and Google spend only) ÷ total Shopify revenue; lower is more efficient. " +
   "Many GAF sales close offline by phone, so treat channel-level ROAS as directional, not a verdict.";
 
 function SeverityDot({ severity }: { severity: Anomaly["severity"] }) {
@@ -135,7 +135,8 @@ export function Overview({ data }: OverviewProps) {
             value={fmtPct(kpis.blendedMer ?? 0)}
             delta={deltas.blendedMer ?? null}
             invertDelta
-            tooltip="Marketing efficiency ratio — ad spend ÷ total Shopify revenue. Lower is more efficient."
+            subLabel={kpis.agencyFees ? `incl. ${fmtCurrency(kpis.agencyFees)} agency fee` : undefined}
+            tooltip="Marketing efficiency ratio — (ad spend + 6% agency fee on Meta and Google spend) ÷ total Shopify revenue. Lower is more efficient."
           />
           <KpiCard
             label="Sessions"
