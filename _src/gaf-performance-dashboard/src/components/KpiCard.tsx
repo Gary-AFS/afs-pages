@@ -18,7 +18,7 @@ export function KpiCard({ label, value, delta, invertDelta, subLabel, tooltip }:
       className="dash-card flex flex-col gap-1 min-w-0 p-3 sm:p-5"
       title={tooltip}
     >
-      {/* LABEL — 10px uppercase tracking-wider, gray-400 */}
+      {/* LABEL — 10px uppercase tracking-wider, gray-400; ⓘ marks a tooltip */}
       <span
         className="text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate"
         style={{
@@ -27,6 +27,9 @@ export function KpiCard({ label, value, delta, invertDelta, subLabel, tooltip }:
         }}
       >
         {label}
+        {tooltip && (
+          <span aria-hidden="true" className="ml-1 opacity-60">&#9432;</span>
+        )}
       </span>
 
       {/* KPI NUMBER + DELTA — wraps rather than clipping on narrow cards */}

@@ -65,6 +65,12 @@ function windowToDates(win: Window): { since: string; until: string } {
     d.setUTCDate(d.getUTCDate() - n);
     return d;
   };
+  if (win === "mtd") {
+    // Month to date, anchored to yesterday's month (Adelaide)
+    const anchor = daysAgo(1);
+    const first = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), 1));
+    return { since: pad(first), until: pad(anchor) };
+  }
   if (win === "lastMonth") {
     // Previous calendar month (Adelaide-anchored)
     const firstOfThis = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));

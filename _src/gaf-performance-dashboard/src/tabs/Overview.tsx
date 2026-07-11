@@ -122,13 +122,13 @@ export function Overview({ data }: OverviewProps) {
             label="Ad Spend"
             value={fmtCurrency(kpis.adSpend ?? 0)}
             delta={deltas.adSpend ?? null}
-            tooltip="Meta + Google + Axon spend for the selected window."
+            tooltip="Source: Meta, Google Ads and AppLovin (Axon) APIs, pulled nightly. Calculation: sum of media spend for the selected window. Excludes the 6% agency fee (that enters the MER only)."
           />
           <KpiCard
             label="Revenue"
             value={fmtCurrency(kpis.revenue ?? 0)}
             delta={deltas.revenue ?? null}
-            tooltip="Total Shopify revenue — includes offline/phone orders GA4 misses."
+            tooltip="Source: Shopify orders API (all order line items). Calculation: sum of discounted line revenue for orders created in the window. Includes phone/offline orders that GA4 never sees."
           />
           <KpiCard
             label="Blended MER"
@@ -136,20 +136,20 @@ export function Overview({ data }: OverviewProps) {
             delta={deltas.blendedMer ?? null}
             invertDelta
             subLabel={kpis.agencyFees ? `incl. ${fmtCurrency(kpis.agencyFees)} agency fee` : undefined}
-            tooltip="Marketing efficiency ratio — (ad spend + 6% agency fee on Meta and Google spend) ÷ total Shopify revenue. Lower is more efficient."
+            tooltip="Sources: ad platform APIs + Shopify. Calculation: (media spend + 6% agency fee on Meta and Google spend only) ÷ total Shopify revenue. Lower is more efficient; team target ~12%. Delta compares the prior equal period."
           />
           <KpiCard
             label="Sessions"
             value={fmtInt(kpis.sessions ?? 0)}
             delta={deltas.sessions ?? null}
-            tooltip="GA4 website sessions (Australian traffic only)."
+            tooltip="Source: GA4 (gymandfitness.com.au property), filtered to Australian traffic only. Calculation: total sessions in the window."
           />
           {kpis.onlineRevenue != null && kpis.onlineRevenue > 0 && (
             <KpiCard
               label="Online Revenue"
               value={fmtCurrency(kpis.onlineRevenue)}
               delta={deltas.onlineRevenue ?? null}
-              tooltip="GA4 online-attributed revenue (Australian traffic only), shown for reference against total Shopify revenue."
+              tooltip="Source: GA4 purchase revenue, Australian traffic only. The online-attributed subset of Shopify revenue — the gap between this and Revenue is offline/phone sales."
             />
           )}
         </div>

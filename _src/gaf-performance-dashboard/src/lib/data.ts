@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export type Window = "yesterday" | "7d" | "30d" | "90d" | "lastMonth";
+export type Window = "yesterday" | "7d" | "30d" | "90d" | "lastMonth" | "mtd";
 
 const FEED_URL =
   "https://gaf-perf-dashboard.pages.dev/gaf-performance-data.json";
