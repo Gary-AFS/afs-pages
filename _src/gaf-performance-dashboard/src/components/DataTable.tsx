@@ -14,6 +14,8 @@ interface Column<T extends Record<string, unknown>> {
   tooltip?: string;
   /** Secondary muted line under the cell value (e.g. "BROAD · Campaign name") */
   sub?: (row: T) => string;
+  /** When set and truthy for a row, the cell value renders as a link (new tab) */
+  href?: (row: T) => string;
 }
 
 interface DataTableProps<T extends Record<string, unknown>> {
@@ -135,6 +137,7 @@ export function DataTable<T extends Record<string, unknown>>({
                   const cell = col.format ? col.format(raw) : String(raw ?? "");
                   const isName = col.isName ?? colIdx === 0;
                   const sub = col.sub ? col.sub(row) : "";
+                  const link = col.href ? col.href(row) : "";
                   return (
                     <td
                       key={col.key}
@@ -145,7 +148,17 @@ export function DataTable<T extends Record<string, unknown>>({
                         fontVariantNumeric: col.align === "right" ? "tabular-nums" : undefined,
                       }}
                     >
-                      {cell}
+                      {link ? (
+                        <a
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                          style={{ color: "inherit" }}
+                        >
+                          {cell}
+                        </a>
+                      ) : cell}
                       {sub && (
                         <div
                           className="text-[11px] font-normal truncate max-w-[280px]"

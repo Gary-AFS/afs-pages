@@ -80,9 +80,18 @@ export interface HubspotKpis {
   totalRevenue: number;
 }
 
+export interface HubspotList {
+  name?: string;
+  listId?: string;
+  size?: number;
+  growth30dPct?: number | null;
+  history?: Array<{ date: string; size: number }>;
+}
+
 export interface HubspotWindow {
   kpis: HubspotKpis;
   sends: Record<string, any>[];
+  list?: HubspotList | null;
 }
 
 export interface ShopifyKpis {

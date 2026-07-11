@@ -133,7 +133,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "seo",         label: "SEO / AEO",         Icon: IconSeo },
   { id: "axon",        label: "Axon",              Icon: IconAxon },
   { id: "email",       label: "Email",             Icon: IconHubSpot },
-  { id: "experiments", label: "Experiments",       Icon: IconExperiments },
+  { id: "experiments", label: "Experimentation Engine", Icon: IconExperiments },
 ];
 
 // ---- Sidebar component ----
