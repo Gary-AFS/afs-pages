@@ -38,6 +38,7 @@ const WINDOW_LABELS: Record<Window, string> = {
   "7d":      "Last 7 days",
   "30d":     "Last 30 days",
   "90d":     "Last 90 days",
+  lastMonth: "Last month",
 };
 
 /** Latest date the snapshot covers — the last day in the 90d blended series. */
@@ -131,7 +132,7 @@ function DashboardShell({ data, onReload }: { data: PerfData; onReload: () => vo
                 color: "var(--gaf-text-primary)",
               }}
             >
-              {(["yesterday", "7d", "30d", "90d"] as Window[]).map((w) => (
+              {(["yesterday", "7d", "30d", "90d", "lastMonth"] as Window[]).map((w) => (
                 <option key={w} value={w}>
                   {WINDOW_LABELS[w]}
                 </option>

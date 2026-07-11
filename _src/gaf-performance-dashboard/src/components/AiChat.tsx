@@ -10,7 +10,7 @@ import { useDateRange } from "../state/DateRangeContext";
 import type { PerfData, Window } from "../lib/data";
 
 const WORKER_URL = "https://gaf-dash-ai.josh-03c.workers.dev";
-const WINDOWS: Window[] = ["yesterday", "7d", "30d", "90d"];
+const WINDOWS: Window[] = ["yesterday", "7d", "30d", "90d", "lastMonth"];
 const MAX_TOOL_ROUNDS = 6;
 
 interface ChatMessage {
