@@ -112,11 +112,23 @@ function IconExperiments() {
   );
 }
 
+// Marketing Expenses — pie-slice mark in GAF orange (this tab leads with a pie).
+function IconExpenses() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" fill="#fde0cc" />
+      <path d="M12 12V3a9 9 0 0 1 7.79 4.5L12 12Z" fill="#f26422" />
+      <path d="M12 12l7.79 4.5A9 9 0 0 1 12 21a9 9 0 0 1-9-9 9 9 0 0 1 9-9v9Z" fill="none" />
+      <circle cx="12" cy="12" r="9" fill="none" stroke="#f26422" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
 // ---- Nav item config ----
 
 export type TabId =
   | "overview" | "meta" | "google" | "pinterest" | "website"
-  | "seo" | "axon" | "email" | "experiments";
+  | "seo" | "axon" | "email" | "experiments" | "expenses";
 
 interface NavItem {
   id: TabId;
@@ -134,6 +146,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "axon",        label: "Axon",              Icon: IconAxon },
   { id: "email",       label: "Email",             Icon: IconHubSpot },
   { id: "experiments", label: "Experimentation Engine", Icon: IconExperiments },
+  { id: "expenses",    label: "Marketing Expenses",     Icon: IconExpenses },
 ];
 
 // ---- Sidebar component ----

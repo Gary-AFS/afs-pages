@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 export type Window = "yesterday" | "7d" | "30d" | "90d" | "lastMonth" | "mtd";
 
 const FEED_URL =
+  (import.meta.env?.VITE_FEED_URL as string | undefined) ||
   "https://gaf-perf-dashboard.pages.dev/gaf-performance-data.json";
 
 // ----- KPI shapes -----
@@ -385,6 +386,25 @@ export interface ExperimentsData {
   experiments?: ExperimentRow[];
 }
 
+// ----- Marketing Expenses shapes -----
+
+export interface ExpenseLineItem {
+  name: string;
+  category: string;
+  /** TRUE = paid ad-channel spend (already shown on Meta/Google/Axon tabs) */
+  mediaSpend: boolean;
+  amount: number;
+  count: number;
+}
+
+export interface ExpensesWindow {
+  lineItems: ExpenseLineItem[];
+  total: number;
+  totalExMedia: number;
+  count: number;
+  dataThrough: string | null;
+}
+
 // ----- Axon shapes -----
 
 export interface AxonKpis {
@@ -466,6 +486,7 @@ export interface PerfData {
   shopify: WindowedRecord<ShopifyWindow>;
   seo?: WindowedRecord<SeoWindow>;
   pinterest?: WindowedRecord<PinterestWindow>;
+  expenses?: WindowedRecord<ExpensesWindow>;
   experiments?: ExperimentsData;
   products: WindowedRecord<ProductRow[]>;
   overview: WindowedRecord<OverviewWindow>;
