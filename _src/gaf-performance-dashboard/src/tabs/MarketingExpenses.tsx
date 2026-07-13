@@ -13,8 +13,11 @@ import { DataTable } from "../components/DataTable";
 import { DonutChart } from "../components/DonutChart";
 import type { DonutSlice } from "../components/DonutChart";
 import { CaveatBanner } from "../components/CaveatBanner";
+import { SourceLink } from "../components/SourceLink";
 import { fmtCurrency, fmtInt } from "../lib/format";
 import type { PerfData, ExpenseLineItem } from "../lib/data";
+
+const EXPENSES_SHEET_URL = "https://docs.google.com/spreadsheets/d/1RRlMgNqAk-BN3PA8H3ywqSWLUJY-5_yG_EXy-X5JkUw/edit?gid=762379671#gid=762379671";
 
 interface Props {
   data: PerfData;
@@ -103,9 +106,12 @@ export function MarketingExpenses({ data }: Props) {
       {/* Header row: title + toggle */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>
-            Marketing Expenses
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>
+              Marketing Expenses
+            </h2>
+            <SourceLink href={EXPENSES_SHEET_URL} title="Source: marketing expenses ledger (Google Sheet)" />
+          </div>
           <p className="text-xs mt-0.5" style={{ color: "var(--gaf-text-muted)" }}>
             {excludeMedia ? "Non-media operating costs" : "Total marketing outlay incl. ad spend"} · gross (incl. GST)
             {win.dataThrough ? ` · data through ${win.dataThrough}` : ""}

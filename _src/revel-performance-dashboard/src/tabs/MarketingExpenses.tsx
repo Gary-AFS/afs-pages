@@ -4,7 +4,7 @@
 // pulled server-side by sources/expenses.py.
 //
 // The "Exclude ad spend" toggle (default ON) drops rows flagged mediaSpend —
-// that paid-channel spend is already shown in full on the Meta/Google/Axon tabs,
+// that paid-channel spend is already shown in full on the Meta/Google tabs,
 // and left in it swamps the pie (~96% of every window). Off shows total outlay.
 import { useState } from "react";
 import { useDateRange } from "../state/DateRangeContext";
@@ -13,8 +13,11 @@ import { DataTable } from "../components/DataTable";
 import { DonutChart } from "../components/DonutChart";
 import type { DonutSlice } from "../components/DonutChart";
 import { CaveatBanner } from "../components/CaveatBanner";
+import { SourceLink } from "../components/SourceLink";
 import { fmtCurrency, fmtInt } from "../lib/format";
 import type { PerfData, ExpenseLineItem } from "../lib/data";
+
+const EXPENSES_SHEET_URL = "https://docs.google.com/spreadsheets/d/1KReaKeXaaS64z9YWQZJbzPCdW86KH7zKVFwURzR-FPs/edit?gid=1824336538#gid=1824336538";
 
 interface Props {
   data: PerfData;
@@ -103,9 +106,12 @@ export function MarketingExpenses({ data }: Props) {
       {/* Header row: title + toggle */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>
-            Marketing Expenses
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold" style={{ color: "var(--gaf-text-primary)", fontFamily: "var(--font-display)" }}>
+              Marketing Expenses
+            </h2>
+            <SourceLink href={EXPENSES_SHEET_URL} title="Source: marketing expenses ledger (Google Sheet)" />
+          </div>
           <p className="text-xs mt-0.5" style={{ color: "var(--gaf-text-muted)" }}>
             {excludeMedia ? "Non-media operating costs" : "Total marketing outlay incl. ad spend"} · gross (incl. GST)
             {win.dataThrough ? ` · data through ${win.dataThrough}` : ""}
@@ -122,7 +128,7 @@ export function MarketingExpenses({ data }: Props) {
             border: "1px solid var(--gaf-input-border)",
           }}
           aria-pressed={excludeMedia}
-          title="Ad-channel spend (Meta, Google, Pinterest, Axon…) is already shown in full on those tabs. Excluding it here keeps this pie about your other marketing costs."
+          title="Ad-channel spend (Meta, Google) is already shown in full on those tabs. Excluding it here keeps this pie about your other marketing costs."
         >
           <span
             className="w-8 h-4 rounded-full relative transition-colors shrink-0"
@@ -148,7 +154,7 @@ export function MarketingExpenses({ data }: Props) {
           <KpiCard
             label="Ad Spend Excluded"
             value={excludeMedia ? fmtCurrency(adSpend) : "—"}
-            subLabel={excludeMedia ? "shown on Meta / Google / Axon tabs" : "included above"}
+            subLabel={excludeMedia ? "shown on Meta / Google tabs" : "included above"}
             tooltip="Paid ad-channel spend flagged as media in the ledger. Excluded from the view above when the toggle is on to avoid double-counting the channel tabs."
           />
           <KpiCard label="Line Items" value={fmtInt(items.length)} tooltip="Distinct vendors/items after grouping duplicates over the window." />
