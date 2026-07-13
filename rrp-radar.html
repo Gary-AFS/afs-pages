@@ -261,13 +261,13 @@
 
   <div class="card">
     <h2><span class="n">2</span> Where the pricing comes from</h2>
-    <p>Entirely from each brand's <strong>public storefront</strong>, no API key required. For each line, the worker resolves the product handle via the storefront's predictive-search endpoint, then reads exact per-variant pricing from the product AJAX endpoint:</p>
-    <pre><span>// title &rarr; handle</span>
-GET /search/suggest.json?q={title}&amp;resources[type]=product
-<span>// handle &rarr; per-variant price &amp; compare_at_price (in cents)</span>
-GET /products/{handle}.js</pre>
-    <p>It matches the exact variant by SKU first, then variant name, then price. If <code>compare_at_price</code> is higher than the current price, the line is on sale and the difference is the saving. This is the same pricing the customer sees on the website, so the rep's quote and the storefront never disagree.</p>
-    <div class="note good"><strong>Verified against live catalogue.</strong> Tested end-to-end on real GAF products &mdash; e.g. the Force USA G20 Pro resolves to <em>was $8,499, now $5,999, save $2,500</em> straight from the storefront.</div>
+    <p>Entirely from each brand's <strong>public storefront</strong>, no API key required. Each draft-order line exposes its exact <strong>variant ID</strong> in the admin, and the worker matches that against a catalogue it pulls once (and caches) from the storefront's public product feed:</p>
+    <pre><span>// build a variant&rarr;price index once, cached 30 min</span>
+GET /products.json?limit=250&amp;page=N   <span>// id, price, compare_at_price</span>
+<span>// fallback for anything not in the feed:</span>
+GET /search/suggest.json?q={title}  &rarr;  GET /products/{handle}.js</pre>
+    <p>Resolving by variant ID is exact and immune to title quirks &mdash; the old title-search path returned nothing for products with a <code>&trade;</code> or unusual characters in the name, which showed as &ldquo;no live price&rdquo;. If <code>compare_at_price</code> is higher than the current price, the line is on sale and the difference is the saving. This is the same pricing the customer sees on the website, so the rep&rsquo;s quote and the storefront never disagree.</p>
+    <div class="note good"><strong>Verified against a live 5-line order.</strong> Every catalogue product prices correctly &mdash; e.g. the Force USA G20 Pro resolves to <em>was $8,499, now $5,999, save $2,500</em>. Service items (e.g. &ldquo;Assembly &amp; Rubbish Removal&rdquo;) have no storefront product, so they correctly show no price.</div>
   </div>
 
   <div class="card">
@@ -293,7 +293,7 @@ GET /products/{handle}.js</pre>
 
 </div>
 <footer>
-  The AFS Group &middot; AFS RRP Radar v0.2.2 &middot; Built 13 Jul 2026 &middot; Managed by Josh / Gary<br>
+  The AFS Group &middot; AFS RRP Radar v0.3.0 &middot; Built 13 Jul 2026 &middot; Managed by Josh / Gary<br>
   Questions &rarr; <a href="mailto:josh@gymandfitness.com.au">josh@gymandfitness.com.au</a>
 </footer>
 </body>
