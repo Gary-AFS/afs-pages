@@ -33,6 +33,21 @@ table{border-collapse:collapse}
 </style>
 </head>
 <body>
+<!-- ============ RETIREMENT MODAL (added 2026-07-13) ============ -->
+<div id="retired-modal" style="position:fixed;inset:0;z-index:99999;background:rgba(17,24,39,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;font-family:'Open Sans',sans-serif">
+  <div style="background:#fff;max-width:540px;width:100%;border-radius:20px;padding:40px 36px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.35)">
+    <div style="width:56px;height:56px;border-radius:14px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px">&#128330;</div>
+    <h1 style="font-family:'Montserrat',sans-serif;font-size:23px;font-weight:800;color:#111827;margin-bottom:12px">This dashboard has been retired</h1>
+    <p style="font-size:14px;line-height:1.65;color:#6b7280;margin-bottom:28px">The Google Ads dashboard has been replaced by the new brand <strong>Performance Marketing dashboards</strong> &mdash; Google Ads now sits alongside Meta, GA4, Shopify, SEO/AEO, email and marketing expenses, all in one place.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a href="https://gary-afs.github.io/afs-pages/gaf-performance-dashboard/" style="display:block;background:#f26422;color:#fff;text-decoration:none;padding:15px 20px;border-radius:12px;font-weight:700;font-size:15px;font-family:'Montserrat',sans-serif">Open the GAF Performance Dashboard &rarr;</a>
+      <a href="https://gary-afs.github.io/afs-pages/revel-performance-dashboard/" style="display:block;background:#25B34B;color:#fff;text-decoration:none;padding:15px 20px;border-radius:12px;font-weight:700;font-size:15px;font-family:'Montserrat',sans-serif">Open the Revel Performance Dashboard &rarr;</a>
+    </div>
+    <p style="font-size:12px;color:#9ca3af;margin-top:26px">AFS Group &middot; Performance Marketing</p>
+  </div>
+</div>
+<!-- ============ /RETIREMENT MODAL ============ -->
+
 <div id="root"></div>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo } = React;
