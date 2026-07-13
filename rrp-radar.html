@@ -209,7 +209,7 @@
   <div class="card">
     <h2>Troubleshooting</h2>
     <h3>The panel says "No line items detected yet"</h3>
-    <p>Make sure you're on the draft-order editor with at least one product added, then click <strong>Rescan</strong>. RRP Radar keys off the product links in the line list; if Shopify has changed the admin layout, ping Gary or Josh &mdash; it's a quick tune (see the status note in Part 2).</p>
+    <p>Make sure you're on the draft-order editor with at least one product added, then click <strong>Rescan</strong>. RRP Radar reads the product links in the line list &mdash; including Shopify's newer web-component admin, which nests them in Shadow DOM. If badges still don't attach after a reload, ping Gary or Josh with a screenshot.</p>
     <h3>A line shows "no live price"</h3>
     <p>That line couldn't be matched to a storefront product &mdash; usually a custom/one-off item, a product not published to the online store, or an unusual title. On-catalogue products match automatically. Hover the badge to see why.</p>
     <h3>Nothing appears at all</h3>
@@ -282,7 +282,7 @@ GET /products/{handle}.js</pre>
 
   <div class="card">
     <h2><span class="n">4</span> Status &amp; limitations</h2>
-    <div class="note warn"><strong>Version 0.1 &mdash; first cut.</strong> The pricing engine is verified against the live catalogue. The one piece that may need a short tuning pass is how it locates line items inside the Shopify admin, since Shopify's admin layout can vary. If badges don't attach on the first go, that's a five-minute selector adjustment &mdash; send Gary a screenshot of the draft order and it'll be sorted.</div>
+    <div class="note"><strong>Version 0.2 &mdash; verified live.</strong> Line-item detection now works against Shopify's current admin, which renders the order editor as web components inside nested Shadow DOM. Badges attach under each product and the summary tallies the total saving. Confirmed end-to-end on a live multi-line draft order.</div>
     <ul>
       <li>Custom / one-off line items (not real catalogue products) won't have a storefront price to match &mdash; they show "no live price".</li>
       <li>Products not published to the online store can't be read from the storefront.</li>
@@ -293,7 +293,7 @@ GET /products/{handle}.js</pre>
 
 </div>
 <footer>
-  The AFS Group &middot; AFS RRP Radar v0.1.0 &middot; Built 13 Jul 2026 &middot; Managed by Josh / Gary<br>
+  The AFS Group &middot; AFS RRP Radar v0.2.0 &middot; Built 13 Jul 2026 &middot; Managed by Josh / Gary<br>
   Questions &rarr; <a href="mailto:josh@gymandfitness.com.au">josh@gymandfitness.com.au</a>
 </footer>
 </body>
