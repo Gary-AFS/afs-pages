@@ -98,7 +98,7 @@ export function Pinterest({ data }: Props) {
         <DataTable<Row> columns={CAMPAIGN_COLS} rows={campaigns} sortable />
       </section>
 
-      <CaveatBanner text="Many GAF sales close offline via phone or in-store – ROAS figures are directional only." />
+      <CaveatBanner text="Many Revel sales close offline via phone – ROAS figures are directional only." />
     </div>
   );
 }

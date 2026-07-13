@@ -107,7 +107,7 @@ function DashboardShell({ data, onReload }: { data: PerfData; onReload: () => vo
           <div className="flex items-center gap-3 mr-auto min-w-0">
             <img
               src={GAF_LOGO_URL}
-              alt="Gym and Fitness"
+              alt="Revel Saunas"
               className="h-7 sm:h-9 w-auto shrink-0"
             />
             <h1

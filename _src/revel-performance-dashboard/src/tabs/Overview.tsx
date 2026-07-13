@@ -13,7 +13,7 @@ interface OverviewProps {
 
 const CAVEAT =
   "Blended MER = (ad spend + 6% agency fee on Meta and Google spend only) ÷ total Shopify revenue; lower is more efficient. " +
-  "Many GAF sales close offline by phone, so treat channel-level ROAS as directional, not a verdict.";
+  "Many Revel sales close offline by phone, so treat channel-level ROAS as directional, not a verdict.";
 
 function SeverityDot({ severity }: { severity: Anomaly["severity"] }) {
   const colour =

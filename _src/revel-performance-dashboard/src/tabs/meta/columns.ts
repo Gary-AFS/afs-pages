@@ -48,7 +48,7 @@ export const METRIC_TOOLTIPS: Record<string, string> = {
   cpa: "Cost per purchase — spend ÷ conversions. Lower is better.",
   convValue: "Revenue value of attributed purchases.",
   purchaseValue: "Revenue value of attributed purchases.",
-  roas: "Return on ad spend — revenue ÷ spend. Directional only: many GAF sales close offline.",
+  roas: "Return on ad spend — revenue ÷ spend. Directional only: many Revel sales close offline.",
   engagements: "Post engagements (reactions, comments, shares, clicks).",
   engagementRate: "Engagements ÷ impressions.",
 };

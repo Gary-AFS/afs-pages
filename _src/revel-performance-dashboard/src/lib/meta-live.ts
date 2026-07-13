@@ -15,7 +15,7 @@ import type { Window } from "./data";
 // ---------------------------------------------------------------------------
 
 const WORKER_BASE = "https://meta-api-proxy.josh-03c.workers.dev/v21.0";
-const GAF_ACCOUNT = "act_10153080558849684";
+const GAF_ACCOUNT = "act_2412898282250572";   // Revel
 /** Sentinel forwarded to the Worker; the Worker substitutes the real token. */
 const PROXY_TOKEN = "proxied";
 

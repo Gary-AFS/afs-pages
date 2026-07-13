@@ -76,7 +76,7 @@ export function GoogleOverview({ googleWin }: Props) {
           <KpiCard label="Conv. Value"        value={fmtCurrency(kpis.convValue ?? 0)}       delta={deltas.convValue ?? null}
                    tooltip="Total revenue value of those primary conversions." />
           <KpiCard label="ROAS"               value={fmtRoas(kpis.roas ?? 0)}               delta={deltas.roas ?? null}
-                   tooltip="Return on ad spend — conversion value ÷ spend. Directional only: many GAF sales close offline." />
+                   tooltip="Return on ad spend — conversion value ÷ spend. Directional only: many Revel sales close offline." />
           <KpiCard label="CPA"                value={fmtCurrency(kpis.cpa ?? 0)}            delta={deltas.cpa ?? null}             invertDelta
                    tooltip="Cost per acquisition — spend ÷ conversions. Lower is better." />
           <KpiCard label="Add to Cart"        value={fmtInt(kpis.atc ?? 0)}                 delta={deltas.atc ?? null}
@@ -93,7 +93,7 @@ export function GoogleOverview({ googleWin }: Props) {
         <p className="mt-3 flex items-start gap-1.5 text-xs" style={{ color: "var(--gaf-text-muted)" }}>
           <span aria-hidden="true">&#9432;</span>
           <span>
-            Many GAF purchases close offline via phone or sales team. Conversions, ROAS and CPA
+            Many Revel purchases close offline via phone or sales team. Conversions, ROAS and CPA
             understate phone-closing campaigns – treat as directional signals, not a verdict.
           </span>
         </p>
@@ -235,7 +235,7 @@ export function GoogleOverview({ googleWin }: Props) {
         </div>
       </div>
 
-      <CaveatBanner text="Many GAF sales close offline via phone or in-store. ROAS and conversion figures are directional only – not a performance verdict." />
+      <CaveatBanner text="Many Revel sales close offline via phone. ROAS and conversion figures are directional only – not a performance verdict." />
     </div>
   );
 }

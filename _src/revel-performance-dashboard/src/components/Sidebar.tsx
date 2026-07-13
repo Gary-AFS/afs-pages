@@ -170,7 +170,7 @@ export function Sidebar({ active, onSelect }: SidebarProps) {
       >
         <img
           src="https://cdn.shopify.com/s/files/1/0802/6279/1481/files/REVEL_Logo_Icon_f9894379-f5b2-45a6-8c22-7de8cf21404e.png?v=1691241102"
-          alt="Gym and Fitness"
+          alt="Revel Saunas"
           className="w-7 h-7 shrink-0"
         />
         <span

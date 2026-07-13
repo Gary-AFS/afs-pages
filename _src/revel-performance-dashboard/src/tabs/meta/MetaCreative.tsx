@@ -376,7 +376,7 @@ export function MetaCreative({ metaWin }: Props) {
 
       <p className="text-[11px]" style={{ color: "var(--gaf-text-muted)" }}>
         Top 3 by the rank metric carry an orange border; green/red borders compare each ad to the mean of the visible set.
-        ROAS is directional only — many GAF sales close offline via phone or in-store.
+        ROAS is directional only — many Revel sales close offline via phone.
       </p>
 
       {/* Modal */}

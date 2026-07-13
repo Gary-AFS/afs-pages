@@ -17,7 +17,7 @@ interface MetaAdsProps {
 }
 
 const CAVEAT =
-  "Many GAF sales close offline via phone or in-store. ROAS figures are directional only - not a performance verdict.";
+  "Many Revel sales close offline via phone. ROAS figures are directional only - not a performance verdict.";
 
 type SubTab =
   | "overview"

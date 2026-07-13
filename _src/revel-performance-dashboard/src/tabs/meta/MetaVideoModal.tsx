@@ -7,7 +7,7 @@ import { fmtCurrency, fmtInt } from "../../lib/format";
 import { fetchVideoSource } from "../../lib/meta-live";
 import type { MetaVideoRow } from "../../lib/data";
 
-const GAF_ACCOUNT_ID = "10153080558849684";
+const GAF_ACCOUNT_ID = "2412898282250572";   // Revel
 
 export interface VideoModalTarget extends MetaVideoRow {
   /** joined from creative[] by adId */
