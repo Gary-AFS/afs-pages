@@ -12,8 +12,14 @@ export interface OverviewKpis {
   adSpend: number;
   /** 6% agency fee on Meta + Google media spend only */
   agencyFees?: number;
-  adSpendInclFees?: number;
+  /** non-media marketing expenses (expenses ledger minus paid ad spend) folded into MER */
+  marketingExpenses?: number;
+  /** ad spend + agency fee + marketing expenses (the MER numerator) */
+  totalMarketingCost?: number;
+  /** NetSuite Sales Array — total sales incl. phone/offline/B2B */
   revenue: number;
+  /** Shopify orders revenue, kept for reference */
+  shopifyRevenue?: number;
   blendedMer: number;
   sessions: number;
   onlineRevenue: number;

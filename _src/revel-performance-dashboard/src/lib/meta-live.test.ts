@@ -79,8 +79,8 @@ describe("refreshMeta", () => {
 
     // Must hit the Cloudflare Worker
     expect(calledUrl).toContain("meta-api-proxy.josh-03c.workers.dev");
-    // Must target the GAF account
-    expect(calledUrl).toContain("act_10153080558849684");
+    // Must target the Revel account
+    expect(calledUrl).toContain("act_2412898282250572");
     // Must be an insights call
     expect(calledUrl).toContain("/insights");
     // Must include the proxy sentinel (not a real token)

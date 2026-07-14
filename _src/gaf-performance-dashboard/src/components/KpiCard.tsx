@@ -1,6 +1,7 @@
 // src/components/KpiCard.tsx
 import { useEffect, useRef, useState } from "react";
 import { Delta } from "./Delta";
+import { SourceLink } from "./SourceLink";
 
 interface KpiCardProps {
   label: string;
@@ -11,9 +12,11 @@ interface KpiCardProps {
   subLabel?: string;
   /** Source/calculation note — hover on desktop, tap the ⓘ on touch devices */
   tooltip?: string;
+  /** Clickable source-document links, rendered top-right of the card */
+  sources?: { href: string; title: string }[];
 }
 
-export function KpiCard({ label, value, delta, invertDelta, subLabel, tooltip }: KpiCardProps) {
+export function KpiCard({ label, value, delta, invertDelta, subLabel, tooltip, sources }: KpiCardProps) {
   const [open, setOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +47,15 @@ export function KpiCard({ label, value, delta, invertDelta, subLabel, tooltip }:
       style={{ zIndex: open ? 40 : undefined }}
       onMouseLeave={() => setOpen(false)}
     >
+      {/* Source-document links (top-right) */}
+      {sources && sources.length > 0 && (
+        <div className="absolute top-2 right-2 flex gap-1">
+          {sources.map((s) => (
+            <SourceLink key={s.href + s.title} href={s.href} title={s.title} />
+          ))}
+        </div>
+      )}
+
       {/* LABEL — ⓘ marks a tooltip; hover or tap to open */}
       <span
         className="text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate"
