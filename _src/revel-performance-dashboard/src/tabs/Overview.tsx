@@ -138,7 +138,7 @@ export function Overview({ data }: OverviewProps) {
             delta={deltas.revenue ?? null}
             subLabel={kpis.shopifyRevenue ? `Shopify: ${fmtCurrency(kpis.shopifyRevenue)}` : undefined}
             sources={[{ href: SALES_SHEET_URL, title: "Source: NetSuite daily sales pivot (Google Sheet)" }]}
-            tooltip="Source: NetSuite daily sales pivot (published sheet). Calculation: sum of daily total sales revenue (incl. shipping) for the window. Captures phone, offline and B2B sales that Shopify and GA4 never see; Shopify online revenue shown below for reference."
+            tooltip="Source: NetSuite daily sales pivot (published sheet). Calculation: sum of daily total sales revenue (incl. shipping) for the window, grossed up 10% for GST (the sheet is GST-exclusive). Captures phone, offline and B2B sales that Shopify and GA4 never see; Shopify online revenue shown below for reference."
           />
           <KpiCard
             label="Blended MER"
