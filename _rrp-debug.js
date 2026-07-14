@@ -108,6 +108,22 @@ window.chrome = {
 
   const PRICE_RE = /\$\s?[\d,]+\.\d{2}/;
 
+  // textContent of an element with our OWN badge text removed. The badge shows
+  // prices ("was $X · save $Y"), and if that text is counted, findLineRows' "nearest
+  // ancestor containing a price" resolves to the tight badge/SKU stack — which does
+  // NOT contain the quantity input — so extractQty defaults to 1 and the saving
+  // reverts to the per-unit amount after the badge is placed. Ignore the badge text
+  // in all price detection so the row stays the full line (incl. the qty input).
+  function textNoBadge(el) {
+    if (!el) return '';
+    let t = el.textContent || '';
+    const badges = el.querySelectorAll ? el.querySelectorAll('.afsrrp-badge') : null;
+    if (badges && badges.length) {
+      badges.forEach(b => { const bt = b.textContent || ''; if (bt) t = t.split(bt).join(''); });
+    }
+    return t;
+  }
+
   // ---- store detection -----------------------------------------------------
   function currentStore() {
     // https://admin.shopify.com/store/{handle}/draft_orders/123
@@ -156,7 +172,7 @@ window.chrome = {
       while (el && hops < 12) {
         const p = parentAcrossShadow(el);
         if (!p) break;
-        if (PRICE_RE.test(p.textContent || '')) { row = p; break; }
+        if (PRICE_RE.test(textNoBadge(p))) { row = p; break; }
         el = p; hops++;
       }
       // Badge host: append into the parent of the SKU line so the badge lands
@@ -179,7 +195,7 @@ window.chrome = {
         host = g.el; let h2 = 0;
         while (host && h2 < 8) {
           const p = parentAcrossShadow(host);
-          if (!p || PRICE_RE.test(p.textContent || '')) break;
+          if (!p || PRICE_RE.test(textNoBadge(p))) break;
           host = p; h2++;
         }
       }
@@ -225,7 +241,7 @@ window.chrome = {
   }
 
   function extractRow(info) {
-    const text = (info.row.textContent || '').replace(/\s+/g, ' ').trim();
+    const text = textNoBadge(info.row).replace(/\s+/g, ' ').trim();
     let sku = '';
     const skuM = text.match(/SKU\s*([A-Za-z0-9._\/\-]+)/i);
     if (skuM) {
