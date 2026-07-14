@@ -12,8 +12,8 @@ interface OverviewProps {
 }
 
 const CAVEAT =
-  "Blended MER = (ad spend + 6% agency fee on Meta and Google spend only) ÷ total Shopify revenue; lower is more efficient. " +
-  "Many GAF sales close offline by phone, so treat channel-level ROAS as directional, not a verdict.";
+  "Blended MER = (ad spend + 6% agency fee on Meta and Google + other marketing expenses) ÷ total NetSuite sales revenue; lower is more efficient. " +
+  "Revenue is total sales from NetSuite (incl. phone/offline/B2B), so treat channel-level ROAS as directional, not a verdict.";
 
 function SeverityDot({ severity }: { severity: Anomaly["severity"] }) {
   const colour =
@@ -128,15 +128,22 @@ export function Overview({ data }: OverviewProps) {
             label="Revenue"
             value={fmtCurrency(kpis.revenue ?? 0)}
             delta={deltas.revenue ?? null}
-            tooltip="Source: Shopify orders API (all order line items). Calculation: sum of discounted line revenue for orders created in the window. Includes phone/offline orders that GA4 never sees."
+            subLabel={kpis.shopifyRevenue ? `Shopify: ${fmtCurrency(kpis.shopifyRevenue)}` : undefined}
+            tooltip="Source: NetSuite Sales Array (total sales orders, published sheet). Calculation: sum of the Amount column for orders dated in the window. Captures phone, offline and B2B sales that Shopify and GA4 never see; Shopify online revenue shown below for reference."
           />
           <KpiCard
             label="Blended MER"
             value={fmtPct(kpis.blendedMer ?? 0)}
             delta={deltas.blendedMer ?? null}
             invertDelta
-            subLabel={kpis.agencyFees ? `incl. ${fmtCurrency(kpis.agencyFees)} agency fee` : undefined}
-            tooltip="Sources: ad platform APIs + Shopify. Calculation: (media spend + 6% agency fee on Meta and Google spend only) ÷ total Shopify revenue. Lower is more efficient; team target ~12%. Delta compares the prior equal period."
+            subLabel={
+              kpis.marketingExpenses
+                ? `incl. ${fmtCurrency(kpis.agencyFees ?? 0)} fee + ${fmtCurrency(kpis.marketingExpenses)} exp`
+                : kpis.agencyFees
+                ? `incl. ${fmtCurrency(kpis.agencyFees)} agency fee`
+                : undefined
+            }
+            tooltip="Sources: ad platform APIs + marketing expenses ledger, over NetSuite sales. Calculation: (media spend + 6% agency fee on Meta and Google + non-media marketing expenses) ÷ total NetSuite sales revenue. Lower is more efficient; team target ~12%. Note: the expenses ledger lags a few days, so very recent windows understate the numerator. Delta compares the prior equal period."
           />
           <KpiCard
             label="Sessions"
@@ -149,7 +156,7 @@ export function Overview({ data }: OverviewProps) {
               label="Online Revenue"
               value={fmtCurrency(kpis.onlineRevenue)}
               delta={deltas.onlineRevenue ?? null}
-              tooltip="Source: GA4 purchase revenue, Australian traffic only. The online-attributed subset of Shopify revenue — the gap between this and Revenue is offline/phone sales."
+              tooltip="Source: GA4 purchase revenue, Australian traffic only. The online-attributed subset of total sales — the gap between this and Revenue is offline/phone/B2B sales."
             />
           )}
         </div>
