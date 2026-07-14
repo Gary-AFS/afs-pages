@@ -8,6 +8,7 @@ import { AiChat } from "./components/AiChat";
 import { Overview } from "./tabs/Overview";
 import { MetaAds } from "./tabs/MetaAds";
 import { GoogleAds } from "./tabs/GoogleAds";
+import { BingAds } from "./tabs/BingAds";
 import { WebsiteTraffic } from "./tabs/WebsiteTraffic";
 import { Axon } from "./tabs/Axon";
 import { Email } from "./tabs/Email";
@@ -25,6 +26,7 @@ function makePanels(data: PerfData): Record<TabId, () => JSX.Element> {
     overview:    () => <Overview data={data} />,
     meta:        () => <MetaAds data={data} />,
     google:      () => <GoogleAds data={data} />,
+    bing:        () => <BingAds data={data} />,
     pinterest:   () => <Pinterest data={data} />,
     website:     () => <WebsiteTraffic data={data} />,
     seo:         () => <SeoAeo data={data} />,

@@ -483,6 +483,8 @@ export interface PerfData {
   // Per-channel paid media
   meta: WindowedRecord<MetaWindow>;
   google: WindowedRecord<GoogleWindow>;
+  // Bing (Microsoft Advertising) — identical window shape to Google
+  bing?: WindowedRecord<GoogleWindow>;
   axon: WindowedRecord<AxonWindow>;
   // Organic social — top-level, not window-keyed (30d snapshot)
   organic?: OrganicData;

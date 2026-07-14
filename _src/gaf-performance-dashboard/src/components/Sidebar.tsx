@@ -48,6 +48,18 @@ function IconGA4() {
   );
 }
 
+// Microsoft Advertising (Bing) — the four Microsoft squares.
+function IconBing() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2" y="2" width="9" height="9" rx="1" fill="#F25022" />
+      <rect x="13" y="2" width="9" height="9" rx="1" fill="#7FBA00" />
+      <rect x="2" y="13" width="9" height="9" rx="1" fill="#00A4EF" />
+      <rect x="13" y="13" width="9" height="9" rx="1" fill="#FFB900" />
+    </svg>
+  );
+}
+
 // Axon (AppLovin's ad engine) — angular "A" monogram in AppLovin blue.
 function IconAxon() {
   return (
@@ -127,7 +139,7 @@ function IconExpenses() {
 // ---- Nav item config ----
 
 export type TabId =
-  | "overview" | "meta" | "google" | "pinterest" | "website"
+  | "overview" | "meta" | "google" | "bing" | "pinterest" | "website"
   | "seo" | "axon" | "email" | "experiments" | "expenses";
 
 interface NavItem {
@@ -140,6 +152,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "overview",    label: "Overview",         Icon: IconOverview },
   { id: "meta",        label: "Meta Ads",          Icon: IconMeta },
   { id: "google",      label: "Google Ads",        Icon: IconGoogleAds },
+  { id: "bing",        label: "Microsoft Ads",     Icon: IconBing },
   { id: "pinterest",   label: "Pinterest",         Icon: IconPinterest },
   { id: "website",     label: "Website Traffic",   Icon: IconGA4 },
   { id: "seo",         label: "SEO / AEO",         Icon: IconSeo },
