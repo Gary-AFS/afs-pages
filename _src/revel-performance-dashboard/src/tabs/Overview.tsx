@@ -16,8 +16,10 @@ const CAVEAT =
   "Revenue is total sales from NetSuite (incl. phone/offline/B2B), so treat channel-level ROAS as directional, not a verdict.";
 
 // Source documents behind the Revenue + MER widgets (Revel NetSuite export Sheet).
+// Revenue reads the daily Sales PIVOT tab (gid 805346772) — NOT the raw dump,
+// which double-counts.
 const SALES_SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/1KReaKeXaaS64z9YWQZJbzPCdW86KH7zKVFwURzR-FPs/edit?gid=1006181993#gid=1006181993";
+  "https://docs.google.com/spreadsheets/d/1KReaKeXaaS64z9YWQZJbzPCdW86KH7zKVFwURzR-FPs/edit?gid=805346772#gid=805346772";
 const EXPENSES_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1KReaKeXaaS64z9YWQZJbzPCdW86KH7zKVFwURzR-FPs/edit?gid=1824336538#gid=1824336538";
 
@@ -135,8 +137,8 @@ export function Overview({ data }: OverviewProps) {
             value={fmtCurrency(kpis.revenue ?? 0)}
             delta={deltas.revenue ?? null}
             subLabel={kpis.shopifyRevenue ? `Shopify: ${fmtCurrency(kpis.shopifyRevenue)}` : undefined}
-            sources={[{ href: SALES_SHEET_URL, title: "Source: NetSuite Sales Array (Google Sheet)" }]}
-            tooltip="Source: NetSuite Sales Array (total sales orders, published sheet). Calculation: sum of the Amount column for orders dated in the window. Captures phone, offline and B2B sales that Shopify and GA4 never see; Shopify online revenue shown below for reference."
+            sources={[{ href: SALES_SHEET_URL, title: "Source: NetSuite daily sales pivot (Google Sheet)" }]}
+            tooltip="Source: NetSuite daily sales pivot (published sheet). Calculation: sum of daily total sales revenue (incl. shipping) for the window. Captures phone, offline and B2B sales that Shopify and GA4 never see; Shopify online revenue shown below for reference."
           />
           <KpiCard
             label="Blended MER"
@@ -151,7 +153,7 @@ export function Overview({ data }: OverviewProps) {
                 : undefined
             }
             sources={[
-              { href: SALES_SHEET_URL, title: "Revenue source: NetSuite Sales Array (Google Sheet)" },
+              { href: SALES_SHEET_URL, title: "Revenue source: NetSuite daily sales pivot (Google Sheet)" },
               { href: EXPENSES_SHEET_URL, title: "Expenses source: marketing expenses ledger (Google Sheet)" },
             ]}
             tooltip="Sources: ad platform APIs + marketing expenses ledger, over NetSuite sales. Calculation: (media spend + 6% agency fee on Meta and Google + non-media marketing expenses) ÷ total NetSuite sales revenue. Lower is more efficient; team target ~12%. Note: the expenses ledger lags a few days, so very recent windows understate the numerator. Delta compares the prior equal period."
