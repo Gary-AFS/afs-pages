@@ -424,6 +424,11 @@ export interface AxonKpis {
   sales?: number;
   roas?: number;
   cpa?: number;
+  /** GA4-measured add-to-cart for the Axon channel (source=axon, AU-only) —
+   *  AppLovin can't optimise to or report ATC, so GA4 is the source. */
+  gaAtc?: number;
+  /** GA4 session base the ATC is measured against (context for the ATC card). */
+  gaSessions?: number;
 }
 
 export interface AxonWindow {

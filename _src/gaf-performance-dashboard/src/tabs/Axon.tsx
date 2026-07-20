@@ -142,6 +142,18 @@ export function Axon({ data }: AxonProps) {
               <KpiCard label="CTR"         value={fmtPct(kpis.ctr ?? 0)}          delta={deltas.ctr ?? null} />
               <KpiCard label="CPC"         value={fmtCpc(kpis.cpc ?? 0)}          delta={deltas.cpc ?? null}   invertDelta tooltip="Spend ÷ clicks. Lower is better." />
               <KpiCard label="CPM"         value={fmtCpc(kpis.cpm ?? 0)}          delta={deltas.cpm ?? null}   invertDelta tooltip="Cost per 1,000 impressions. Lower is better." />
+              <KpiCard
+                label="Add to Cart"
+                value={fmtInt(kpis.gaAtc ?? 0)}
+                delta={deltas.gaAtc ?? null}
+                subLabel={`of ${fmtInt(kpis.gaSessions ?? 0)} GA4 sessions`}
+                tooltip={
+                  "Measured in GA4, not AppLovin. Add-to-cart events from the Axon channel " +
+                  "(source=axon / medium=paid), Australia only. AppLovin can't optimise toward " +
+                  "or report add-to-cart, so GA4 is the source of truth for it. This is the " +
+                  "number to watch move off zero as the deep-linked creative beds in."
+                }
+              />
               <KpiCard label="Conversions" value={fmtInt(kpis.conversions ?? 0)}  delta={deltas.conversions ?? null} />
               <KpiCard label="Conv. Value" value={fmtCurrency(kpis.sales ?? 0)}   delta={deltas.sales ?? null} />
               <KpiCard label="ROAS"        value={hasConversions ? fmtRoas(kpis.roas ?? 0) : "–"} delta={hasConversions ? deltas.roas ?? null : null} />
