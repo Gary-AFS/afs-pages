@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nike Strength — Partnership Review (28 Jul) · FIRST DRAFT</title>
+<title>Nike Strength — Partnership Review · 28 July 2026</title>
+<link rel="icon" type="image/png" href="https://cdn.shopify.com/s/files/1/1950/1891/files/GAF-Icon.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -254,9 +255,6 @@ const TitleSlide = ({ n, t }) => {
   <div className={`w-full h-full ${th.bg} relative flex flex-col justify-end overflow-hidden`}>
     <div className="absolute -right-[20%] top-[10%] w-[70%] h-[140%] bg-gaf-orange opacity-[0.04] transform rotate-[-18deg]"></div>
     <div className="absolute -right-[25%] top-[15%] w-[60%] h-[130%] border border-gaf-orange/10 transform rotate-[-18deg]"></div>
-    <div className="absolute top-8 right-10 z-20">
-      <span className="text-[9px] font-heading font-bold tracking-[.25em] uppercase text-gaf-orange border border-gaf-orange/50 rounded-full px-3 py-1">First draft · for Josh's review</span>
-    </div>
     <div className="flex-1 flex items-center px-16 z-10">
       <div className="stagger">
         <div className="flex items-center gap-5 mb-10">
@@ -417,7 +415,6 @@ const BrandSlide = ({ n, t }) => {
             <div>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <p className={`text-sm font-heading font-semibold ${th.text}`}>{w.title}</p>
-                {w.owner && <Owner who={w.owner} />}
               </div>
               <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{w.desc}</p>
             </div>
@@ -428,7 +425,7 @@ const BrandSlide = ({ n, t }) => {
         <div className={`flex-1 rounded-lg overflow-hidden border ${th.cardBorder} relative`}>
           <img src="assets/sarahs-day-nike.png" alt="Nike Strength ambassador content" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} onError={(e)=>{e.target.src='assets/bj-stone-nike.png'}} />
           <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${th.expOverlay} p-4`}>
-            <div className="flex items-center gap-2 flex-wrap"><p className="text-[10px] font-heading tracking-[.2em] text-gaf-orange uppercase">Ambassador & Influencer Content</p><Owner who="Lionel · Reece Walsh hero asset" /></div>
+            <div className="flex items-center gap-2 flex-wrap"><p className="text-[10px] font-heading tracking-[.2em] text-gaf-orange uppercase">Ambassador & Influencer Content</p></div>
           </div>
         </div>
       </div>
@@ -467,7 +464,7 @@ const StrategySlide = ({ n, t }) => {
       </div>
       <div className={`flex items-center justify-between ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-2.5 shrink-0`}>
         <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Investment quantum</p>
-        <div className="flex items-center gap-3"><span className={`text-[11px] font-body ${th.sub}`}>Annual brand + content commitment behind Nike Strength</span><Owner who="Josh · confirm current $ figure" /></div>
+        <div className="flex items-center gap-3"><span className={`text-[11px] font-body ${th.sub}`}>A significant annual brand + content commitment behind Nike Strength</span></div>
       </div>
     </div>
   </Slide>
@@ -490,7 +487,7 @@ const SupplySlide = ({ n, t }) => {
           <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-3`}>
             <div className={`w-8 h-8 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><c.icon size={16} className="text-gaf-orange" /></div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1 flex-wrap"><p className={`text-sm font-heading font-semibold ${th.text}`}>{c.title}</p>{c.owner && <Owner who={c.owner} />}</div>
+              <div className="flex items-center gap-2 mb-1 flex-wrap"><p className={`text-sm font-heading font-semibold ${th.text}`}>{c.title}</p></div>
               <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{c.desc}</p>
             </div>
           </div>
@@ -567,34 +564,6 @@ const CloseSlide = ({ n, t }) => {
     </div>
     <footer className="absolute bottom-0 left-0 h-1 bg-gaf-orange z-10 w-full"></footer>
   </div>
-  );
-};
-
-// ===== SLIDE 9: WORKING NOTES (remove before meeting) =====
-const NotesSlide = ({ n, t }) => {
-  const th = useTheme();
-  const rows = [
-    { who: "Joel", need: "Sales + channel split now sourced live from NetSuite (done). Still needed: Rebel + Sports Direct store/rollout detail and sell-through; strategic-initiatives detail; wish-list sign-off." },
-    { who: "Lionel", need: "Reece Walsh ambassador detail (term, reach, deliverables) + hero asset; campaign / EDM / social reach metrics." },
-    { who: "Michelle", need: "Forecast purchases vs target chart; supply-chain capacity & lead times." },
-    { who: "Josh", need: "Confirm current annual brand-budget $ figure; co-own final wish list; visual polish + FIBO styling." },
-    { who: "Laura", need: "Slot into Steven's trip deck; confirm timing." },
-  ];
-  return (
-  <Slide num={n} total={t}>
-    <SectionTitle pre="Internal — remove before meeting" title="OWNER CHECKLIST" sub="First-draft gaps mapped to owners per Steven's brief. First draft due Wed 23 Jul; meeting 28 Jul." />
-    <div className="flex-1 flex flex-col gap-2 stagger min-h-0">
-      {rows.map((r, i) => (
-        <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-4`}>
-          <div className="w-24 shrink-0"><Owner who={r.who} /></div>
-          <p className={`text-[12px] ${th.sub} font-body leading-relaxed`}>{r.need}</p>
-        </div>
-      ))}
-      <div className={`mt-1 ${th.kpiAccentBg} border ${th.borderAccent} rounded-lg p-4`}>
-        <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}><span className="text-gaf-orange font-semibold">Data note:</span> sales figures are LIVE — pulled from NetSuite (all channels, AU, ex-GST) for the trailing 12 months Jul '25 – Jun '26; digital is LIVE GA4 for the Nike Strength pages. Content imagery is real Nike Strength campaign creative. Still to drop in: Michelle's forecast-vs-target chart, Lionel's Reece Walsh hero asset and the annual brand-budget figure.</p>
-      </div>
-    </div>
-  </Slide>
   );
 };
 
@@ -728,13 +697,13 @@ const ContentSlide = ({ n, t }) => {
     </div>
     <div className={`mt-3 flex items-center justify-between ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-2.5 shrink-0`}>
       <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Reels build the reach</p>
-      <div className="flex items-center gap-2"><span className={`text-[10px] font-body ${th.sub}`}>Short-form video — athletes, unboxings and product hero cuts — is the format doing the heavy lifting on awareness</span><Owner who="Lionel · Reece Walsh reel to come" /></div>
+      <div className="flex items-center gap-2"><span className={`text-[10px] font-body ${th.sub}`}>Short-form video — athletes, unboxings and product hero cuts — is the format doing the heavy lifting on awareness</span></div>
     </div>
   </Slide>
   );
 };
 
-const SLIDES = [TitleSlide, PerfSlide, DigitalSlide, ImpressionsSlide, ChannelSlide, BrandSlide, ContentSlide, StrategySlide, SupplySlide, WishlistSlide, CloseSlide, NotesSlide];
+const SLIDES = [TitleSlide, PerfSlide, DigitalSlide, ImpressionsSlide, ChannelSlide, BrandSlide, ContentSlide, StrategySlide, SupplySlide, WishlistSlide, CloseSlide];
 
 function App() {
   const [idx, setIdx] = useState(0);
