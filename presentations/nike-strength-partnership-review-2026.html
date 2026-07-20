@@ -224,6 +224,11 @@ const monthlyTraffic = [
   {m:'Jul',v:18123},{m:'Aug',v:15270},{m:'Sep',v:14141},{m:'Oct',v:16395},{m:'Nov',v:13512},{m:'Dec',v:10855},
   {m:'Jan',v:16319},{m:'Feb',v:11486},{m:'Mar',v:12578},{m:'Apr',v:13020},{m:'May',v:52591},{m:'Jun',v:47392},
 ];
+// Meta ad impressions — Nike Strength campaigns, monthly (Jul '25 – Jun '26)
+const monthlyImpr = [
+  {m:'Jul',v:207327},{m:'Aug',v:194882},{m:'Sep',v:149664},{m:'Oct',v:166341},{m:'Nov',v:228273},{m:'Dec',v:275484},
+  {m:'Jan',v:190802},{m:'Feb',v:129906},{m:'Mar',v:144593},{m:'Apr',v:226561},{m:'May',v:999632},{m:'Jun',v:1081012},
+];
 const trafficChannels = [
   { name:'Paid Social', sessions:131184, color:'#f26422' },
   { name:'Paid Shopping', sessions:28397, color:'#e8520d' },
@@ -339,14 +344,15 @@ const PerfSlide = ({ n, t }) => {
 const ChannelSlide = ({ n, t }) => {
   const th = useTheme();
   const retail = [
-    { icon: Store, title: "Rebel Sport — live", desc: "On the floor at Rebel (Toowoomba South, expanding) — Australia's largest sporting retailer.", tag: "New" },
-    { icon: Store, title: "Sports Direct", desc: "Extending shelf presence and reach across the retail network.", tag: "New" },
-    { icon: Bolt, title: "gymandfitness.com.au", desc: "The always-on D2C engine and conversion hub for the brand in AU.", tag: "$563K · 87%" },
-    { icon: Users, title: "Wholesale & Commercial", desc: "Gyms, facilities and retail sell-in — the growth vector as awareness scales.", tag: "$85K" },
+    { icon: Store, title: "Rebel Sport — AU", desc: "Pilot store live (June). 20 stores by end October, Grind dumbbell + plate led; online in development.", tag: "20 stores" },
+    { icon: Store, title: "Sports Direct — AU", desc: "Pilot live (July); second store this month and a store rollout plan underway.", tag: "New" },
+    { icon: Truck, title: "Rebel NZ", desc: "Enabling website sales through a 3PL facility.", tag: "Soon" },
+    { icon: Bolt, title: "gymandfitness.com.au", desc: "Steady quarter-on-quarter growth, the widest Nike Strength range, and our D2C engine.", tag: "$563K · 87%" },
+    { icon: Users, title: "Dropship + independents", desc: "Steady demand via Harvey Norman, TWL and independent retailers.", tag: "Growing" },
   ];
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="3 · Physical Presence" title="AVAILABLE EVERYWHERE" sub="The second half of the model: be where the customer already shops — on the floor of Australia's biggest retailers, and always-on in D2C. Reach creates the demand; presence captures it." />
+    <SectionTitle pre="3 · Physical Presence" title="AVAILABLE EVERYWHERE" sub="The second half of the model: be where the customer already shops. From a standing start 12 months ago — now landing on the floor of Australia's biggest retailers, and always-on in D2C." />
     <div className="flex flex-1 gap-6 min-h-0">
 
       <div className={`w-[34%] shrink-0 relative rounded-xl overflow-hidden border ${th.cardBorder} bg-gaf-dark`}>
@@ -478,7 +484,7 @@ const SupplySlide = ({ n, t }) => {
       <div className="flex-1 flex flex-col gap-3 stagger">
         {[
           { icon: Truck, title: "Supply chain capability", desc: "Established freight, warehousing and fulfilment across ANZ — ready to scale volume as retail comes online.", owner: "Michelle · capacity & lead times" },
-          { icon: Target, title: "Forecast purchases vs target", desc: "Committed forward purchasing against agreed targets, demonstrating confidence and long-term intent to Nike Strength.", owner: "Michelle · forecast vs target chart" },
+          { icon: Target, title: "Forecast purchases ramp to $5M", desc: "Committed forward purchasing to a $5M run-rate by FY29 — deliberate over-investment on an S-curve as the retail rollout scales.", owner: null },
           { icon: Dollar, title: "Sustainable brand growth", desc: "Clear internal sales targets and margin discipline underpinning a durable, profitable partnership.", owner: "Joel / Michelle · target numbers" },
         ].map((c, i) => (
           <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-3`}>
@@ -490,16 +496,19 @@ const SupplySlide = ({ n, t }) => {
           </div>
         ))}
       </div>
-      <div className={`w-[340px] shrink-0 ${th.cardBg} rounded-lg border ${th.cardBorder} p-6 flex flex-col justify-center items-center text-center`}>
-        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase mb-4">Forecast vs Target</p>
-        <div className="w-full flex flex-col items-center gap-3 opacity-90">
-          <div className={`w-full h-32 rounded-lg border-2 border-dashed ${th.cardBorder} flex flex-col items-center justify-center gap-2`}>
-            <Target size={22} className="text-gaf-orange" />
-            <p className={`text-[11px] ${th.sub} font-body px-4`}>Forecast-vs-target visual to drop in</p>
-            <Owner who="Michelle" />
-          </div>
-          <p className={`text-[10px] ${th.muted} font-body leading-relaxed`}>Placeholder — Michelle to supply committed purchase forecast against target for the current and next FY.</p>
+      <div className={`w-[340px] shrink-0 ${th.cardBg} rounded-lg border ${th.cardBorder} p-6 flex flex-col`}>
+        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Forecast Purchases (AUD)</p>
+        <p className={`text-[10px] ${th.sub} font-body mb-4`}>From $570K in FY25 to a <span className="text-gaf-orange font-semibold">$5M run-rate by FY29</span></p>
+        <div className="flex items-end justify-around gap-3 flex-1">
+          {[{y:'FY27',v:1.5},{y:'FY28',v:3},{y:'FY29',v:5}].map((d,i)=>(
+            <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+              <span className="text-sm font-heading font-bold text-gaf-orange mb-1">${d.v}M</span>
+              <div className="w-full rounded-sm bar-grow origin-bottom" style={{height:`${(d.v/5)*90}%`,minHeight:'6px',background:`linear-gradient(to top,#f26422,${d.v===5?'#ff8a50':'#c03008'})`,animationDelay:`${i*0.12}s`}}></div>
+              <span className={`text-[10px] ${th.muted} mt-2 font-body`}>{d.y}</span>
+            </div>
+          ))}
         </div>
+        <p className={`text-[9px] ${th.muted} font-body mt-3 leading-relaxed`}>Committed forward purchasing — over-investing now to build durable infrastructure for the long term.</p>
       </div>
     </div>
   </Slide>
@@ -511,34 +520,32 @@ const WishlistSlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="8 · The Ask" title="DISTRIBUTOR WISH LIST" sub="Where support and collaboration from Nike Strength would accelerate our growth in the region." />
+    <SectionTitle pre="8 · The Ask" title="THE ACTIVATION ASK" sub="We fund the brand-building — the share of mind. To convert that awareness into retail volume in a discount-driven market, we're asking Nike Strength to co-invest in the activation layer." />
     <div className="flex flex-col flex-1 gap-4 min-h-0">
-      <div className="bg-gaf-orange rounded-lg p-5 flex items-center gap-4 shrink-0">
-        <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0"><Dollar size={20} className="text-white" /></div>
-        <div>
-          <h3 className="font-heading font-bold text-white uppercase tracking-wider text-sm">Co-invest in the brand — priority ask</h3>
-          <p className="text-[11px] text-white/90 font-body mt-1 leading-relaxed">Marketing development funds (MDF) alongside our own committed brand budget — accelerating Nike Strength from a product line to a destination brand across ANZ retail and D2C.</p>
-        </div>
-      </div>
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0 stagger">
         {[
-          { title: "Marketing Assets", icon: Bolt, items: ["Global Nike Strength brand assets for AU campaigns","Athlete / ambassador content rights for AU activations","Co-branded creative templates for Meta & YouTube","Product seeding budget at landed cost for UGC"] },
-          { title: "Pricing & Margin", icon: Pct, items: ["Margin review on key SKUs across the chain","Domestic freight relief on heavy products","Volume-based pricing tiers as we scale retail","Support on hero-SKU pricing for campaigns"] },
-          { title: "Strategic Partnership", icon: Target, items: ["Joint business plan with aligned ANZ targets","New-product roadmap visibility — first-mover in AU","Quarterly review cadence","Support building Nike Strength as a 'pull' brand for retailers"] },
+          { pct:"3%", title:"Supplier Marketing Fund", icon: Bolt, desc:"A 3% rebate on all purchases into a joint marketing fund — used to execute Nike Strength product across our marketing channels.", note:"On every purchase → marketing execution" },
+          { pct:"2%", title:"Merchandising Support", icon: Store, desc:"Support for in-store merchandising — fabricating product display stands, like the in-house unit already live on the Rebel floor.", note:"In-store display fabrication" },
+          { pct:"10%", title:"Quarterly Scan-Backs", icon: Pct, desc:"Funds retail promotions of ~20% off. In a discount-driven market, a 20% promo can lift sell-through up to 3x.", note:"Quarterly · funds ~20% retail promos" },
         ].map((s, i) => (
           <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-5 flex flex-col`}>
-            <div className="flex items-center gap-2 mb-4"><s.icon size={16} className="text-gaf-orange" /><h4 className={`text-[10px] font-heading font-semibold tracking-[.2em] uppercase ${th.text}`}>{s.title}</h4></div>
-            <div className="space-y-3 flex-1">
-              {s.items.map((item, j) => (
-                <div key={j} className="flex items-start gap-2"><Msg size={10} className={`${th.muted} mt-1 shrink-0`} /><p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{item}</p></div>
-              ))}
+            <div className="flex items-center justify-between mb-3">
+              <div className={`w-9 h-9 rounded-lg ${th.kpiAccentBg} flex items-center justify-center`}><s.icon size={17} className="text-gaf-orange" /></div>
+              <span className="text-4xl font-heading font-bold text-gaf-orange leading-none">{s.pct}</span>
             </div>
+            <h4 className={`text-sm font-heading font-bold ${th.text} mb-2`}>{s.title}</h4>
+            <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{s.desc}</p>
+            <div className={`mt-auto pt-4 flex items-center gap-2`}><div className="w-1.5 h-1.5 rounded-full bg-gaf-orange shrink-0"></div><span className={`text-[10px] font-heading font-semibold ${th.sub}`}>{s.note}</span></div>
           </div>
         ))}
       </div>
+      <div className="bg-gaf-orange rounded-lg px-5 py-3 shrink-0 flex items-start gap-4">
+        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5"><Target size={16} className="text-white" /></div>
+        <p className="text-[12px] text-white font-body leading-snug"><span className="font-semibold">Why it matters:</span> AU/NZ retail is intensely discount-driven — a ~20% promotion can lift volume up to 3x. This level of support is a standard condition of trade for the national retailers, so Nike Strength's backing is what unlocks the deal, not an optional extra.</p>
+      </div>
       <div className={`flex items-center justify-between ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-2.5 shrink-0`}>
-        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Owners</p>
-        <div className="flex items-center gap-2"><Owner who="Joel / Josh · finalise the asks" /><span className={`text-[10px] font-body ${th.sub}`}>to align with the commercial relationship</span></div>
+        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Plus · seasonal deal support</p>
+        <span className={`text-[10px] font-body ${th.sub}`}>Buy-up + combo-kit deals for our three peak events — EOFY, Black Friday and New Year — to get more product into more hands.</span>
       </div>
     </div>
   </Slide>
@@ -653,6 +660,46 @@ const DigitalSlide = ({ n, t }) => {
   );
 };
 
+// ===== SLIDE: IMPRESSIONS AT SCALE (Meta) =====
+const ImpressionsSlide = ({ n, t }) => {
+  const th = useTheme();
+  const maxV = Math.max(...monthlyImpr.map(d => d.v));
+  const fmt = v => v >= 950000 ? (v/1e6).toFixed(2)+'M' : (v/1000).toFixed(0)+'K';
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="2 · Share of Mind" title="IMPRESSIONS AT SCALE" sub="Meta ad impressions for Nike Strength campaigns. When we switched the awareness push on in May, monthly impressions stepped up roughly 5x — from ~200K to over a million a month." />
+    <div className="flex flex-col flex-1 gap-5 min-h-0">
+      <div className="grid grid-cols-4 gap-4 shrink-0 stagger">
+        <Kpi label="Impressions · 12 mo" value="4.0M" sub="Nike Strength campaigns" />
+        <Kpi label="Peak Month" value="1.08M" sub="June 2026" />
+        <Kpi label="Step-Up" value="≈5x" sub="vs the prior baseline" accent />
+        <Kpi label="People Reached" value="649K" sub="in June alone" />
+      </div>
+      <div className={`flex-1 ${th.cardBg} rounded-lg border ${th.cardBorder} p-5 min-h-0 flex flex-col`}>
+        <div className="flex items-center justify-between mb-4">
+          <p className={`text-[9px] font-heading tracking-[.3em] ${th.sub} uppercase`}>Monthly Ad Impressions — Nike Strength</p>
+          <p className={`text-[10px] ${th.sub} font-body`}>Awareness campaign live from <span className="text-gaf-orange font-semibold">May 2026</span></p>
+        </div>
+        <div className="flex items-end gap-2 flex-1">
+          {monthlyImpr.map((d, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+              <span className={`text-[8px] font-body font-semibold ${th.sub} mb-1`}>{fmt(d.v)}</span>
+              <div className="w-full rounded-sm bar-grow origin-bottom" style={{
+                height: `${(d.v / maxV) * 92}%`, minHeight: '3px',
+                background: `linear-gradient(to top, #f26422, ${d.v === maxV ? '#ff8a50' : '#c03008'})`,
+                animationDelay: `${i * 0.05}s`
+              }}></div>
+              <span className={`text-[8px] ${th.muted} mt-2 font-body`}>{d.m}</span>
+            </div>
+          ))}
+        </div>
+        <p className={`text-[10px] ${th.sub} font-body mt-3 pt-3 border-t ${th.cardBorder} shrink-0`}><span className="text-gaf-orange font-semibold">The step-change is the story:</span> a sustained ~5x lift in how often Australians see Nike Strength — the top of the funnel that feeds every channel below it.</p>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
 // ===== SLIDE: TOP CREATIVE (best reels by reach) =====
 const ContentSlide = ({ n, t }) => {
   const th = useTheme();
@@ -687,7 +734,7 @@ const ContentSlide = ({ n, t }) => {
   );
 };
 
-const SLIDES = [TitleSlide, PerfSlide, DigitalSlide, ChannelSlide, BrandSlide, ContentSlide, StrategySlide, SupplySlide, WishlistSlide, CloseSlide, NotesSlide];
+const SLIDES = [TitleSlide, PerfSlide, DigitalSlide, ImpressionsSlide, ChannelSlide, BrandSlide, ContentSlide, StrategySlide, SupplySlide, WishlistSlide, CloseSlide, NotesSlide];
 
 function App() {
   const [idx, setIdx] = useState(0);
