@@ -349,7 +349,7 @@ const ChannelSlide = ({ n, t }) => {
     <SectionTitle pre="3 · How The Brand Grows" title="EXPANDING REACH" sub="Two moves, one goal — make Nike Strength the brand more Australians think of, and the brand they can buy wherever they shop." />
     <div className="flex flex-1 gap-5 min-h-0">
 
-      <div className="flex-1 flex flex-col gap-3 stagger min-h-0 justify-between">
+      <div className="flex-1 flex flex-col gap-3 stagger min-h-0">
         <div className="flex items-center gap-3 shrink-0">
           <div className={`w-9 h-9 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><Eye size={18} className="text-gaf-orange" /></div>
           <div>
@@ -357,21 +357,23 @@ const ChannelSlide = ({ n, t }) => {
             <p className={`text-lg font-heading font-bold ${th.text} leading-tight`}>Reach, through social</p>
           </div>
         </div>
-        <div className={`${th.cardBg} border-l-2 border-gaf-orange rounded-lg p-4`}>
-          <p className={`text-[12px] ${th.text} font-body leading-relaxed`}>We use Gym and Fitness — our audience, our channels and a dedicated awareness budget — as the vehicle to build Nike Strength awareness across Australia.</p>
+        <div className="flex flex-col gap-2.5">
+          <div className={`${th.cardBg} border-l-2 border-gaf-orange rounded-lg p-4`}>
+            <p className={`text-[12px] ${th.text} font-body leading-relaxed`}>We use Gym and Fitness — our audience, our channels and a dedicated awareness budget — as the vehicle to build Nike Strength awareness across Australia.</p>
+          </div>
+          <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4`}>
+            <p className={`text-[12px] ${th.sub} font-body leading-relaxed`}>Spend is optimised for <span className="text-gaf-orange font-semibold">reach and sessions to branded Nike Strength pages</span> — not for our own sales. A more famous brand sells more, everywhere.</p>
+          </div>
+          <div className={`${th.kpiAccentBg} border ${th.borderAccent} rounded-lg p-4 flex items-center gap-5`}>
+            <div><p className="text-2xl font-heading font-bold text-gaf-orange leading-none">~8x</p><p className={`text-[9px] ${th.sub} font-body mt-1`}>traffic to branded<br/>Nike pages since<br/>the awareness push</p></div>
+            <div className={`w-px h-10 ${th.bg3}`}></div>
+            <div><p className={`text-2xl font-heading font-bold ${th.text} leading-none`}>238K</p><p className={`text-[9px] ${th.sub} font-body mt-1`}>sessions to Nike<br/>pages · 12 months</p></div>
+          </div>
         </div>
-        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4`}>
-          <p className={`text-[12px] ${th.sub} font-body leading-relaxed`}>Spend is optimised for <span className="text-gaf-orange font-semibold">reach and sessions to branded Nike Strength pages</span> — not for our own sales. A more famous brand sells more, everywhere.</p>
-        </div>
-        <div className={`${th.kpiAccentBg} border ${th.borderAccent} rounded-lg p-4 flex items-center gap-5`}>
-          <div><p className="text-2xl font-heading font-bold text-gaf-orange leading-none">~8x</p><p className={`text-[9px] ${th.sub} font-body mt-1`}>traffic to branded<br/>Nike pages since<br/>the awareness push</p></div>
-          <div className={`w-px h-10 ${th.bg3}`}></div>
-          <div><p className={`text-2xl font-heading font-bold ${th.text} leading-none`}>238K</p><p className={`text-[9px] ${th.sub} font-body mt-1`}>sessions to Nike<br/>pages · 12 months</p></div>
-        </div>
-        <div className="flex items-center gap-2 pt-1 shrink-0"><Target size={13} className="text-gaf-orange shrink-0" /><p className={`text-[11px] font-heading font-semibold ${th.text}`}>Mental availability — front of mind before the buy.</p></div>
+        <div className="flex items-center gap-2 shrink-0"><Target size={13} className="text-gaf-orange shrink-0" /><p className={`text-[11px] font-heading font-semibold ${th.text}`}>Mental availability — front of mind before the buy.</p></div>
       </div>
 
-      <div className="flex-1 flex flex-col gap-3 stagger min-h-0 justify-between">
+      <div className="flex-1 flex flex-col gap-3 stagger min-h-0">
         <div className="flex items-center gap-3 shrink-0">
           <div className={`w-9 h-9 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><Store size={18} className="text-gaf-orange" /></div>
           <div>
@@ -379,14 +381,16 @@ const ChannelSlide = ({ n, t }) => {
             <p className={`text-lg font-heading font-bold ${th.text} leading-tight`}>Available, everywhere</p>
           </div>
         </div>
-        {retail.map((c,i)=>(
-          <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg px-4 py-2.5 flex items-center gap-3`}>
-            <div className={`w-7 h-7 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><c.icon size={14} className="text-gaf-orange" /></div>
-            <div className="flex-1"><p className={`text-[13px] font-heading font-semibold ${th.text}`}>{c.title}</p><p className={`text-[11px] ${th.sub} font-body leading-snug`}>{c.desc}</p></div>
-            <span className={`text-[10px] font-heading font-semibold text-gaf-orange border border-gaf-orange/40 rounded-full px-2 py-[2px] whitespace-nowrap shrink-0`}>{c.tag}</span>
-          </div>
-        ))}
-        <div className="flex items-center gap-2 pt-1 shrink-0"><Target size={13} className="text-gaf-orange shrink-0" /><p className={`text-[11px] font-heading font-semibold ${th.text}`}>Physical availability — easy to buy, in every channel.</p></div>
+        <div className="flex flex-col gap-2.5">
+          {retail.map((c,i)=>(
+            <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg px-4 py-2.5 flex items-center gap-3`}>
+              <div className={`w-7 h-7 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><c.icon size={14} className="text-gaf-orange" /></div>
+              <div className="flex-1"><p className={`text-[13px] font-heading font-semibold ${th.text}`}>{c.title}</p><p className={`text-[11px] ${th.sub} font-body leading-snug`}>{c.desc}</p></div>
+              <span className={`text-[10px] font-heading font-semibold text-gaf-orange border border-gaf-orange/40 rounded-full px-2 py-[2px] whitespace-nowrap shrink-0`}>{c.tag}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 shrink-0"><Target size={13} className="text-gaf-orange shrink-0" /><p className={`text-[11px] font-heading font-semibold ${th.text}`}>Physical availability — easy to buy, in every channel.</p></div>
       </div>
     </div>
 
@@ -631,6 +635,7 @@ const DigitalSlide = ({ n, t }) => {
               </div>
             ))}
           </div>
+          <p className={`text-[10px] ${th.sub} font-body mt-3 pt-3 border-t ${th.cardBorder} shrink-0 leading-snug`}><span className="text-gaf-orange font-semibold">Why the May–Jun step-up?</span> A deliberate brand-awareness campaign switching on — reach-optimised spend to branded Nike pages, by design (not an organic swing). The strategy behind it is on the next slide.</p>
         </div>
         <div className="w-[300px] shrink-0 flex flex-col">
           <p className={`text-[9px] font-heading tracking-[.3em] ${th.sub} uppercase mb-3`}>Traffic Sources</p>
