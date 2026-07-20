@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nike Strength — Partnership Review (28 Jul) · FIRST DRAFT</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        gaf: { orange: '#f26422', black: '#0a0a0a', dark: '#141414', mid: '#1e1e1e', steel: '#2a2a2a', ash: '#8a8a8a' },
+        lt: { bg: '#ffffff', card: '#f7f7f8', card2: '#eeeef0', border: '#e0e0e2', text: '#1a1a1a', sub: '#6b6b6b', muted: '#b0b0b0' },
+      },
+      fontFamily: {
+        display: ['"Montserrat"', 'sans-serif'],
+        heading: ['"Montserrat"', 'sans-serif'],
+        body: ['"Open Sans"', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',sans-serif;overflow:hidden}
+h1,h2,h3,h4,h5,h6{font-family:'Montserrat',sans-serif}
+.font-display{font-weight:900;letter-spacing:.01em}
+.font-heading{font-family:'Montserrat',sans-serif}
+.grain-dark::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index:9999}
+.slide-enter{animation:slideIn .5s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.stagger>*{opacity:0;animation:slideIn .5s cubic-bezier(.16,1,.3,1) forwards}
+.stagger>*:nth-child(1){animation-delay:.05s}
+.stagger>*:nth-child(2){animation-delay:.12s}
+.stagger>*:nth-child(3){animation-delay:.19s}
+.stagger>*:nth-child(4){animation-delay:.26s}
+.stagger>*:nth-child(5){animation-delay:.33s}
+.stagger>*:nth-child(6){animation-delay:.4s}
+.stagger>*:nth-child(7){animation-delay:.47s}
+.stagger>*:nth-child(8){animation-delay:.54s}
+.bar-grow{animation:barGrow .8s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.fill-anim{animation:fillWidth 1s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes fillWidth{from{width:0}to{width:var(--target-w)}}
+.donut-animate{animation:donutDraw 1.2s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes donutDraw{from{stroke-dashoffset:var(--circumference)}to{stroke-dashoffset:var(--dash-offset)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#f26422;border-radius:10px}
+.slash{position:absolute;width:200%;height:1px;transform:rotate(-12deg)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://esm.sh/react@19.1.0" type="module"></script>
+<script src="https://esm.sh/react-dom@19.1.0/client" type="module"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
+<script type="text/babel" data-type="module">
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'https://esm.sh/react@19.1.0';
+import { createRoot } from 'https://esm.sh/react-dom@19.1.0/client';
+
+// ===== THEME =====
+const ThemeCtx = createContext();
+const useTheme = () => useContext(ThemeCtx);
+const themes = {
+  light: {
+    bg: 'bg-white', bg2: 'bg-lt-card', bg3: 'bg-lt-card2',
+    border: 'border-lt-border', borderAccent: 'border-gaf-orange/20',
+    text: 'text-lt-text', sub: 'text-lt-sub', muted: 'text-lt-muted', textInv: 'text-white',
+    cardBg: 'bg-lt-card', cardBorder: 'border-lt-border',
+    slashColor: 'rgba(242,100,34,0.06)', grainClass: '',
+    bodyBg: '#f0f0f0', logoFilter: '', titleText: 'text-lt-text',
+    donutTrack: '#eeeef0', barBg: 'linear-gradient(to top, #ddd, #ccc)',
+    kpiAccentBg: 'bg-gaf-orange/5', kpiDarkBg: 'bg-lt-text',
+    navBg: 'bg-black/5', navBorder: 'border-black/10', navText: 'text-lt-text',
+    navHover: 'hover:bg-gaf-orange hover:border-gaf-orange hover:text-white',
+    navDisabled: 'bg-black/5 text-lt-muted cursor-not-allowed',
+    green: 'text-emerald-600', greenBg: 'bg-emerald-500/10', greenBorder: 'hover:border-emerald-500/30',
+    amber: 'text-amber-600', amberBg: 'bg-amber-500/10', amberBorder: 'hover:border-amber-500/30',
+    progressBg: 'bg-emerald-500', progressWarn: 'bg-amber-500',
+    expOverlay: 'from-white via-white/70 to-transparent', expOverlayR: 'from-white/80 to-transparent',
+    expText: 'text-lt-text', expSub: 'text-lt-sub', expCard: 'bg-black/5 border-black/10',
+    footerText: 'text-lt-muted',
+  },
+  dark: {
+    bg: 'bg-gaf-black', bg2: 'bg-gaf-dark', bg3: 'bg-gaf-mid',
+    border: 'border-gaf-steel/20', borderAccent: 'border-gaf-orange/20',
+    text: 'text-white', sub: 'text-gaf-ash', muted: 'text-gaf-steel', textInv: 'text-gaf-black',
+    cardBg: 'bg-gaf-dark', cardBorder: 'border-gaf-steel/20',
+    slashColor: 'rgba(242,100,34,0.15)', grainClass: 'grain-dark',
+    bodyBg: '#0a0a0a', logoFilter: 'brightness-0 invert', titleText: 'text-white',
+    donutTrack: '#1e1e1e', barBg: 'linear-gradient(to top, #333, #555)',
+    kpiAccentBg: 'bg-gaf-orange/5', kpiDarkBg: 'bg-gaf-dark',
+    navBg: 'bg-white/5', navBorder: 'border-white/10', navText: 'text-white',
+    navHover: 'hover:bg-gaf-orange hover:border-gaf-orange',
+    navDisabled: 'bg-gaf-steel/20 text-gaf-steel cursor-not-allowed',
+    green: 'text-emerald-400', greenBg: 'bg-emerald-500/10', greenBorder: 'hover:border-emerald-500/30',
+    amber: 'text-amber-400', amberBg: 'bg-amber-500/10', amberBorder: 'hover:border-amber-500/30',
+    progressBg: 'bg-emerald-400', progressWarn: 'bg-amber-400',
+    expOverlay: 'from-gaf-black via-gaf-black/50 to-transparent', expOverlayR: 'from-gaf-black/70 to-transparent',
+    expText: 'text-white', expSub: 'text-white/80', expCard: 'bg-white/5 border-white/10',
+    footerText: 'text-gaf-steel',
+  }
+};
+
+// ===== ICONS =====
+const I = ({ d, size = 18, className = '', sw = 1.5 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
+  </svg>
+);
+const ChevL = p => <I {...p} d="M15 18l-6-6 6-6" />;
+const ChevR = p => <I {...p} d="M9 18l6-6-6-6" />;
+const Dollar = p => <I {...p} d={["M12 2v20","M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"]} />;
+const Bolt = p => <I {...p} d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />;
+const Eye = p => <I {...p} d={["M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"]} />;
+const Users = p => <I {...p} d={["M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2","M12 7a4 4 0 100-8 4 4 0 000 8","M22 21v-2a4 4 0 00-3-3.87","M16 3.13a4 4 0 010 7.75"]} />;
+const Check = p => <svg xmlns="http://www.w3.org/2000/svg" width={p.size||18} height={p.size||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={p.className||''}><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>;
+const Target = p => <svg xmlns="http://www.w3.org/2000/svg" width={p.size||18} height={p.size||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={p.className||''}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
+const Store = p => <I {...p} d={["M3 9l1-5h16l1 5","M4 9v11a1 1 0 001 1h14a1 1 0 001-1V9","M9 21v-6h6v6","M3 9h18"]} />;
+const Truck = p => <I {...p} d={["M1 3h15v13H1z","M16 8h4l3 3v5h-7","M5.5 18.5a2 2 0 100-4 2 2 0 000 4z","M18.5 18.5a2 2 0 100-4 2 2 0 000 4z"]} />;
+const Star = p => <I {...p} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />;
+const Pct = p => <I {...p} d={["M19 5L5 19","M6.5 9a2.5 2.5 0 100-5 2.5 2.5 0 000 5","M17.5 20a2.5 2.5 0 100-5 2.5 2.5 0 000 5"]} />;
+const Msg = p => <I {...p} d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" />;
+const Cam = p => <I {...p} d={["M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"]} />;
+const Sun = p => <I {...p} d={["M12 1v2","M12 21v2","M4.22 4.22l1.42 1.42","M18.36 18.36l1.42 1.42","M1 12h2","M21 12h2","M4.22 19.78l1.42-1.42","M18.36 5.64l1.42-1.42"]} />;
+const Moon = p => <I {...p} d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />;
+
+const GAF_LOGO = "https://cdn.shopify.com/s/files/1/1950/1891/files/GAFLogo-Primary-WhiteBG_51691f07-8b4f-4d1d-aefc-f2fc004eaa84.png?v=1775792576";
+
+// ===== OWNER CHIP (first-draft input marker) =====
+const Owner = ({ who }) => (
+  <span className="inline-flex items-center gap-1 text-[8px] font-heading font-semibold tracking-[.15em] uppercase text-gaf-orange border border-gaf-orange/40 rounded-full px-2 py-[2px] whitespace-nowrap">
+    ◇ {who}
+  </span>
+);
+
+// ===== DONUT =====
+const Donut = ({ data, size = 200, thickness = 24 }) => {
+  const th = useTheme();
+  const r = (size - thickness) / 2;
+  const c = 2 * Math.PI * r;
+  const total = data.reduce((s, d) => s + d.value, 0);
+  let cum = 0;
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} style={{transform:'rotate(-90deg)'}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={th.donutTrack} strokeWidth={thickness} />
+      {data.map((d, i) => {
+        const pct = d.value / total; const offset = c * (1 - pct); const rotation = cum * 360; cum += pct;
+        return <circle key={i} cx={size/2} cy={size/2} r={r} fill="none" stroke={d.color} strokeWidth={thickness}
+          strokeDasharray={c} style={{'--circumference': c, '--dash-offset': offset}}
+          className="donut-animate" strokeDashoffset={c}
+          transform={`rotate(${rotation} ${size/2} ${size/2})`} />;
+      })}
+    </svg>
+  );
+};
+
+const Logo = () => { const th = useTheme(); return <img src={GAF_LOGO} alt="GAF" className={`h-8 w-auto object-contain opacity-60 ${th.logoFilter}`} />; };
+
+// ===== SLIDE WRAPPER =====
+const Slide = ({ children, num, total, noPad }) => {
+  const th = useTheme();
+  return (
+  <div className={`w-full h-full ${th.bg} ${th.text} flex flex-col relative overflow-hidden`}>
+    <div className="slash" style={{top:'30%',left:'-50%',background:`linear-gradient(90deg,transparent,${th.slashColor},transparent)`}}></div>
+    <div className="slash" style={{top:'60%',left:'-30%',background:`linear-gradient(90deg,transparent,${th.slashColor},transparent)`}}></div>
+    <header className="flex justify-between items-center px-10 pt-6 pb-4 z-10 shrink-0">
+      <Logo />
+      <div className="flex items-center gap-3">
+        <span className={`text-[10px] font-heading font-light tracking-[.3em] ${th.sub} uppercase`}>Nike Strength × AFS Group</span>
+        <div className={`w-px h-4 ${th.bg3}`}></div>
+        <span className={`text-[10px] font-body ${th.sub}`}>{num}<span className={`${th.muted} mx-1`}>/</span>{total}</span>
+      </div>
+    </header>
+    <main className={`flex-1 flex flex-col z-10 overflow-hidden ${noPad ? '' : 'px-10 pb-8'}`}>{children}</main>
+    <footer className="h-1 bg-gradient-to-r from-gaf-orange via-gaf-orange to-transparent z-10 shrink-0" style={{width: `${(num/total)*100}%`}}></footer>
+  </div>
+  );
+};
+
+const Kpi = ({ label, value, sub, accent }) => {
+  const th = useTheme();
+  return (
+  <div className={`p-5 rounded-lg border ${accent ? `${th.kpiAccentBg} ${th.borderAccent}` : `${th.cardBg} ${th.cardBorder}`}`}>
+    <p className={`text-[9px] font-heading font-medium tracking-[.25em] uppercase mb-3 ${accent ? 'text-gaf-orange' : th.sub}`}>{label}</p>
+    <p className={`text-3xl font-heading font-bold ${accent ? 'text-gaf-orange' : th.text}`}>{value}</p>
+    {sub && <p className={`text-[11px] ${th.sub} mt-1.5 font-body`}>{sub}</p>}
+  </div>
+  );
+};
+
+const SectionTitle = ({ pre, title, sub }) => {
+  const th = useTheme();
+  return (
+  <div className="mb-6 shrink-0 stagger">
+    {pre && <p className="text-[10px] font-heading tracking-[.4em] text-gaf-orange uppercase mb-2">{pre}</p>}
+    <h1 className={`font-display text-5xl md:text-7xl ${th.text} leading-[0.9] tracking-wide`}>{title}</h1>
+    {sub && <p className={`text-sm ${th.sub} mt-3 font-body max-w-2xl leading-relaxed`}>{sub}</p>}
+  </div>
+  );
+};
+
+// ===== DATA (baseline: trailing 12-mo ANZ, May '25–Mar '26 — refresh pending Joel's channel report) =====
+const monthlyData = [
+  { month: 'May', rev: 4121 }, { month: 'Jun', rev: 14830 }, { month: 'Jul', rev: 35472 },
+  { month: 'Aug', rev: 17202 }, { month: 'Sep', rev: 41628 }, { month: 'Oct', rev: 56908 },
+  { month: 'Nov', rev: 77515 }, { month: 'Dec', rev: 93022 }, { month: 'Jan', rev: 58936 },
+  { month: 'Feb', rev: 81149 }, { month: 'Mar', rev: 78428 },
+];
+const channels = [
+  { name: 'gymandfitness.com.au (D2C)', value: 498640, color: '#f26422' },
+  { name: 'GAF Wholesale', value: 42623, color: '#888' },
+  { name: 'GAF Commercial', value: 17948, color: '#bbb' },
+];
+
+// ===== SLIDE 1: TITLE =====
+const TitleSlide = ({ n, t }) => {
+  const th = useTheme();
+  return (
+  <div className={`w-full h-full ${th.bg} relative flex flex-col justify-end overflow-hidden`}>
+    <div className="absolute -right-[20%] top-[10%] w-[70%] h-[140%] bg-gaf-orange opacity-[0.04] transform rotate-[-18deg]"></div>
+    <div className="absolute -right-[25%] top-[15%] w-[60%] h-[130%] border border-gaf-orange/10 transform rotate-[-18deg]"></div>
+    <div className="absolute top-8 right-10 z-20">
+      <span className="text-[9px] font-heading font-bold tracking-[.25em] uppercase text-gaf-orange border border-gaf-orange/50 rounded-full px-3 py-1">First draft · for Josh's review</span>
+    </div>
+    <div className="flex-1 flex items-center px-16 z-10">
+      <div className="stagger">
+        <div className="flex items-center gap-5 mb-10">
+          <img src={GAF_LOGO} alt="Gym and Fitness" className={`h-14 w-auto object-contain ${th.logoFilter}`} />
+          <div className={`w-px h-10 ${th.bg3}`}></div>
+          <span className={`text-[11px] font-heading tracking-[.4em] ${th.sub} uppercase`}>Partnership Review</span>
+        </div>
+        <h1 className={`font-display text-[8rem] md:text-[11rem] leading-[0.85] tracking-wider ${th.titleText}`}>
+          NIKE<br/><span className="text-gaf-orange">STRENGTH</span>
+        </h1>
+        <div className="flex items-center gap-6 mt-10">
+          <div className="w-16 h-[2px] bg-gaf-orange"></div>
+          <p className={`text-sm font-body ${th.sub} tracking-wider`}>Prepared for Kevin, CEO — Nike Strength · 28 July 2026 · ANZ</p>
+        </div>
+      </div>
+    </div>
+    <div className="px-16 pb-8 z-10">
+      <p className={`text-[10px] font-heading tracking-[.5em] ${th.muted} uppercase`}>AFS Group · Gym and Fitness — Confidential</p>
+    </div>
+    <footer className="h-1 bg-gradient-to-r from-gaf-orange via-gaf-orange to-transparent z-10 shrink-0" style={{width:'10%'}}></footer>
+  </div>
+  );
+};
+
+// ===== SLIDE 2: BUSINESS PERFORMANCE =====
+const PerfSlide = ({ n, t }) => {
+  const th = useTheme();
+  const max = Math.max(...monthlyData.map(d => d.rev));
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="1 · Current Business" title="PERFORMANCE" sub="Nike Strength across ANZ — trailing 12-month baseline (May '25 – Mar '26). Figures to be refreshed with Joel's channel-split report before the meeting." />
+    <div className="flex flex-col flex-1 gap-5 min-h-0">
+      <div className="grid grid-cols-4 gap-4 shrink-0 stagger">
+        <Kpi label="Total Revenue" value="$559K" sub="Trailing 12 months" />
+        <Kpi label="Gross Profit" value="$77K" sub="13.7% average margin" />
+        <Kpi label="Units Sold" value="4,749" sub="~430 units / month" />
+        <Kpi label="Trajectory" value="↑ Strong" sub="$4K (May) → $93K peak (Dec)" accent />
+      </div>
+      <div className={`flex-1 ${th.cardBg} rounded-lg border ${th.cardBorder} p-5 min-h-0`}>
+        <div className="flex items-center justify-between mb-4">
+          <p className={`text-[9px] font-heading tracking-[.3em] ${th.sub} uppercase`}>Monthly Revenue — establishing the brand</p>
+          <div className="flex items-center gap-3"><Owner who="Joel · refresh to current FY" /><p className={`text-[10px] ${th.sub} font-body`}>Peak: <span className="text-gaf-orange font-semibold">$93K</span> (Dec)</p></div>
+        </div>
+        <div className="flex items-end gap-[6px] h-[calc(100%-36px)]">
+          {monthlyData.map((d, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+              <span className={`text-[8px] font-body font-semibold ${th.sub} mb-1`}>${(d.rev/1000).toFixed(0)}K</span>
+              <div className="w-full rounded-sm bar-grow origin-bottom" style={{
+                height: `${(d.rev / max) * 88}%`, minHeight: '3px',
+                background: `linear-gradient(to top, #f26422, ${d.rev === max ? '#ff8a50' : '#c03008'})`,
+                animationDelay: `${i * 0.06}s`
+              }}></div>
+              <span className={`text-[8px] ${th.muted} mt-2 font-body`}>{d.month}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 3: CHANNEL & RETAIL WINS =====
+const ChannelSlide = ({ n, t }) => {
+  const th = useTheme();
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="2 · Retail & Channel" title="EXPANDING REACH" sub="Nike Strength is scaling beyond D2C into Australia's biggest retail floors." />
+    <div className="flex flex-1 gap-6 min-h-0">
+      <div className="flex-1 flex flex-col gap-3 stagger">
+        {[
+          { icon: Store, title: "Rebel Sport", desc: "Landing Nike Strength on the floor of Australia's largest sporting retailer — a marquee credibility and volume channel.", owner: "Joel · SKUs, launch date, volume" },
+          { icon: Store, title: "Sports Direct", desc: "Retail distribution win extending shelf presence and reach across the network.", owner: "Joel · scope & sell-through" },
+          { icon: Bolt, title: "gymandfitness.com.au — D2C engine", desc: "Our owned store remains the demand engine — ~89% of Nike Strength revenue and the content + conversion hub for the brand in ANZ.", owner: null },
+          { icon: Users, title: "Commercial & Wholesale", desc: "Growing B2B pipeline into gyms and facilities, with the Experience Centre as the live showroom.", owner: "Joel · pipeline value" },
+        ].map((c, i) => (
+          <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-3`}>
+            <div className={`w-8 h-8 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><c.icon size={16} className="text-gaf-orange" /></div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <p className={`text-sm font-heading font-semibold ${th.text}`}>{c.title}</p>
+                {c.owner && <Owner who={c.owner} />}
+              </div>
+              <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{c.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="w-[320px] flex flex-col items-center justify-center gap-6 shrink-0">
+        <div className="relative">
+          <Donut data={channels} size={200} thickness={24} />
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className={`text-3xl font-heading font-bold ${th.text}`}>89%</span>
+            <span className={`text-[9px] ${th.sub} font-body`}>D2C today</span>
+          </div>
+        </div>
+        <div className="w-full space-y-2">
+          {channels.map((d, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-sm" style={{backgroundColor: d.color}}></div>
+              <span className={`text-[11px] font-body ${th.sub} flex-1`}>{d.name}</span>
+              <span className={`text-sm font-heading font-semibold ${th.text}`}>${(d.value/1000).toFixed(0)}K</span>
+            </div>
+          ))}
+          <p className={`text-[10px] ${th.muted} font-body pt-2 leading-relaxed`}>Retail (Rebel, Sports Direct) opens a new channel mix on top of the D2C base.</p>
+        </div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 4: BRAND BUILDING & MARKETING =====
+const BrandSlide = ({ n, t }) => {
+  const th = useTheme();
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="3 · Brand Building" title="MARKETING WINS" sub="Investing in awareness — turning Nike Strength into a destination brand, not just a product line." />
+    <div className="flex gap-6 flex-1 min-h-0">
+      <div className="flex-1 flex flex-col gap-3 stagger">
+        {[
+          { title: "Reece Walsh — Ambassador Partnership", desc: "Marquee athlete signing tying Nike Strength to elite Australian sport and a huge national following.", owner: "Lionel · term, reach, deliverables" },
+          { title: "BJ Stone × Aus Fitness Expo Launch", desc: "Brand activation at Australia's largest fitness expo with a strongman athlete driving foot traffic and credibility.", owner: null },
+          { title: "Sarah's Day Partnership (1.2M followers)", desc: "High-profile influencer collaboration generating organic reach and social proof in the AU fitness market.", owner: null },
+          { title: "Always-on content — hype reels, EDM, POS", desc: "Strongman hype reels, a Nike Strength dumbbell EDM (built in HubSpot), and in-store POS keeping the brand in-market.", owner: "Lionel · campaign metrics" },
+        ].map((w, i) => (
+          <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-3`}>
+            <div className={`w-5 h-5 rounded-full ${th.greenBg} flex items-center justify-center shrink-0 mt-0.5`}><Star size={11} className="text-gaf-orange" /></div>
+            <div>
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <p className={`text-sm font-heading font-semibold ${th.text}`}>{w.title}</p>
+                {w.owner && <Owner who={w.owner} />}
+              </div>
+              <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{w.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="w-[380px] shrink-0 flex flex-col gap-3">
+        <div className={`flex-1 rounded-lg overflow-hidden border ${th.cardBorder} relative`}>
+          <img src="assets/sarahs-day-nike.png" alt="Nike Strength ambassador content" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} onError={(e)=>{e.target.src='assets/bj-stone-nike.png'}} />
+          <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${th.expOverlay} p-4`}>
+            <div className="flex items-center gap-2 flex-wrap"><p className="text-[10px] font-heading tracking-[.2em] text-gaf-orange uppercase">Ambassador & Influencer Content</p><Owner who="Lionel · Reece Walsh hero asset" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 5: STRATEGIC INITIATIVES & INVESTMENT =====
+const StrategySlide = ({ n, t }) => {
+  const th = useTheme();
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="4 · Strategy" title="INVESTING TO GROW" sub="Where we are putting our own capital behind Nike Strength for the long term." />
+    <div className="flex flex-col flex-1 gap-4 min-h-0">
+      <div className={`${th.cardBg} border-l-2 border-gaf-orange rounded-lg p-5 shrink-0`}>
+        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase mb-2">Strategic Focus</p>
+        <p className={`text-sm font-body ${th.text} leading-relaxed`}>Shifting from conversion-only to brand building — investing in awareness, content and retail presence so Nike Strength stands as a destination brand across ANZ.</p>
+      </div>
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0 stagger">
+        {[
+          { title: "Experience Centre", icon: Cam, items: ["Purpose-built Nike Strength showroom at GAF HQ","In-house photo & video content studio","B2B walk-through for wholesale buyers","Dedicated athlete / ambassador hub"] },
+          { title: "Digital-First Brand Budget", icon: Bolt, items: ["Dedicated annual brand budget behind Nike Strength","Meta + YouTube awareness engine","Product seeding for UGC & influencer content","~10 new content pieces every month"] },
+          { title: "Commercial & Lead Gen", icon: Target, items: ["Geo-routing AU traffic from Nike Strength US site to GAF","Standalone brand treatment, GAF as lead partner","Digital handles B2C — sales team freed for B2B","Clearance discipline on fragmented / discontinued SKUs"] },
+        ].map((s, i) => (
+          <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-5 flex flex-col`}>
+            <div className="flex items-center gap-2 mb-4"><s.icon size={16} className="text-gaf-orange" /><h4 className={`text-[10px] font-heading font-semibold tracking-[.2em] uppercase ${th.text}`}>{s.title}</h4></div>
+            <div className="space-y-3 flex-1">
+              {s.items.map((item, j) => (
+                <div key={j} className="flex items-start gap-2"><div className="w-1 h-1 rounded-full bg-gaf-orange mt-1.5 shrink-0"></div><p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{item}</p></div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className={`flex items-center justify-between ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-2.5 shrink-0`}>
+        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Investment quantum</p>
+        <div className="flex items-center gap-3"><span className={`text-[11px] font-body ${th.sub}`}>Annual brand + content commitment behind Nike Strength</span><Owner who="Josh · confirm current $ figure" /></div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 6: SUPPLY CHAIN & FORECAST =====
+const SupplySlide = ({ n, t }) => {
+  const th = useTheme();
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="5 · Partnership" title="BUILT TO LAST" sub="Long-term commitment — supply chain capability and forecast purchases against target." />
+    <div className="flex gap-6 flex-1 min-h-0">
+      <div className="flex-1 flex flex-col gap-3 stagger">
+        {[
+          { icon: Truck, title: "Supply chain capability", desc: "Established freight, warehousing and fulfilment across ANZ — ready to scale volume as retail comes online.", owner: "Michelle · capacity & lead times" },
+          { icon: Target, title: "Forecast purchases vs target", desc: "Committed forward purchasing against agreed targets, demonstrating confidence and long-term intent to Nike Strength.", owner: "Michelle · forecast vs target chart" },
+          { icon: Dollar, title: "Sustainable brand growth", desc: "Clear internal sales targets and margin discipline underpinning a durable, profitable partnership.", owner: "Joel / Michelle · target numbers" },
+        ].map((c, i) => (
+          <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-3`}>
+            <div className={`w-8 h-8 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><c.icon size={16} className="text-gaf-orange" /></div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap"><p className={`text-sm font-heading font-semibold ${th.text}`}>{c.title}</p>{c.owner && <Owner who={c.owner} />}</div>
+              <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{c.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className={`w-[340px] shrink-0 ${th.cardBg} rounded-lg border ${th.cardBorder} p-6 flex flex-col justify-center items-center text-center`}>
+        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase mb-4">Forecast vs Target</p>
+        <div className="w-full flex flex-col items-center gap-3 opacity-90">
+          <div className={`w-full h-32 rounded-lg border-2 border-dashed ${th.cardBorder} flex flex-col items-center justify-center gap-2`}>
+            <Target size={22} className="text-gaf-orange" />
+            <p className={`text-[11px] ${th.sub} font-body px-4`}>Forecast-vs-target visual to drop in</p>
+            <Owner who="Michelle" />
+          </div>
+          <p className={`text-[10px] ${th.muted} font-body leading-relaxed`}>Placeholder — Michelle to supply committed purchase forecast against target for the current and next FY.</p>
+        </div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 7: DISTRIBUTOR WISH LIST =====
+const WishlistSlide = ({ n, t }) => {
+  const th = useTheme();
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="6 · The Ask" title="DISTRIBUTOR WISH LIST" sub="Where support and collaboration from Nike Strength would accelerate our growth in the region." />
+    <div className="flex flex-col flex-1 gap-4 min-h-0">
+      <div className="bg-gaf-orange rounded-lg p-5 flex items-center gap-4 shrink-0">
+        <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0"><Dollar size={20} className="text-white" /></div>
+        <div>
+          <h3 className="font-heading font-bold text-white uppercase tracking-wider text-sm">Co-invest in the brand — priority ask</h3>
+          <p className="text-[11px] text-white/90 font-body mt-1 leading-relaxed">Marketing development funds (MDF) alongside our own committed brand budget — accelerating Nike Strength from a product line to a destination brand across ANZ retail and D2C.</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0 stagger">
+        {[
+          { title: "Marketing Assets", icon: Bolt, items: ["Global Nike Strength brand assets for AU campaigns","Athlete / ambassador content rights for AU activations","Co-branded creative templates for Meta & YouTube","Product seeding budget at landed cost for UGC"] },
+          { title: "Pricing & Margin", icon: Pct, items: ["Margin review on key SKUs across the chain","Domestic freight relief on heavy products","Volume-based pricing tiers as we scale retail","Support on hero-SKU pricing for campaigns"] },
+          { title: "Strategic Partnership", icon: Target, items: ["Joint business plan with aligned ANZ targets","New-product roadmap visibility — first-mover in AU","Quarterly review cadence","Support building Nike Strength as a 'pull' brand for retailers"] },
+        ].map((s, i) => (
+          <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-5 flex flex-col`}>
+            <div className="flex items-center gap-2 mb-4"><s.icon size={16} className="text-gaf-orange" /><h4 className={`text-[10px] font-heading font-semibold tracking-[.2em] uppercase ${th.text}`}>{s.title}</h4></div>
+            <div className="space-y-3 flex-1">
+              {s.items.map((item, j) => (
+                <div key={j} className="flex items-start gap-2"><Msg size={10} className={`${th.muted} mt-1 shrink-0`} /><p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{item}</p></div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className={`flex items-center justify-between ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-2.5 shrink-0`}>
+        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Owners</p>
+        <div className="flex items-center gap-2"><Owner who="Joel / Josh · finalise the asks" /><span className={`text-[10px] font-body ${th.sub}`}>to align with the commercial relationship</span></div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 8: CLOSE =====
+const CloseSlide = ({ n, t }) => {
+  const th = useTheme();
+  return (
+  <div className={`w-full h-full ${th.bg} relative flex items-center justify-center overflow-hidden`}>
+    <div className="absolute -right-[20%] top-[10%] w-[70%] h-[140%] bg-gaf-orange opacity-[0.04] transform rotate-[-18deg]"></div>
+    <div className={`absolute -left-[20%] bottom-[10%] w-[50%] h-[120%] border ${th.cardBorder} opacity-30 transform rotate-[-18deg]`}></div>
+    <div className="z-10 text-center stagger px-10">
+      <p className="text-[10px] font-heading tracking-[.5em] text-gaf-orange uppercase mb-6">Invested for the long term</p>
+      <h1 className={`font-display text-6xl md:text-8xl ${th.text} leading-[0.9] tracking-wide`}>BUILDING NIKE<br/>STRENGTH, <span className="text-gaf-orange">TOGETHER</span></h1>
+      <div className="w-16 h-[2px] bg-gaf-orange mx-auto mt-8"></div>
+      <p className={`text-sm ${th.sub} font-body mt-6 max-w-xl mx-auto leading-relaxed`}>Well positioned to keep growing Nike Strength across the region — and clear on where your support takes us further, faster.</p>
+    </div>
+    <footer className="absolute bottom-0 left-0 h-1 bg-gaf-orange z-10 w-full"></footer>
+  </div>
+  );
+};
+
+// ===== SLIDE 9: WORKING NOTES (remove before meeting) =====
+const NotesSlide = ({ n, t }) => {
+  const th = useTheme();
+  const rows = [
+    { who: "Joel", need: "Channel-split performance report (D2C / Rebel / Sports Direct / Commercial); Rebel + Sports Direct launch detail, SKUs, volume; strategic-initiatives detail; wish-list sign-off." },
+    { who: "Lionel", need: "Reece Walsh ambassador detail (term, reach, deliverables) + hero asset; campaign / EDM / social reach metrics." },
+    { who: "Michelle", need: "Forecast purchases vs target chart; supply-chain capacity & lead times." },
+    { who: "Josh", need: "Confirm current annual brand-budget $ figure; co-own final wish list; visual polish + FIBO styling." },
+    { who: "Laura", need: "Slot into Steven's trip deck; confirm timing." },
+  ];
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="Internal — remove before meeting" title="OWNER CHECKLIST" sub="First-draft gaps mapped to owners per Steven's brief. First draft due Wed 23 Jul; meeting 28 Jul." />
+    <div className="flex-1 flex flex-col gap-2 stagger min-h-0">
+      {rows.map((r, i) => (
+        <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-4`}>
+          <div className="w-24 shrink-0"><Owner who={r.who} /></div>
+          <p className={`text-[12px] ${th.sub} font-body leading-relaxed`}>{r.need}</p>
+        </div>
+      ))}
+      <div className={`mt-1 ${th.kpiAccentBg} border ${th.borderAccent} rounded-lg p-4`}>
+        <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}><span className="text-gaf-orange font-semibold">Note:</span> performance figures shown are the trailing-12-month ANZ baseline (from Josh's prior Nike Strength FIBO deck) as a visual placeholder — swap for the current-FY numbers once Joel's channel report lands.</p>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+const SLIDES = [TitleSlide, PerfSlide, ChannelSlide, BrandSlide, StrategySlide, SupplySlide, WishlistSlide, CloseSlide, NotesSlide];
+
+function App() {
+  const [idx, setIdx] = useState(0);
+  const [key, setKey] = useState(0);
+  const [dark, setDark] = useState(false);
+  const th = dark ? themes.dark : themes.light;
+  const go = useCallback((dir) => {
+    const next = idx + dir;
+    if (next >= 0 && next < SLIDES.length) { setIdx(next); setKey(k => k + 1); }
+  }, [idx]);
+  useEffect(() => {
+    const h = e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+      else if (e.key === 'ArrowLeft') go(-1);
+      else if (e.key === 'd' || e.key === 'D') setDark(d => !d);
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [go]);
+  useEffect(() => { document.body.style.background = th.bodyBg; document.body.className = th.grainClass; }, [dark]);
+  const C = SLIDES[idx];
+  return (
+    <ThemeCtx.Provider value={th}>
+      <div className={`w-screen h-screen flex items-center justify-center`} style={{background: th.bodyBg}}>
+        <div key={key} className="w-full h-full max-w-[1600px] max-h-[900px] aspect-video relative overflow-hidden slide-enter rounded-lg" style={{boxShadow: dark ? '0 0 80px rgba(0,0,0,.6)' : '0 4px 60px rgba(0,0,0,.12)'}}>
+          <C n={idx + 1} t={SLIDES.length} />
+          <div className="absolute bottom-6 right-8 flex gap-2 z-50">
+            <button onClick={() => setDark(d => !d)} title="Toggle theme (D)"
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all border ${th.navBg} ${th.navBorder} ${th.navText} ${th.navHover}`}>
+              {dark ? <Sun size={14} /> : <Moon size={14} />}
+            </button>
+            <div className="w-px h-9 bg-gaf-orange/20"></div>
+            <button onClick={() => go(-1)} disabled={idx===0}
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all border ${idx===0 ? th.navDisabled : `${th.navBg} ${th.navBorder} ${th.navText} ${th.navHover}`}`}><ChevL size={16} /></button>
+            <button onClick={() => go(1)} disabled={idx===SLIDES.length-1}
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all border ${idx===SLIDES.length-1 ? th.navDisabled : `${th.navBg} ${th.navBorder} ${th.navText} ${th.navHover}`}`}><ChevR size={16} /></button>
+          </div>
+        </div>
+      </div>
+    </ThemeCtx.Provider>
+  );
+}
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
