@@ -136,10 +136,25 @@ function IconExpenses() {
   );
 }
 
+// Growth Matrix — mini spreadsheet grid with a rising bar column, GAF orange
+// (the tab replicates Josh's daily P&L sheet).
+function IconGrowthMatrix() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="2.5" stroke="#f26422" strokeWidth="1.8" />
+      <line x1="2" y1="8.5" x2="22" y2="8.5" stroke="#f26422" strokeWidth="1.4" />
+      <line x1="9" y1="2" x2="9" y2="22" stroke="#f26422" strokeWidth="1.4" />
+      <rect x="11.5" y="16" width="2.6" height="3.5" rx="0.6" fill="#f26422" />
+      <rect x="15.2" y="13.5" width="2.6" height="6" rx="0.6" fill="#f26422" />
+      <rect x="18.9" y="11" width="2.6" height="8.5" rx="0.6" fill="#f26422" opacity="0.85" />
+    </svg>
+  );
+}
+
 // ---- Nav item config ----
 
 export type TabId =
-  | "overview" | "meta" | "google" | "bing" | "pinterest" | "website"
+  | "overview" | "growthmatrix" | "meta" | "google" | "bing" | "pinterest" | "website"
   | "seo" | "axon" | "email" | "experiments" | "expenses";
 
 interface NavItem {
@@ -150,6 +165,7 @@ interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { id: "overview",    label: "Overview",         Icon: IconOverview },
+  { id: "growthmatrix", label: "Growth Matrix",    Icon: IconGrowthMatrix },
   { id: "meta",        label: "Meta Ads",          Icon: IconMeta },
   { id: "google",      label: "Google Ads",        Icon: IconGoogleAds },
   { id: "bing",        label: "Microsoft Ads",     Icon: IconBing },

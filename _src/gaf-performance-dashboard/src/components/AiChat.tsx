@@ -60,6 +60,15 @@ function getDashboardData(
   const snapshotSections: Record<string, unknown> = {
     experiments: data.experiments,
     organic: data.organic,
+    // Month-level view only (totals/runRate/notes) — the per-day matrix is
+    // ~250KB and sanitize() would silently truncate day arrays mid-month.
+    growthMatrix: data.growthMatrix
+      ? {
+          dataThrough: data.growthMatrix.dataThrough,
+          agencyFeeRate: data.growthMatrix.agencyFeeRate,
+          months: data.growthMatrix.months.map(({ days: _days, ...m }) => m),
+        }
+      : undefined,
   };
   let node: unknown;
   if (section in snapshotSections) {

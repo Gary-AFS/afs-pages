@@ -16,6 +16,7 @@ import { SeoAeo } from "./tabs/SeoAeo";
 import { Pinterest } from "./tabs/Pinterest";
 import { Experiments } from "./tabs/Experiments";
 import { MarketingExpenses } from "./tabs/MarketingExpenses";
+import { GrowthMatrix } from "./tabs/GrowthMatrix";
 
 // Same white-background GAF logo the reference dashboards use.
 const GAF_LOGO_URL =
@@ -24,6 +25,7 @@ const GAF_LOGO_URL =
 function makePanels(data: PerfData): Record<TabId, () => JSX.Element> {
   return {
     overview:    () => <Overview data={data} />,
+    growthmatrix: () => <GrowthMatrix data={data} />,
     meta:        () => <MetaAds data={data} />,
     google:      () => <GoogleAds data={data} />,
     bing:        () => <BingAds data={data} />,

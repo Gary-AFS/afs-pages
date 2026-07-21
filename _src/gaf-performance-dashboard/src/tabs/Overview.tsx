@@ -12,7 +12,7 @@ interface OverviewProps {
 }
 
 const CAVEAT =
-  "Blended MER = (ad spend + 6% agency fee on Meta and Google + other marketing expenses) ÷ total NetSuite sales revenue; lower is more efficient. " +
+  "Blended MER = (ad spend + 8% agency fee on Meta and Google + other marketing expenses) ÷ total NetSuite sales revenue; lower is more efficient. " +
   "Revenue is total sales from NetSuite (incl. phone/offline/B2B), so treat channel-level ROAS as directional, not a verdict.";
 
 // Source documents behind the Revenue + MER widgets (GAF NetSuite export Sheet).
@@ -128,7 +128,7 @@ export function Overview({ data }: OverviewProps) {
             label="Ad Spend"
             value={fmtCurrency(kpis.adSpend ?? 0)}
             delta={deltas.adSpend ?? null}
-            tooltip="Source: Meta, Google Ads and AppLovin (Axon) APIs, pulled nightly. Calculation: sum of media spend for the selected window. Excludes the 6% agency fee (that enters the MER only)."
+            tooltip="Source: Meta, Google Ads and AppLovin (Axon) APIs, pulled nightly. Calculation: sum of media spend for the selected window. Excludes the 8% agency fee (that enters the MER only)."
           />
           <KpiCard
             label="Revenue"
@@ -154,7 +154,7 @@ export function Overview({ data }: OverviewProps) {
               { href: SALES_SHEET_URL, title: "Revenue source: NetSuite Sales Array (Google Sheet)" },
               { href: EXPENSES_SHEET_URL, title: "Expenses source: marketing expenses ledger (Google Sheet)" },
             ]}
-            tooltip="Sources: ad platform APIs + marketing expenses ledger, over NetSuite sales. Calculation: (media spend + 6% agency fee on Meta and Google + non-media marketing expenses) ÷ total NetSuite sales revenue. Lower is more efficient; team target ~12%. Note: the expenses ledger lags a few days, so very recent windows understate the numerator. Delta compares the prior equal period."
+            tooltip="Sources: ad platform APIs + marketing expenses ledger, over NetSuite sales. Calculation: (media spend + 8% agency fee on Meta and Google + non-media marketing expenses) ÷ total NetSuite sales revenue. Lower is more efficient; team target ~12%. Note: the expenses ledger lags a few days, so very recent windows understate the numerator. Delta compares the prior equal period."
           />
           <KpiCard
             label="Sessions"

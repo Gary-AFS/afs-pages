@@ -10,7 +10,7 @@ const FEED_URL =
 
 export interface OverviewKpis {
   adSpend: number;
-  /** 6% agency fee on Meta + Google media spend only */
+  /** 8% agency fee on Meta + Google media spend only (matches the Growth Matrix sheet) */
   agencyFees?: number;
   /** non-media marketing expenses (expenses ledger minus paid ad spend) folded into MER */
   marketingExpenses?: number;
@@ -411,6 +411,39 @@ export interface ExpensesWindow {
   dataThrough: string | null;
 }
 
+// ----- Growth Matrix shapes (month-keyed daily P&L, not window-keyed) -----
+
+/** One day of the Growth Matrix. All metric fields are absent/null when
+ *  hasData is false (days beyond the data, matching blank sheet columns).
+ *  Ratio fields are FRACTIONS (0.0474 = 4.74%) and null on divide-by-zero. */
+export interface GrowthMatrixDay {
+  date: string;
+  hasData: boolean;
+  [metric: string]: number | string | boolean | null | undefined;
+}
+
+export interface GrowthMatrixMonth {
+  key: string;           // "2026-07"
+  label: string;         // "July 2026"
+  daysInMonth: number;
+  daysElapsed: number;   // days with data — the run-rate divisor
+  days: GrowthMatrixDay[];
+  /** Additive fields summed; ratio fields recomputed from the sums (like the
+   *  sheet's Month Total column). */
+  totals: Record<string, number | null>;
+  /** Month-total pace projected to the full month (additive fields only). */
+  runRate: Record<string, number>;
+  /** Josh's hand-typed Note row from the month tab, {iso date: note}. */
+  notes: Record<string, string>;
+}
+
+export interface GrowthMatrixData {
+  months: GrowthMatrixMonth[];   // oldest → newest
+  dataThrough: string | null;
+  agencyFeeRate: number;         // 0.08 — the sheet's "Conversion Factory" rate
+  drivers: Record<string, number>;
+}
+
 // ----- Axon shapes -----
 
 export interface AxonKpis {
@@ -501,6 +534,7 @@ export interface PerfData {
   pinterest?: WindowedRecord<PinterestWindow>;
   expenses?: WindowedRecord<ExpensesWindow>;
   experiments?: ExperimentsData;
+  growthMatrix?: GrowthMatrixData;
   products: WindowedRecord<ProductRow[]>;
   overview: WindowedRecord<OverviewWindow>;
   anomalies: WindowedRecord<Anomaly[]>;
