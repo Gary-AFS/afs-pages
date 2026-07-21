@@ -80,6 +80,23 @@
   .rej .n{font-family:var(--display);font-weight:900;font-size:28px;color:var(--gaf-ink)}
   .rej .t{font-weight:700;color:var(--g800);margin:2px 0 4px;font-size:15px}
   .rej .d{font-size:13.5px;color:var(--g600)}
+  .wexample{margin-top:22px;border:1px solid var(--g200);border-radius:12px;overflow:hidden;background:#fff}
+  .wex-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--g50);border-bottom:1px solid var(--g200);padding:12px 18px}
+  .wex-tag{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--g700)}
+  .wex-stamp{font-family:var(--display);font-weight:900;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--g600);padding:4px 12px;border-radius:20px}
+  .wex-cart{padding:4px 18px}
+  .wex-line{display:grid;grid-template-columns:118px 1fr auto;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid var(--g100);font-size:14.5px}
+  .wex-line:last-child{border-bottom:none}
+  .wex-role{font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--g500)}
+  .wex-line.anchor .wex-role{color:var(--gaf-orange-700)}
+  .wex-prod{color:var(--gaf-ink);font-weight:600}
+  .wex-line.anchor .wex-prod{font-weight:800}
+  .wex-amt{font-family:var(--display);font-weight:800;color:var(--gaf-ink);white-space:nowrap}
+  .wex-line.missing{opacity:.65}
+  .wex-line.missing .wex-prod{font-style:italic;color:var(--g500);font-weight:500}
+  .wex-verdict{padding:16px 18px;background:var(--gaf-orange-soft);font-size:14px;color:var(--g700);border-top:1px solid var(--gaf-orange)}
+  .wex-verdict strong{color:var(--gaf-orange-700)}
+  @media(max-width:820px){.wex-line{grid-template-columns:90px 1fr auto;gap:10px}}
   .note{font-size:13.5px;color:var(--g500);margin-top:14px;border-left:3px solid var(--g300);padding-left:12px}
   section.dark .note{color:var(--g400);border-color:var(--g700)}
   .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
@@ -183,6 +200,15 @@
     <div class="reject">
       <div class="rej"><div class="n">1,663</div><div class="t">One centrepiece, no build-out</div><div class="d">A single anchor over $3,376 (a lone treadmill or AIO) with fewer than two attachments. High value, but no gym was built — this is the key definitional call for the team: is a standalone $4k treadmill a Home Gym Builder sale, or not?</div></div>
       <div class="rej"><div class="n">516</div><div class="t">No training centrepiece</div><div class="d">Over $3,376 of plates, barbells, benches or commercial machines with no anchor present. This is the Performance Optimiser (barbell-and-plates) or a commercial fit-out — correctly excluded from home-gym demand.</div></div>
+    </div>
+    <div class="wexample">
+      <div class="wex-head"><span class="wex-tag">Worked example · a real cart the rule rejects</span><span class="wex-stamp">Not counted</span></div>
+      <div class="wex-cart">
+        <div class="wex-line anchor"><span class="wex-role">Anchor</span><span class="wex-prod">Force USA C20 All-In-One Trainer</span><span class="wex-amt">$6,499</span></div>
+        <div class="wex-line"><span class="wex-role">Attachment 1</span><span class="wex-prod">Sliding bench</span><span class="wex-amt">$849</span></div>
+        <div class="wex-line missing"><span class="wex-role">Attachment 2</span><span class="wex-prod">nothing else in the cart</span><span class="wex-amt">&mdash;</span></div>
+      </div>
+      <div class="wex-verdict"><strong>$8,862 cart &mdash; rejected.</strong> A flagship all-in-one and a bench, bought by a consumer, more than double the $3,376 gate. It has a genuine training centrepiece, but only one attachment, so it fails the two-attachment test and does not count as a Home Gym Builder sale today. This single order is the 1,663-cart question made concrete: if a C20-plus-bench is not a home-gym build, what is? The team's call on this one edge sets the baseline.</div>
     </div>
     <p class="note">85% of the qualifying builders are individual consumers, not companies — the composition rule skews consumer on its own, which is exactly what the archetype needs. It works.</p>
   </div>
