@@ -50,16 +50,14 @@
   .path .formula{font-family:var(--display);font-weight:700;color:var(--gaf-orange-700);margin-top:12px;font-size:15px}
   .path .hits{margin-top:12px;font-size:13px;color:var(--g500);font-weight:600;border-top:1px solid var(--g200);padding-top:10px}
   .path .hits b{font-family:var(--display);color:var(--gaf-black);font-size:15px}
-  /* funnel */
   .funnel{display:grid;grid-template-columns:1fr;gap:10px;margin-top:6px}
   .frow{display:flex;align-items:center;gap:16px}
   .fbar{height:52px;border-radius:8px;display:flex;align-items:center;padding:0 18px;color:#fff;font-family:var(--display);font-weight:800;white-space:nowrap}
   .fbar.f1{background:var(--g700);width:100%}
-  .fbar.f2{background:var(--g500);width:64%}
-  .fbar.f3{background:var(--gaf-orange);width:41%}
+  .fbar.f2{background:var(--g500);width:52%}
+  .fbar.f3{background:var(--gaf-orange);width:30%}
   .fmeta{font-size:13.5px;color:var(--g600)}
   .fmeta b{font-family:var(--display);color:var(--gaf-ink)}
-  /* bars */
   .bars{margin-top:8px}
   .bar-row{display:grid;grid-template-columns:120px 1fr 54px;align-items:center;gap:12px;margin:8px 0}
   .bar-row .lbl{font-size:13px;color:var(--g700);font-weight:600;text-align:right}
@@ -96,7 +94,6 @@
   .wex-line.missing .wex-prod{font-style:italic;color:var(--g500);font-weight:500}
   .wex-verdict{padding:16px 18px;background:var(--gaf-orange-soft);font-size:14px;color:var(--g700);border-top:1px solid var(--gaf-orange)}
   .wex-verdict strong{color:var(--gaf-orange-700)}
-  @media(max-width:820px){.wex-line{grid-template-columns:90px 1fr auto;gap:10px}}
   .note{font-size:13.5px;color:var(--g500);margin-top:14px;border-left:3px solid var(--g300);padding-left:12px}
   section.dark .note{color:var(--g400);border-color:var(--g700)}
   .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
@@ -110,7 +107,7 @@
   footer strong{color:#fff}
   footer a{color:var(--gaf-orange);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(242,100,34,.4)}
   footer a:hover{border-bottom-color:var(--gaf-orange)}
-  @media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}.paths,.reject{grid-template-columns:1fr}.bar-row{grid-template-columns:96px 1fr 48px}}
+  @media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}.paths,.reject{grid-template-columns:1fr}.bar-row{grid-template-columns:96px 1fr 48px}.wex-line{grid-template-columns:90px 1fr auto;gap:10px}}
 </style>
 </head>
 <body>
@@ -119,7 +116,7 @@
   <div class="wrap">
     <div class="eyebrow">GAF · Home Gym Builder BHAG · KPI Baseline</div>
     <h1>What counts as a<br>Home Gym Builder sale</h1>
-    <p class="sub">The locked success metric, pressure-tested against Chris's completed NetSuite categorisation and run over the last full 12 months of GAF trade. The baseline is in: <strong style="color:#fff">1,580 Home Gym Builder sales</strong> a year, 85% of them consumers. This is the number we grow toward the 30,000-by-2030 BHAG.</p>
+    <p class="sub">The locked success metric, pressure-tested against Chris's completed NetSuite categorisation and run over the last 12 months of GAF AU retail trade. The baseline: <strong style="color:#fff">894 Home Gym Builder sales</strong> a year, 97% of them consumers. This is the number we grow toward the 30,000-by-2030 BHAG.</p>
   </div>
 </header>
 
@@ -142,14 +139,14 @@
         <h3>One centrepiece, kitted out</h3>
         <p>One anchor product, plus at least two attachment items, with a total cart value over the threshold. The everyday home-gym build.</p>
         <div class="formula">1 anchor &nbsp;+&nbsp; 2 attachments &nbsp;+&nbsp; cart &gt; $3,376</div>
-        <div class="hits"><b>1,441</b> of the 1,580 qualifying sales (91%)</div>
+        <div class="hits"><b>648</b> of the 894 qualifying sales (72%)</div>
       </div>
       <div class="path">
         <span class="tag">Path B · Multi-anchor</span>
         <h3>Two centrepieces in one cart</h3>
         <p>Two or more anchor products, with a total cart value over the threshold — regardless of attachment count. Two centrepieces is self-evidently a gym build.</p>
         <div class="formula">2+ anchors &nbsp;+&nbsp; cart &gt; $3,376</div>
-        <div class="hits"><b>139</b> of the 1,580 qualifying sales (9%)</div>
+        <div class="hits"><b>246</b> of the 894 qualifying sales (28%)</div>
       </div>
     </div>
     <p class="note">The $3,376 gate is the average Home Gym Builder cart value from our archetype economics. The lever that makes the metric decisive is the <strong>anchor list</strong>, not the gate — anchors are project-defining training centrepieces only.</p>
@@ -159,31 +156,31 @@
 <!-- THE BASELINE -->
 <section class="dark">
   <div class="wrap">
-    <div class="eyebrow">The baseline · FY26 (Jul 2025 – Jun 2026)</div>
-    <h2>1,580 Home Gym Builder sales a year</h2>
-    <p class="lead">Run against every GAF sales order for the last full financial year — all channels, so commercial and phone sales are caught, not just Shopify. The two-path rule applied to the real order-line composition of each cart.</p>
+    <div class="eyebrow">The baseline · last 12 months of GAF AU trade</div>
+    <h2>894 Home Gym Builder sales a year</h2>
+    <p class="lead">Scoped to the GAF AU and GAF Online-AU sales channels (matching the standing NetSuite report, so no commercial, wholesale, NZ, export or staff orders), the two-path rule applied to the real order-line composition of each cart.</p>
     <div class="kpis">
-      <div class="kpi" style="background:#141414;border-color:#333"><div class="n" style="color:#fff">1,580</div><div class="l" style="color:var(--g400)">Home Gym Builder sales / year</div></div>
-      <div class="kpi hot"><div class="n">1,345</div><div class="l">Of them are B2C consumers (85%)</div></div>
-      <div class="kpi" style="background:#141414;border-color:#333"><div class="n" style="color:#fff">$15.6<span class="u">M</span></div><div class="l" style="color:var(--g400)">Revenue ($10.2M from consumers)</div></div>
-      <div class="kpi" style="background:#141414;border-color:#333"><div class="n" style="color:#fff">$9,883</div><div class="l" style="color:var(--g400)">Average builder cart value</div></div>
+      <div class="kpi" style="background:#141414;border-color:#333"><div class="n" style="color:#fff">894</div><div class="l" style="color:var(--g400)">Home Gym Builder sales / year</div></div>
+      <div class="kpi hot"><div class="n">869</div><div class="l">Of them are B2C consumers (97%)</div></div>
+      <div class="kpi" style="background:#141414;border-color:#333"><div class="n" style="color:#fff">$7.7<span class="u">M</span></div><div class="l" style="color:var(--g400)">Revenue ($7.1M from consumers)</div></div>
+      <div class="kpi" style="background:#141414;border-color:#333"><div class="n" style="color:#fff">$8,636</div><div class="l" style="color:var(--g400)">Average builder cart value</div></div>
     </div>
     <h3 style="font-size:16px;font-weight:800;margin:30px 0 12px;color:#fff">Home Gym Builder sales by month</h3>
     <div class="bars">
-      <div class="bar-row"><div class="lbl">Jul 25</div><div class="bar-track"><div class="bar-fill" style="width:29%"></div></div><div class="val">101</div></div>
-      <div class="bar-row"><div class="lbl">Aug 25</div><div class="bar-track"><div class="bar-fill" style="width:29%"></div></div><div class="val">101</div></div>
-      <div class="bar-row"><div class="lbl">Sep 25</div><div class="bar-track"><div class="bar-fill" style="width:27%"></div></div><div class="val">96</div></div>
-      <div class="bar-row"><div class="lbl">Oct 25</div><div class="bar-track"><div class="bar-fill" style="width:26%"></div></div><div class="val">91</div></div>
-      <div class="bar-row"><div class="lbl">Nov 25</div><div class="bar-track"><div class="bar-fill peak" style="width:100%"></div></div><div class="val">354</div></div>
-      <div class="bar-row"><div class="lbl">Dec 25</div><div class="bar-track"><div class="bar-fill" style="width:69%"></div></div><div class="val">243</div></div>
-      <div class="bar-row"><div class="lbl">Jan 26</div><div class="bar-track"><div class="bar-fill" style="width:52%"></div></div><div class="val">183</div></div>
-      <div class="bar-row"><div class="lbl">Feb 26</div><div class="bar-track"><div class="bar-fill" style="width:30%"></div></div><div class="val">106</div></div>
-      <div class="bar-row"><div class="lbl">Mar 26</div><div class="bar-track"><div class="bar-fill" style="width:27%"></div></div><div class="val">96</div></div>
-      <div class="bar-row"><div class="lbl">Apr 26</div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><div class="val">64</div></div>
-      <div class="bar-row"><div class="lbl">May 26</div><div class="bar-track"><div class="bar-fill" style="width:21%"></div></div><div class="val">76</div></div>
-      <div class="bar-row"><div class="lbl">Jun 26</div><div class="bar-track"><div class="bar-fill" style="width:19%"></div></div><div class="val">68</div></div>
+      <div class="bar-row"><div class="lbl">Aug 25</div><div class="bar-track"><div class="bar-fill" style="width:32%"></div></div><div class="val">52</div></div>
+      <div class="bar-row"><div class="lbl">Sep 25</div><div class="bar-track"><div class="bar-fill" style="width:44%"></div></div><div class="val">71</div></div>
+      <div class="bar-row"><div class="lbl">Oct 25</div><div class="bar-track"><div class="bar-fill" style="width:30%"></div></div><div class="val">49</div></div>
+      <div class="bar-row"><div class="lbl">Nov 25</div><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><div class="val">116</div></div>
+      <div class="bar-row"><div class="lbl">Dec 25</div><div class="bar-track"><div class="bar-fill" style="width:59%"></div></div><div class="val">95</div></div>
+      <div class="bar-row"><div class="lbl">Jan 26</div><div class="bar-track"><div class="bar-fill" style="width:34%"></div></div><div class="val">55</div></div>
+      <div class="bar-row"><div class="lbl">Feb 26</div><div class="bar-track"><div class="bar-fill" style="width:33%"></div></div><div class="val">53</div></div>
+      <div class="bar-row"><div class="lbl">Mar 26</div><div class="bar-track"><div class="bar-fill" style="width:44%"></div></div><div class="val">71</div></div>
+      <div class="bar-row"><div class="lbl">Apr 26</div><div class="bar-track"><div class="bar-fill" style="width:36%"></div></div><div class="val">59</div></div>
+      <div class="bar-row"><div class="lbl">May 26</div><div class="bar-track"><div class="bar-fill" style="width:43%"></div></div><div class="val">69</div></div>
+      <div class="bar-row"><div class="lbl">Jun 26</div><div class="bar-track"><div class="bar-fill peak" style="width:100%"></div></div><div class="val">162</div></div>
+      <div class="bar-row"><div class="lbl">Jul (part)</div><div class="bar-track"><div class="bar-fill" style="width:26%"></div></div><div class="val">42</div></div>
     </div>
-    <p class="note">Black Friday November (354) and December (243) carry the year — 38% of all Home Gym Builder sales land in those two months. The metric will be strongly seasonal; judge it on rolling 12-month or same-month-last-year, never month-on-month.</p>
+    <p class="note">EOFY June (162) and Black Friday November (116) carry the year. The metric is strongly seasonal, so judge it on a rolling 12 months or same-month-last-year, never month on month. "Jul (part)" combines the two partial July tails of the trailing window.</p>
   </div>
 </section>
 
@@ -191,28 +188,28 @@
 <section>
   <div class="wrap">
     <div class="eyebrow">Is the metric decisive?</div>
-    <h2>It rejects 58% of big carts as "not a build"</h2>
-    <p class="lead">Decisiveness is the whole point — the measure has to separate a Home Gym Builder from a Performance Optimiser and a Budget-Conscious Seeker. Of the 3,759 carts a year that clear the $3,376 value gate, the composition rule passes only 1,580. Value alone is not enough; the build has to be there.</p>
+    <h2>It rejects nearly half of big carts as "not a build"</h2>
+    <p class="lead">Decisiveness is the whole point — the measure has to separate a Home Gym Builder from a Performance Optimiser and a Budget-Conscious Seeker. Of the 1,696 GAF AU carts a year that clear the $3,376 value gate, the composition rule passes 894. Value alone is not enough; the build has to be there.</p>
     <div class="funnel">
-      <div class="frow"><div class="fbar f1">13,812 GAF sales orders</div><div class="fmeta">Every GAF order, FY26 — the full population.</div></div>
-      <div class="frow"><div class="fbar f2">3,759 clear the $3,376 gate</div><div class="fmeta"><b>27%</b> of orders. The value gate alone — the candidate universe.</div></div>
-      <div class="frow"><div class="fbar f3">1,580 are Home Gym Builder sales</div><div class="fmeta"><b>42%</b> of value-carts pass composition · <b>11%</b> of all GAF orders.</div></div>
+      <div class="frow"><div class="fbar f1">~15,400 GAF AU sales orders</div><div class="fmeta">Every GAF AU / Online-AU order, last 12 months — the full population.</div></div>
+      <div class="frow"><div class="fbar f2">1,696 clear the $3,376 gate</div><div class="fmeta"><b>11%</b> of orders. The value gate alone — the candidate universe.</div></div>
+      <div class="frow"><div class="fbar f3">894 are Home Gym Builder sales</div><div class="fmeta"><b>53%</b> of value-carts pass composition · <b>6%</b> of all GAF AU orders.</div></div>
     </div>
-    <h3 style="font-size:16px;font-weight:800;margin:30px 0 10px">The 2,179 value-carts the rule correctly turns away</h3>
+    <h3 style="font-size:16px;font-weight:800;margin:30px 0 10px">The 802 value-carts the rule correctly turns away</h3>
     <div class="reject">
-      <div class="rej"><div class="n">1,663</div><div class="t">One centrepiece, no build-out</div><div class="d">A single anchor over $3,376 (a lone treadmill or AIO) with fewer than two attachments. High value, but no gym was built — this is the key definitional call for the team: is a standalone $4k treadmill a Home Gym Builder sale, or not?</div></div>
-      <div class="rej"><div class="n">516</div><div class="t">No training centrepiece</div><div class="d">Over $3,376 of plates, barbells, benches or commercial machines with no anchor present. This is the Performance Optimiser (barbell-and-plates) or a commercial fit-out — correctly excluded from home-gym demand.</div></div>
+      <div class="rej"><div class="n">508</div><div class="t">One centrepiece, no build-out</div><div class="d">A single anchor over $3,376 (a lone treadmill or AIO) with fewer than two attachments. High value, but no gym was built — this is the key definitional call for the team: is a standalone AIO or treadmill a Home Gym Builder sale, or not?</div></div>
+      <div class="rej"><div class="n">294</div><div class="t">No training centrepiece</div><div class="d">Over $3,376 of plates, barbells, dumbbells or benches with no anchor present. This is the Performance Optimiser (barbell-and-plates) — correctly excluded from home-gym demand.</div></div>
     </div>
     <div class="wexample">
       <div class="wex-head"><span class="wex-tag">Worked example · a real cart the rule rejects</span><span class="wex-stamp">Not counted</span></div>
       <div class="wex-cart">
-        <div class="wex-line anchor"><span class="wex-role">Anchor</span><span class="wex-prod">Force USA C20 All-In-One Trainer</span><span class="wex-amt">$6,499</span></div>
-        <div class="wex-line"><span class="wex-role">Attachment 1</span><span class="wex-prod">Sliding bench</span><span class="wex-amt">$849</span></div>
+        <div class="wex-line anchor"><span class="wex-role">Anchor</span><span class="wex-prod">Force USA C20 All-In-One Trainer</span><span class="wex-amt">$7,705</span></div>
+        <div class="wex-line"><span class="wex-role">Attachment 1</span><span class="wex-prod">Sliding bench</span><span class="wex-amt">$477</span></div>
         <div class="wex-line missing"><span class="wex-role">Attachment 2</span><span class="wex-prod">nothing else in the cart</span><span class="wex-amt">&mdash;</span></div>
       </div>
-      <div class="wex-verdict"><strong>$8,862 cart &mdash; rejected.</strong> A flagship all-in-one and a bench, bought by a consumer, more than double the $3,376 gate. It has a genuine training centrepiece, but only one attachment, so it fails the two-attachment test and does not count as a Home Gym Builder sale today. This single order is the 1,663-cart question made concrete: if a C20-plus-bench is not a home-gym build, what is? The team's call on this one edge sets the baseline.</div>
+      <div class="wex-verdict"><strong>$9,000 cart &mdash; rejected.</strong> A flagship all-in-one and a bench, bought by a consumer, well over the $3,376 gate. It has a genuine training centrepiece, but only one attachment, so it fails the two-attachment test and does not count as a Home Gym Builder sale today. This single order is the 508-cart question made concrete: if a C20-plus-bench is not a home-gym build, what is? The team's call on this edge sets the baseline.</div>
     </div>
-    <p class="note">85% of the qualifying builders are individual consumers, not companies — the composition rule skews consumer on its own, which is exactly what the archetype needs. It works.</p>
+    <p class="note">97% of the qualifying builders are individual consumers, not companies — with commercial and wholesale channels scoped out, the metric is now almost purely a consumer measure, exactly what the archetype needs.</p>
   </div>
 </section>
 
@@ -248,30 +245,14 @@
   </div>
 </section>
 
-<!-- COVERAGE PRESSURE TEST -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow">Pressure test · Is the rule runnable?</div>
-    <h2>Chris's categorisation is complete enough to run it</h2>
-    <p class="lead">The metric can only run if every anchor sub-category holds SKUs and the item master is categorised. It is. Against the completed NetSuite categorisation (item master, 20260601 version):</p>
-    <div class="kpis">
-      <div class="kpi"><div class="n">1,800</div><div class="l">Active items categorised</div></div>
-      <div class="kpi"><div class="n">99.9<span class="u">%</span></div><div class="l">Sub-category coverage of the item master</div></div>
-      <div class="kpi hot"><div class="n">14 / 14</div><div class="l">Anchor sub-categories populated</div></div>
-      <div class="kpi"><div class="n">248</div><div class="l">Anchor SKUs across the 14 sub-cats</div></div>
-    </div>
-    <p class="note">One data-quality tidy-up surfaced by the run: 68 live SKUs on real orders (kit bundles like the HEX and power sets, and variant codes like the C10, X15 and M10 all-in-ones) sit outside the 20260601 master and had to be mapped by hand from their NetSuite descriptions to classify them. Before this goes live as a standing KPI, those bundle/variant SKUs should be folded into the categorisation sheet so the rule runs automatically. Also confirm whether "Commercial Cardio" (40 SKUs) rolls into the cardio anchors or stays commercial-only.</p>
-  </div>
-</section>
-
 <!-- BHAG -->
-<section class="alt">
+<section>
   <div class="wrap">
     <div class="eyebrow">The point of the number</div>
     <h2>The baseline we grow from</h2>
     <p class="lead">The BHAG is 30,000 home gyms built by 2030. This baseline is the starting line and the yardstick — every campaign, the AI Gym Designer, and the Home Gym Builder journey map now move a number we can actually see.</p>
     <div class="bhag">
-      <div class="big">1,345<span>B2C Home Gym Builder sales — FY26 baseline</span></div>
+      <div class="big">869<span>B2C Home Gym Builder sales — last-12-month baseline</span></div>
       <div class="arrow">&rarr;</div>
       <div class="big">30,000<span>Home gyms built by 2030 — the BHAG</span></div>
     </div>
@@ -280,25 +261,25 @@
 </section>
 
 <!-- METHOD -->
-<section>
+<section class="alt">
   <div class="wrap">
     <div class="eyebrow">Method &amp; assumptions</div>
     <h2>How the number was built</h2>
     <p class="lead">So the team can trust, challenge and reproduce it.</p>
     <div class="cov" style="grid-template-columns:1fr">
-      <div class="cell"><div class="s"><strong>Scope.</strong> All Gym &amp; Fitness (NetSuite subsidiary "Gym &amp; Fitness Inc") sales orders dated 1 Jul 2025 – 30 Jun 2026, all order statuses that represent a real sale (billed, closed, pending &amp; partial fulfilment; no cancellations present). 13,812 orders. Read-only throughout.</div></div>
-      <div class="cell"><div class="s"><strong>Value gate.</strong> Order total over $3,376, inclusive of GST and freight (the cart value the customer is charged). 3,759 orders clear it.</div></div>
+      <div class="cell"><div class="s"><strong>Scope.</strong> Sales orders on the GAF AU + GAF Online-AU departments (matching the standing NetSuite saved search 6022), dated the last 12 months, excluding cancelled and closed orders. This excludes GAF Commercial, Wholesale, Warranty, NZ and Export. ~15,400 orders. Read-only throughout.</div></div>
+      <div class="cell"><div class="s"><strong>Value gate.</strong> Order total over $3,376, inclusive of GST and freight (the cart value the customer is charged). 1,696 orders clear it.</div></div>
       <div class="cell"><div class="s"><strong>Composition.</strong> For each cart, the priced order lines were taken (kit parents counted once, their exploded component and box lines collapsed to the parent, tax/discount/shipping lines dropped), each distinct product mapped to its sub-category, then tagged anchor / attachment / neither and the two-path rule applied.</div></div>
       <div class="cell"><div class="s"><strong>Attachments are counted by distinct SKU</strong> — two different attachment products, per Adam's "any 2 other SKUs" rule. A single line bought in quantity 2 is one attachment, not two.</div></div>
-      <div class="cell"><div class="s"><strong>Coverage.</strong> 100% of the 14,005 priced lines were classified — the ~75% that matched the categorisation sheet directly, plus 68 bundle/variant SKUs (3,518 lines) resolved by hand from their NetSuite descriptions. Unresolved lines were treated as "neither" (the conservative direction — it cannot manufacture a false builder).</div></div>
-      <div class="cell"><div class="s"><strong>Known judgement calls, flagged not hidden.</strong> "VF-RTE15" resolved to Versa-Fit flooring tiles (an attachment), not a treadmill. The "50lb weight-stack upgrade" and cable/landmine attachments were treated as neither (all-in-one accessories), which slightly tightens Path A. Re-running once the sheet absorbs these SKUs will firm the number.</div></div>
+      <div class="cell"><div class="s"><strong>Coverage.</strong> 96% of the 14,200 priced lines matched the categorisation sheet directly; the remaining 4% (REP racks and Ares trainers, STEPR cardio, Impulse machines, flooring and plate bundles) were classified from their NetSuite descriptions. Unresolved lines were treated as "neither" (the conservative direction — it cannot manufacture a false builder).</div></div>
+      <div class="cell"><div class="s"><strong>Residual caveats, flagged not hidden.</strong> The saved search's staff/warranty/test order-source exclusion is not yet applied in this run (small effect). The bundle and variant SKUs should be folded into Chris's categorisation sheet so the KPI runs automatically. Re-running with both will firm the number.</div></div>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <strong>GAF — Home Gym Builder KPI baseline.</strong> Prepared for the Gym and Fitness Brand Meeting rhythm. Categorisation: Chris (NetSuite, 20260601). Rule: Adam Carter + Gary. Order + line data: NetSuite, FY26, read-only. Baseline run 21 Jul 2026. Source: <a href="https://3522640.app.netsuite.com/app/common/search/search.nl?cu=T&amp;e=T&amp;id=6022">NetSuite saved search 6022</a> (access required). Internal — not for distribution.
+    <strong>GAF — Home Gym Builder KPI baseline.</strong> Prepared for the Gym and Fitness Brand Meeting rhythm. Categorisation: Chris (NetSuite, 20260601). Rule: Adam Carter + Gary. Order + line data: NetSuite, last 12 months, read-only. Baseline run 21 Jul 2026. Source: <a href="https://3522640.app.netsuite.com/app/common/search/search.nl?cu=T&amp;e=T&amp;id=6022">NetSuite saved search 6022</a> (access required). Internal — not for distribution.
   </div>
 </footer>
 
