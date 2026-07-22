@@ -402,9 +402,9 @@ const BrandSlide = ({ n, t }) => {
   const [active, setActive] = useState(0);
   const wins = [
     { src:'assets/nike-bjstone-record.jpg', tag:'World Record Attempt', title:'BJ Stone · 277.5kg', desc:"Australia's Strongest Man 2025 lifting in Nike Strength — a marquee athlete moment." },
-    { src:'assets/nike-maroons-partnership.png', tag:'Elite Sport', title:'QLD Maroons', desc:'Gym and Fitness × State of Origin champions — the marketing reach we bring to the table.' },
+    { src:'assets/nike-maroons-partnership.png', tag:'Team Fitout', title:'QLD Maroons', desc:'State of Origin champions training camp — kitted out with a full Nike Strength fitout.' },
     { src:'assets/sarahs-day-nike.png', tag:'Influencer', title:"Sarah's Day · 1.2M", desc:'High-profile collaboration driving organic reach and social proof in the AU fitness market.' },
-    { src:'assets/bj-stone-nike.png', tag:'Brand Activation', title:'Aus Fitness Expo', desc:"BJ Stone strongman activation at Australia's largest fitness expo — foot traffic and credibility." },
+    { src:'assets/nike-reece-walsh.png', tag:'Home Gym Fitout', title:'Reece Walsh', desc:"Brisbane Broncos fullback — a full Nike Strength home gym fitout for one of the NRL's biggest names." },
   ];
   return (
   <Slide num={n} total={t}>
@@ -431,7 +431,7 @@ const BrandSlide = ({ n, t }) => {
     </div>
     <div className={`mt-3 flex items-center gap-3 ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-3 shrink-0`}>
       <span className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase shrink-0">Also in market</span>
-      <p className={`text-[12px] font-body ${th.sub} leading-snug`}><span className={`font-semibold ${th.text}`}>Reece Walsh</span> ambassador signing · <span className={`font-semibold ${th.text}`}>always-on content</span> — strongman hype reels, a Nike Strength dumbbell EDM and in-store POS keeping the brand in-market.</p>
+      <p className={`text-[12px] font-body ${th.sub} leading-snug`}><span className={`font-semibold ${th.text}`}>BJ Stone × Aus Fitness Expo</span> activation · <span className={`font-semibold ${th.text}`}>always-on content</span> — strongman hype reels, a Nike Strength dumbbell EDM and in-store POS keeping the brand in-market.</p>
     </div>
   </Slide>
   );
