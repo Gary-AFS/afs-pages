@@ -396,39 +396,42 @@ const ChannelSlide = ({ n, t }) => {
   );
 };
 
-// ===== SLIDE 4: BRAND BUILDING & MARKETING =====
+// ===== SLIDE 4: BRAND BUILDING & MARKETING (image-led hover-expand gallery) =====
 const BrandSlide = ({ n, t }) => {
   const th = useTheme();
+  const [active, setActive] = useState(0);
+  const wins = [
+    { src:'assets/nike-bjstone-record.jpg', tag:'World Record Attempt', title:'BJ Stone · 277.5kg', desc:"Australia's Strongest Man 2025 lifting in Nike Strength — a marquee athlete moment." },
+    { src:'assets/nike-maroons-partnership.png', tag:'Elite Sport', title:'QLD Maroons', desc:'Gym and Fitness × State of Origin champions — the marketing reach we bring to the table.' },
+    { src:'assets/sarahs-day-nike.png', tag:'Influencer', title:"Sarah's Day · 1.2M", desc:'High-profile collaboration driving organic reach and social proof in the AU fitness market.' },
+    { src:'assets/bj-stone-nike.png', tag:'Brand Activation', title:'Aus Fitness Expo', desc:"BJ Stone strongman activation at Australia's largest fitness expo — foot traffic and credibility." },
+  ];
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="4 · Brand Building" title="MARKETING WINS" sub="Investing in awareness — turning Nike Strength into a destination brand, not just a product line." />
-    <div className="flex gap-6 flex-1 min-h-0">
-      <div className="flex-1 flex flex-col gap-3 stagger">
-        {[
-          { title: "Reece Walsh — Ambassador Partnership", desc: "Marquee athlete signing tying Nike Strength to elite Australian sport and a huge national following.", owner: "Lionel · term, reach, deliverables" },
-          { title: "BJ Stone × Aus Fitness Expo Launch", desc: "Brand activation at Australia's largest fitness expo with a strongman athlete driving foot traffic and credibility.", owner: null },
-          { title: "Sarah's Day Partnership (1.2M followers)", desc: "High-profile influencer collaboration generating organic reach and social proof in the AU fitness market.", owner: null },
-          { title: "Always-on content — hype reels, EDM, POS", desc: "Strongman hype reels, a Nike Strength dumbbell EDM (built in HubSpot), and in-store POS keeping the brand in-market.", owner: "Lionel · campaign metrics" },
-        ].map((w, i) => (
-          <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-3`}>
-            <div className={`w-5 h-5 rounded-full ${th.greenBg} flex items-center justify-center shrink-0 mt-0.5`}><Star size={11} className="text-gaf-orange" /></div>
-            <div>
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <p className={`text-sm font-heading font-semibold ${th.text}`}>{w.title}</p>
-              </div>
-              <p className={`text-[11px] ${th.sub} font-body leading-relaxed`}>{w.desc}</p>
-            </div>
+    <SectionTitle pre="4 · Brand Building" title="MARKETING WINS" sub="Turning Nike Strength into a destination brand — marquee athletes, elite-sport partnerships and always-on content." />
+    <div className="flex gap-4 flex-1 min-h-0 items-center justify-center stagger">
+      {wins.map((w, i) => {
+        const on = active === i;
+        return (
+        <div key={i} onMouseEnter={()=>setActive(i)}
+          className={`relative h-full aspect-[9/16] rounded-xl overflow-hidden cursor-pointer border ${th.cardBorder}`}
+          style={{ transform: on ? 'scale(1.04)' : 'scale(1)', zIndex: on ? 10 : 1, boxShadow: on ? '0 24px 60px rgba(0,0,0,.45)' : '0 8px 24px rgba(0,0,0,.22)', transition:'transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s ease' }}>
+          <img src={w.src} alt={w.title} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center',display:'block'}} onError={(e)=>{e.currentTarget.src='assets/bj-stone-nike.png'}} />
+          <div className="absolute inset-0" style={{background:`linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,${on?'.12':'.34'}) 45%, rgba(0,0,0,0))`, transition:'background .4s ease'}}></div>
+          <div className="absolute top-3 left-3">
+            <span className="inline-block text-[9px] font-heading font-bold tracking-[.15em] uppercase text-white bg-gaf-orange rounded-full px-2.5 py-1 whitespace-nowrap shadow">{w.tag}</span>
           </div>
-        ))}
-      </div>
-      <div className="w-[380px] shrink-0 flex flex-col gap-3">
-        <div className={`flex-1 rounded-lg overflow-hidden border ${th.cardBorder} relative`}>
-          <img src="assets/sarahs-day-nike.png" alt="Nike Strength ambassador content" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} onError={(e)=>{e.target.src='assets/bj-stone-nike.png'}} />
-          <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${th.expOverlay} p-4`}>
-            <div className="flex items-center gap-2 flex-wrap"><p className="text-[10px] font-heading tracking-[.2em] text-gaf-orange uppercase">Ambassador & Influencer Content</p></div>
+          <div className="absolute inset-x-0 bottom-0 p-4">
+            <p className="font-heading font-bold text-white text-lg leading-tight">{w.title}</p>
+            <p className={`text-white/85 font-body text-[11px] leading-snug mt-1 overflow-hidden transition-all duration-500 ${on ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}>{w.desc}</p>
           </div>
         </div>
-      </div>
+        );
+      })}
+    </div>
+    <div className={`mt-3 flex items-center gap-3 ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-3 shrink-0`}>
+      <span className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase shrink-0">Also in market</span>
+      <p className={`text-[12px] font-body ${th.sub} leading-snug`}><span className={`font-semibold ${th.text}`}>Reece Walsh</span> ambassador signing · <span className={`font-semibold ${th.text}`}>always-on content</span> — strongman hype reels, a Nike Strength dumbbell EDM and in-store POS keeping the brand in-market.</p>
     </div>
   </Slide>
   );
