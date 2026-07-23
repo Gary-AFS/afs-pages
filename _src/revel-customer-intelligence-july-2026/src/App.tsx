@@ -208,6 +208,11 @@ export default function App() {
   const topFunc = arch.functional.filter(jobFilter)[0];
   const topEmo = arch.emotional.filter(jobFilter)[0];
   const topBarriers = arch.barriers.filter((x: any) => x.name !== "unspecified").slice(0, 3);
+  // Lead the Job call-out with whichever job defines this archetype most strongly, by share (functional vs emotional).
+  const F = topFunc ? { ...topFunc, kind: "Functionally" } : null;
+  const E = topEmo ? { ...topEmo, kind: "Emotionally" } : null;
+  const jobPrimary = F && E ? (E.pct > F.pct ? E : F) : F;   // Quiet Shopper (no functional) keeps the "undisclosed" primary
+  const jobSecondary = F && E ? (jobPrimary === F ? E : F) : E;
   // Quiet Shopper (id 1) deliberately last — it's the low-disclosure catch-all, not a true identity.
   const ARCH_SORTED = [2, 0, 4, 1].map(i => ARCHETYPES.find((a: any) => a.id === i));
 
@@ -458,10 +463,10 @@ export default function App() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 24 }}>
               <div style={{ background: C.greenSoft, borderRadius: 10, borderTop: `4px solid ${GREEN}`, padding: "18px 20px" }}>
                 <div style={{ ...EYEBROW, color: C.greenBody, marginBottom: 10 }}>The Job — what they hire us to do</div>
-                {topFunc
-                  ? <p style={{ fontSize: 17, fontWeight: 700, color: C.text, lineHeight: 1.35, marginBottom: 8 }}>{pretty(topFunc.name)} <span style={{ color: C.greenBody }}>{topFunc.pct}%</span></p>
+                {jobPrimary
+                  ? <p style={{ fontSize: 17, fontWeight: 700, color: C.text, lineHeight: 1.35, marginBottom: 8 }}>{pretty(jobPrimary.name)} <span style={{ color: C.greenBody }}>{jobPrimary.pct}%</span></p>
                   : <p style={{ fontSize: 17, fontWeight: 700, color: C.text, lineHeight: 1.35, marginBottom: 8 }}>Largely undisclosed on calls</p>}
-                {topEmo && <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.5 }}>Emotionally: <strong style={{ color: C.text }}>{pretty(topEmo.name)}</strong> ({topEmo.pct}%){arch.id === 4 ? " — certainty and reputation" : " — a personal retreat, not status"}.</p>}
+                {jobSecondary && <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.5 }}>{jobSecondary.kind}: <strong style={{ color: C.text }}>{pretty(jobSecondary.name)}</strong> ({jobSecondary.pct}%)</p>}
               </div>
               <div style={{ background: "rgba(194,59,34,0.06)", borderRadius: 10, borderTop: "4px solid #C23B22", padding: "18px 20px" }}>
                 <div style={{ ...EYEBROW, color: "#C23B22", marginBottom: 10 }}>The Fear — what holds them back</div>
