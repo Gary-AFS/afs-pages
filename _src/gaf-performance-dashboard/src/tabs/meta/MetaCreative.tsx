@@ -6,6 +6,8 @@ import { useState, useMemo } from "react";
 import { fmtCurrency, fmtCpc, fmtCompact, fmtPct, fmtInt, fmtRoas, fmtCurrencyCompact } from "../../lib/format";
 import { DataTable } from "../../components/DataTable";
 import { MetaCreativeModal } from "./MetaCreativeModal";
+import { MetricFilter, applyMetricFilter } from "./MetricFilter";
+import type { MetricFilterState } from "./MetricFilter";
 import { OBJECTIVE_LABELS, OBJECTIVE_BADGE } from "./columns";
 import type { MetaWindow, MetaCreativeRow } from "../../lib/data";
 
@@ -33,6 +35,25 @@ const SORT_OPTIONS: { key: string; label: string; lowerBetter?: boolean; fmt: (n
   { key: "impressions",     label: "Impressions",                 fmt: fmtCompact },
   { key: "reach",           label: "Reach",                       fmt: fmtCompact },
   { key: "clicks",          label: "Clicks",                      fmt: fmtCompact },
+];
+
+// Numeric min/max filter metrics (mirrors Campaigns/Ad Sets, mapped to creative fields).
+const CREATIVE_FILTER_METRICS = [
+  { key: "spend",          label: "Spend" },
+  { key: "roas",           label: "ROAS" },
+  { key: "purchaseValue",  label: "Revenue" },
+  { key: "purchases",      label: "Purchases" },
+  { key: "cpa",            label: "CPA" },
+  { key: "addToCart",      label: "ATC" },
+  { key: "atcRate",        label: "ATC Rate" },
+  { key: "ctr",            label: "CTR" },
+  { key: "cpc",            label: "CPC" },
+  { key: "cpm",            label: "CPM" },
+  { key: "impressions",    label: "Impressions" },
+  { key: "reach",          label: "Reach" },
+  { key: "clicks",         label: "Clicks" },
+  { key: "engagements",    label: "Engagements" },
+  { key: "engagementRate", label: "Eng Rate" },
 ];
 
 // Small labelled stat used in the card footer grid.
@@ -107,6 +128,7 @@ export function MetaCreative({ metaWin }: Props) {
   const [campaignFilter, setCampaignFilter] = useState<string>("");
   const [sortKey, setSortKey] = useState<string>("spend");
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const [filters, setFilters] = useState<MetricFilterState[]>([]);
 
   const creative = (metaWin.creative ?? []) as MetaCreativeRow[];
 
@@ -122,13 +144,14 @@ export function MetaCreative({ metaWin }: Props) {
     if (typeFilter === "Video") rows = rows.filter(c => Boolean(c.videoId));
     if (typeFilter === "Image") rows = rows.filter(c => !Boolean(c.videoId));
     if (campaignFilter) rows = rows.filter(c => String(c.campaign ?? "") === campaignFilter);
+    rows = applyMetricFilter(rows, filters) as MetaCreativeRow[];
     rows.sort((a, b) => {
       const av = Number(a[sortKey] ?? 0);
       const bv = Number(b[sortKey] ?? 0);
       return sortOption.lowerBetter ? av - bv : bv - av;
     });
     return rows;
-  }, [creative, typeFilter, campaignFilter, sortKey, sortOption.lowerBetter]);
+  }, [creative, typeFilter, campaignFilter, filters, sortKey, sortOption.lowerBetter]);
 
   // Mean of the rank metric across visible cards — drives green/red borders
   // (reference uses the mean of visible cards for creative colouring).
@@ -239,6 +262,15 @@ export function MetaCreative({ metaWin }: Props) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Metric filter */}
+      <div className="dash-card p-3 sm:p-4">
+        <MetricFilter
+          filters={filters}
+          onChange={setFilters}
+          metrics={CREATIVE_FILTER_METRICS}
+        />
       </div>
 
       {/* Cards view */}

@@ -6,6 +6,8 @@ import { fmtCurrency, fmtInt, fmtPct } from "../../lib/format";
 import { DataTable } from "../../components/DataTable";
 import { MetaVideoModal } from "./MetaVideoModal";
 import type { VideoModalTarget } from "./MetaVideoModal";
+import { MetricFilter, applyMetricFilter } from "./MetricFilter";
+import type { MetricFilterState } from "./MetricFilter";
 import type { MetaWindow, MetaVideoRow } from "../../lib/data";
 
 interface Props {
@@ -21,6 +23,22 @@ const SORT_OPTIONS: { key: SortVideoKey; label: string }[] = [
   { key: "p100Rate",      label: "Completion %" },
   { key: "videoPlays",    label: "Plays" },
   { key: "avgWatchTime",  label: "Avg Watch Time" },
+];
+
+// Numeric min/max filter metrics (mirrors Campaigns/Ad Sets, mapped to video fields).
+const VIDEO_FILTER_METRICS = [
+  { key: "spend",          label: "Spend" },
+  { key: "videoPlays",     label: "Plays" },
+  { key: "thruPlays",      label: "ThruPlays" },
+  { key: "thumbStopRate",  label: "Thumb Stop %" },
+  { key: "p25Rate",        label: "25% Played" },
+  { key: "p50Rate",        label: "50% Played" },
+  { key: "p75Rate",        label: "75% Played" },
+  { key: "p100Rate",       label: "Completion %" },
+  { key: "avgWatchTime",   label: "Avg Watch (s)" },
+  { key: "impressions",    label: "Impressions" },
+  { key: "atc",            label: "ATC" },
+  { key: "engagements",    label: "Engagements" },
 ];
 
 // Retention colour: >=50% green, >=25% amber, else red (per spec).
@@ -100,6 +118,7 @@ export function MetaVideo({ metaWin }: Props) {
   const [sortKey, setSortKey] = useState<SortVideoKey>("spend");
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [selected, setSelected] = useState<VideoModalTarget | null>(null);
+  const [filters, setFilters] = useState<MetricFilterState[]>([]);
 
   const video = (metaWin.video ?? []) as MetaVideoRow[];
   const withPlays = video.filter((v) => Number(v.videoPlays ?? 0) > 0);
@@ -118,20 +137,26 @@ export function MetaVideo({ metaWin }: Props) {
     return map;
   }, [metaWin.creative]);
 
+  // Numeric min/max filters narrow the whole view (KPIs + listing).
+  const filteredPlays = useMemo(
+    () => applyMetricFilter(withPlays, filters) as MetaVideoRow[],
+    [withPlays, filters]
+  );
+
   const sorted = useMemo(() => {
-    return [...withPlays].sort((a, b) => Number(b[sortKey] ?? 0) - Number(a[sortKey] ?? 0));
-  }, [withPlays, sortKey]);
+    return [...filteredPlays].sort((a, b) => Number(b[sortKey] ?? 0) - Number(a[sortKey] ?? 0));
+  }, [filteredPlays, sortKey]);
 
   // Summary KPIs
-  const totalSpend = withPlays.reduce((s, v) => s + Number(v.spend ?? 0), 0);
-  const thumbStops = withPlays.map(v => Number(v.thumbStopRate ?? 0)).filter(x => x > 0);
+  const totalSpend = filteredPlays.reduce((s, v) => s + Number(v.spend ?? 0), 0);
+  const thumbStops = filteredPlays.map(v => Number(v.thumbStopRate ?? 0)).filter(x => x > 0);
   const avgThumbStop = thumbStops.length ? thumbStops.reduce((a, b) => a + b, 0) / thumbStops.length : 0;
-  const completions = withPlays.map(v => Number(v.p100Rate ?? 0)).filter(x => x > 0);
+  const completions = filteredPlays.map(v => Number(v.p100Rate ?? 0)).filter(x => x > 0);
   const avgCompletion = completions.length ? completions.reduce((a, b) => a + b, 0) / completions.length : 0;
-  const watchTimes = withPlays.map(v => Number(v.avgWatchTime ?? 0)).filter(x => x > 0);
+  const watchTimes = filteredPlays.map(v => Number(v.avgWatchTime ?? 0)).filter(x => x > 0);
   const avgWatch = watchTimes.length ? watchTimes.reduce((a, b) => a + b, 0) / watchTimes.length : 0;
 
-  if (sorted.length === 0) {
+  if (withPlays.length === 0) {
     return (
       <div className="fade-in dash-card p-8 text-center text-sm" style={{ color: "var(--gaf-text-muted)" }}>
         No video retention data available for this window.
@@ -204,6 +229,21 @@ export function MetaVideo({ metaWin }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Metric filter */}
+      <div className="dash-card p-3 sm:p-4">
+        <MetricFilter
+          filters={filters}
+          onChange={setFilters}
+          metrics={VIDEO_FILTER_METRICS}
+        />
+      </div>
+
+      {sorted.length === 0 && (
+        <div className="dash-card p-8 text-center text-sm" style={{ color: "var(--gaf-text-muted)" }}>
+          No video ads match the current filters.
+        </div>
+      )}
 
       {/* Cards view */}
       {viewMode === "cards" && (
