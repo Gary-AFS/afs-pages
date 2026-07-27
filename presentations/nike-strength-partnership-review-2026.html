@@ -479,13 +479,13 @@ const SupplySlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="7 · Partnership" title="BUILT TO LAST" sub="Long-term commitment — supply chain capability and forecast purchases against target." />
+    <SectionTitle pre="7 · Partnership" title="BUILT TO LAST" sub="Long-term commitment — 2026 purchases against the contracted target, and the supply chain to scale from here." />
     <div className="flex gap-6 flex-1 min-h-0">
       <div className="flex-1 flex flex-col gap-3 stagger">
         {[
-          { icon: Truck, title: "Supply chain capability", desc: "Established freight, warehousing and fulfilment across ANZ — ready to scale volume as retail comes online.", owner: "Michelle · capacity & lead times" },
-          { icon: Target, title: "Forecast purchases ramp to $5M", desc: "Committed forward purchasing to a $5M run-rate by FY29 — deliberate over-investment on an S-curve as the retail rollout scales.", owner: null },
-          { icon: Dollar, title: "Sustainable brand growth", desc: "Clear internal sales targets and margin discipline underpinning a durable, profitable partnership.", owner: "Joel / Michelle · target numbers" },
+          { icon: Target, title: "89% to target — cadence-constrained", desc: "2026 purchases land at $1.07M against the $1.2M contracted target. The constraint is the ordering cadence, not demand — quarterly windows force lumpy buys against months of stock cover. A monthly cadence closes the gap.", owner: null },
+          { icon: Truck, title: "Supply chain capability", desc: "Established freight, warehousing and fulfilment across ANZ — currently carrying 3-4+ months of stock cover under quarterly ordering, ready to scale volume as retail comes online.", owner: null },
+          { icon: Dollar, title: "Ramp to a $5M run-rate", desc: "Committed forward purchasing to a $5M run-rate by FY29 — deliberate over-investment on an S-curve as the retail rollout scales, with margin discipline underneath.", owner: null },
         ].map((c, i) => (
           <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex items-start gap-3`}>
             <div className={`w-8 h-8 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><c.icon size={16} className="text-gaf-orange" /></div>
@@ -496,19 +496,28 @@ const SupplySlide = ({ n, t }) => {
           </div>
         ))}
       </div>
-      <div className={`w-[340px] shrink-0 ${th.cardBg} rounded-lg border ${th.cardBorder} p-6 flex flex-col`}>
-        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Forecast Purchases (AUD)</p>
-        <p className={`text-[10px] ${th.sub} font-body mb-4`}>From $570K in FY25 to a <span className="text-gaf-orange font-semibold">$5M run-rate by FY29</span></p>
+      <div className={`w-[380px] shrink-0 ${th.cardBg} rounded-lg border ${th.cardBorder} p-6 flex flex-col`}>
+        <div className="flex items-center justify-between">
+          <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">2026 Purchases (AUD)</p>
+          <span className="text-[11px] font-heading font-bold text-gaf-orange">89% of target</span>
+        </div>
+        <p className={`text-[10px] ${th.sub} font-body mb-4`}><span className={`font-semibold ${th.text}`}>$1.07M</span> actual + forecast vs the <span className="text-gaf-orange font-semibold">$1.2M</span> contracted target</p>
         <div className="flex items-end justify-around gap-3 flex-1">
-          {[{y:'FY27',v:1.5},{y:'FY28',v:3},{y:'FY29',v:5}].map((d,i)=>(
+          {[{m:'Mar',v:165,f:false},{m:'Jun',v:30,f:false},{m:'Jul',v:194,f:false},{m:'Sep',v:322,f:true},{m:'Dec',v:357,f:true}].map((d,i)=>(
             <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-              <span className="text-sm font-heading font-bold text-gaf-orange mb-1">${d.v}M</span>
-              <div className="w-full rounded-sm bar-grow origin-bottom" style={{height:`${(d.v/5)*90}%`,minHeight:'6px',background:`linear-gradient(to top,#f26422,${d.v===5?'#ff8a50':'#c03008'})`,animationDelay:`${i*0.12}s`}}></div>
-              <span className={`text-[10px] ${th.muted} mt-2 font-body`}>{d.y}</span>
+              <span className={`text-[11px] font-heading font-bold ${d.f ? th.sub : 'text-gaf-orange'} mb-1`}>${d.v}K</span>
+              <div className="w-full rounded-sm bar-grow origin-bottom" style={{height:`${(d.v/357)*82}%`,minHeight:'5px',
+                background: d.f ? 'repeating-linear-gradient(45deg, rgba(242,100,34,.55) 0 6px, rgba(242,100,34,.22) 6px 12px)' : 'linear-gradient(to top,#f26422,#c03008)',
+                animationDelay:`${i*0.1}s`}}></div>
+              <span className={`text-[10px] ${th.muted} mt-2 font-body`}>{d.m}</span>
             </div>
           ))}
         </div>
-        <p className={`text-[9px] ${th.muted} font-body mt-3 leading-relaxed`}>Committed forward purchasing — over-investing now to build durable infrastructure for the long term.</p>
+        <div className="flex items-center gap-4 mt-3">
+          <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm" style={{background:'#f26422'}}></div><span className={`text-[9px] ${th.sub} font-body`}>Actual · $388K</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm" style={{background:'repeating-linear-gradient(45deg, rgba(242,100,34,.55) 0 3px, rgba(242,100,34,.22) 3px 6px)'}}></div><span className={`text-[9px] ${th.sub} font-body`}>Forecast · $679K</span></div>
+        </div>
+        <p className={`text-[9px] ${th.muted} font-body mt-2 leading-relaxed`}>Quarterly windows make the buys lumpy — the two remaining openings (Sep + Dec) carry $679K. The ramp from here: $1.5M FY27 → $3M FY28 → $5M FY29.</p>
       </div>
     </div>
   </Slide>
@@ -520,8 +529,8 @@ const WishlistSlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="8 · The Ask" title="THE ACTIVATION ASK" sub="We fund the brand-building — the share of mind. To convert that awareness into retail volume in a discount-driven market, we're asking Nike Strength to co-invest in the activation layer." />
-    <div className="flex flex-col flex-1 gap-4 min-h-0">
+    <SectionTitle pre="8 · The Ask" title="SUPPORT TO SCALE" sub="We fund the brand-building — the share of mind. To convert that awareness into retail volume, we're asking Nike Strength for support in two areas: co-investment in the activation layer, and ordering flexibility so stock keeps pace with demand." />
+    <div className="flex flex-col flex-1 gap-3 min-h-0">
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0 stagger">
         {[
           { pct:"3%", title:"Supplier Marketing Fund", icon: Bolt, desc:"A 3% rebate on all purchases into a joint marketing fund — used to execute Nike Strength product across our marketing channels.", note:"On every purchase → marketing execution" },
@@ -539,13 +548,29 @@ const WishlistSlide = ({ n, t }) => {
           </div>
         ))}
       </div>
-      <div className="bg-gaf-orange rounded-lg px-5 py-3 shrink-0 flex items-start gap-4">
-        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5"><Target size={16} className="text-white" /></div>
-        <p className="text-[12px] text-white font-body leading-snug"><span className="font-semibold">Why it matters:</span> AU/NZ retail is intensely discount-driven — a ~20% promotion can lift volume up to 3x. This level of support is a standard condition of trade for the national retailers, so Nike Strength's backing is what unlocks the deal, not an optional extra.</p>
+      <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 shrink-0`}>
+        <div className="flex items-center gap-3 mb-3">
+          <div className={`w-8 h-8 rounded-lg ${th.kpiAccentBg} flex items-center justify-center shrink-0`}><Truck size={15} className="text-gaf-orange" /></div>
+          <h4 className={`text-sm font-heading font-bold ${th.text}`}>Ordering &amp; Supply</h4>
+          <span className="text-[9px] font-heading font-semibold text-gaf-orange border border-gaf-orange/40 rounded-full px-2.5 py-[2px] whitespace-nowrap">Cuts 3-4 months of stock cover</span>
+          <p className={`text-[10px] ${th.sub} font-body ml-auto`}>Less capital tied up in cover = more capital buying Nike Strength</p>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { title:"Annual forecast, monthly draw-down", desc:"We give Nike a full year's forecast upfront — and draw down against stock monthly, instead of lumpy quarterly buys." },
+            { title:"Split shipments", desc:"Quarterly orders split into three lots on monthly sailings — no inbound spikes our warehouse can't absorb." },
+            { title:"Colourway consistency", desc:"Hold Grind weight colourways stable to avoid obsolescence — the national retailers need range consistency." },
+          ].map((o, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <div className="w-1 h-1 rounded-full bg-gaf-orange mt-[7px] shrink-0"></div>
+              <div><p className={`text-[11px] font-heading font-semibold ${th.text} leading-snug`}>{o.title}</p><p className={`text-[10px] ${th.sub} font-body leading-snug mt-0.5`}>{o.desc}</p></div>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className={`flex items-center justify-between ${th.cardBg} border ${th.cardBorder} rounded-lg px-5 py-2.5 shrink-0`}>
-        <p className="text-[9px] font-heading tracking-[.3em] text-gaf-orange uppercase">Plus · seasonal deal support</p>
-        <span className={`text-[10px] font-body ${th.sub}`}>Buy-up + combo-kit deals for our three peak events — EOFY, Black Friday and New Year — to get more product into more hands.</span>
+      <div className="bg-gaf-orange rounded-lg px-5 py-2.5 shrink-0 flex items-start gap-4">
+        <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5"><Target size={14} className="text-white" /></div>
+        <p className="text-[11px] text-white font-body leading-snug"><span className="font-semibold">Why it matters:</span> AU/NZ retail is intensely discount-driven — a ~20% promotion can lift volume up to 3x, and this support is a standard condition of trade for the national retailers. Monthly ordering is the same story on the supply side: it frees working capital and lets both of us respond faster to demand. Plus seasonal buy-up + combo-kit deals for EOFY, Black Friday and New Year.</p>
       </div>
     </div>
   </Slide>
