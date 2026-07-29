@@ -1,59 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFS Group Dashboard</title>
-    <link rel="icon" type="image/png" href="/afs-pages/images/afs-group-icon-orange.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                navy: '#0E2A44',
-                offwhite: '#EDEAE3',
-                orange: '#F26422',
-                grey: '#424242',
-                darkgrey: '#232323',
-              }
-            },
-            fontFamily: {
-              sans: ['Archivo', 'sans-serif'],
-            }
-          }
-        }
-      }
-    </script>
-    <style>
-      body {
-        background-color: #EDEAE3;
-        font-family: 'Archivo', sans-serif;
-        color: #0E2A44;
-      }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #ccc;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #0E2A44;
-      }
-    </style>
-  <script type="module" crossorigin src="/afs-pages/afs-group-health-dashboard/assets/index-M0UEf2Gn.js"></script>
+<head>
+<meta charset="utf-8">
+<title>Moved: AFS Group</title>
+<link rel="canonical" href="https://the-afs-group.github.io/afs-group-health-dashboard/">
+<meta name="robots" content="noindex">
+<!-- No-JS fallback. The script below runs first and preserves ?query and
+     #hash, which several dashboards use for state; this bare refresh cannot. -->
+<meta http-equiv="refresh" content="3; url=https://the-afs-group.github.io/afs-group-health-dashboard/">
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center;
+         justify-content:center; background:#f7f7f5; color:#1a1a1a;
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .card { max-width:32rem; padding:2.5rem; text-align:center; }
+  h1 { font-size:1.25rem; margin:0 0 .75rem; }
+  p { margin:0 0 1.25rem; color:#555; line-height:1.5; }
+  a { color:#f26422; font-weight:600; word-break:break-all; }
+</style>
 </head>
-  <body>
-    <div id="root"></div>
+<body>
+<div class="card">
+  <h1>This page has moved</h1>
+  <p>AFS Group pages now live on the organisation account.
+     Redirecting you now. Please update your bookmark.</p>
+  <p><a id="t" href="https://the-afs-group.github.io/afs-group-health-dashboard/">https://the-afs-group.github.io/afs-group-health-dashboard/</a></p>
+</div>
+<script>
+  var t = "https://the-afs-group.github.io/afs-group-health-dashboard/" + window.location.search + window.location.hash;
+  document.getElementById("t").href = t;
+  window.location.replace(t);
+</script>
 </body>
 </html>
