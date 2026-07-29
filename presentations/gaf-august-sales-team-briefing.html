@@ -215,18 +215,11 @@ const offerRoster = [
   { name: "REP Arcadia Functional Trainer", sku: "FT-3500", cat: "Functional", price: "$4,199", was: "", img: IMG.arcadia, stock: 2, note: "Only 2 units on hand" },
 ];
 
-const repReadiness = [
-  { name: "REP Altitude Series", detail: "Rack range, the month's lead REP story", state: "no-listing", label: "No listing live" },
-  { name: "REP PR-5000 Power Rack", detail: "7 units on hand, sitting in draft", state: "draft", label: "Draft, not sellable" },
-  { name: "REP Arcadia FT-3500", detail: "Live at $4,199, 2 units on hand", state: "thin", label: "Live, stock thin" },
-  { name: "REP PR-4000 Power Rack", detail: "Live at $1,529, 6 units on hand", state: "ok", label: "Live and sellable" },
-];
-
-const altitudeWork = [
-  { task: "Equipment list", status: "done" },
-  { task: "Content videography", status: "open" },
-  { task: "Homepage banners", status: "open" },
-  { task: "Listing build, modelled on the M10", status: "open" },
+const stockReality = [
+  { name: "Altitude Series", detail: "Stock landing this month. Listing goes live end of day, banners ready.", state: "ok", label: "This is the push" },
+  { name: "Ares Series", detail: "We are under, not over. Do not lead with it.", state: "thin", label: "Short" },
+  { name: "PR-4000 Power Rack", detail: "Live at $1,529, 6 units on hand.", state: "ok", label: "Live and selling" },
+  { name: "Arcadia FT-3500", detail: "Live at $4,199, only 2 units on hand.", state: "thin", label: "Stock thin" },
 ];
 
 const wgaSequence = [
@@ -238,13 +231,13 @@ const wgaSequence = [
 const alsoRunning = [
   { name: "Hyrox Perth", when: "21 to 23 Aug", detail: "Perth Convention and Exhibition Centre. Race weekend activation.", IconComp: Flame },
   { name: "GC Show Day", when: "28 Aug", detail: "Gold Coast Show Day public holiday trading.", IconComp: Cal },
-  { name: "CLP-V4 Launch", when: "Through Aug", detail: "Force USA direct-to-consumer launch, same wave as the C10-V2.", IconComp: Bolt },
+  { name: "CLP-V4 Launch", when: "TBC", detail: "Force USA direct-to-consumer launch, same wave as the C10-V2. Timing not locked.", IconComp: Bolt },
 ];
 
 const forwardLook = [
   { name: "M20 Launch", when: "1 Sep" },
-  { name: "Experience Centre Launch Day", when: "12 Sep" },
   { name: "Father's Day", when: "6 Sep" },
+  { name: "Experience Centre Launch", when: "Likely Oct" },
 ];
 
 // ===== SLIDE 1: TITLE =====
@@ -310,7 +303,7 @@ const JulySlide = ({ n, t }) => {
       </div>
       <div className={`${th.greenBg} border ${th.greenBorder} rounded-lg p-3.5 flex items-start gap-3`}>
         <TrendUp size={18} className={`${th.green} shrink-0 mt-0.5`} />
-        <p className={`text-[14px] font-body ${th.sub} leading-snug`}><span className={`font-semibold ${th.text}`}>Read it straight.</span> Fulfilled GP ran well ahead of created GP in July, which is the EOFY order book being invoiced out rather than new demand. The created line is the honest measure of how July traded, and it beat budget by 17.9%.</p>
+        <p className={`text-[14px] font-body ${th.sub} leading-snug`}>Fulfilled GP ran well ahead of created GP in July, which is the EOFY order book being invoiced out rather than new demand. The created line is the measure of how July actually traded, and it beat budget by 17.9%.</p>
       </div>
     </div>
   </Slide>
@@ -326,12 +319,12 @@ const TargetsSlide = ({ n, t }) => {
   ];
   const operational = [
     { label: "Website Sessions", value: "183,551", IconComp: Users, sub: "Target from the GAF data sheet" },
-    { label: "Abandoned Carts", value: "850", IconComp: Pkg, sub: "Derived from lead-to-GP ratio" },
-    { label: "Inbound Phone Calls", value: "235", IconComp: Megaphone, sub: "Derived from lead-to-GP ratio" },
+    { label: "Abandoned Carts", value: "690", IconComp: Pkg, sub: "Scaled off July, below its 735" },
+    { label: "Inbound Phone Calls", value: "180", IconComp: Megaphone, sub: "Scaled off July, below its 192" },
   ];
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="The Month Ahead" title="AUGUST TARGETS" sub="August carries the same GP budget as July. Cart and call targets are derived from the trailing three-month ratio of leads per dollar of GP created, then applied to the August budget." />
+    <SectionTitle pre="The Month Ahead" title="AUGUST TARGETS" sub="August carries the same GP budget as July, which lands 6% under what July actually created. Cart and call targets scale off July's own rate, so both sit below July's result rather than above it." />
     <div className="flex-1 flex flex-col gap-4 min-h-0 justify-center">
       <div className="grid grid-cols-2 gap-5 stagger">
         {financial.map((m, i) => (
@@ -359,7 +352,7 @@ const TargetsSlide = ({ n, t }) => {
       </div>
       <div className="bg-gaf-orange/5 border border-gaf-orange/20 rounded-lg p-3.5 flex items-start gap-3">
         <Target size={18} className="text-gaf-orange shrink-0 mt-0.5" />
-        <p className={`text-[14px] font-body ${th.sub} leading-snug`}>Same number as July, without the EOFY order book behind it. The play on the next slide is how we hold that number on a different product mix.</p>
+        <p className={`text-[14px] font-body ${th.sub} leading-snug`}>Same budget as July, without the EOFY order book behind it. The play on the next slide is where the volume comes from instead.</p>
       </div>
     </div>
   </Slide>
@@ -377,18 +370,18 @@ const PlaySlide = ({ n, t }) => {
   };
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="The Objective" title="THE AUGUST PLAY" sub="All-in-One inventory is still short and we are carrying heavy REP stock with an obligation to move it. The play is to hold GP by shifting the mix onto REP, which means the store side has to be ready before the spend goes on." />
+    <SectionTitle pre="The Objective" title="THE AUGUST PLAY" sub="All-in-One inventory is still short, so the load has to move. We are not heavy in REP stock overall, and we are actually under on the Ares Series. What we do have is Altitude stock landing this month, so that is what we get behind." />
     <div className="flex gap-5 flex-1 min-h-0">
       <div className="w-[330px] shrink-0 flex flex-col gap-3 min-h-0">
         <div className="bg-gaf-orange rounded-lg p-5 text-white relative overflow-hidden shrink-0">
           <div className="absolute -right-4 -top-4 opacity-10"><Target size={130} /></div>
           <p className="text-[13px] font-heading tracking-[.3em] uppercase opacity-90 mb-2 relative z-10">The Shift</p>
-          <h3 className="font-display text-3xl tracking-wide leading-[0.98] relative z-10">HOLD GP<br/>ON A REP MIX</h3>
-          <p className="text-[14px] font-body opacity-95 leading-snug relative z-10 mt-3">Same GP target as July, carried by different products.</p>
+          <h3 className="font-display text-3xl tracking-wide leading-[0.98] relative z-10">GET BEHIND<br/>ALTITUDE</h3>
+          <p className="text-[14px] font-body opacity-95 leading-snug relative z-10 mt-3">The one REP range with stock arriving. Push what we can actually ship.</p>
         </div>
         <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex-1 flex flex-col min-h-0 gap-2.5`}>
           <p className={`text-[11px] font-heading tracking-[.25em] text-gaf-orange uppercase`}>Where the Spend Goes</p>
-          {[["REP and Altitude","the strength load while AIOs are short"],["Glide and G20 Pro","the two in-stock heroes that keep converting"],["Evergreen cardio","holds the base"]].map(([a,b],i)=>(
+          {[["Altitude","the new range, stock landing this month"],["Glide and G20 Pro","the two in-stock heroes that keep converting"],["Evergreen cardio","holds the base"]].map(([a,b],i)=>(
             <div key={i} className={`${th.bg3} rounded-lg p-3`}>
               <p className={`text-[15px] font-heading font-semibold ${th.text} leading-tight`}>{a}</p>
               <p className={`text-[13px] ${th.sub} font-body mt-0.5 leading-snug`}>{b}</p>
@@ -397,25 +390,20 @@ const PlaySlide = ({ n, t }) => {
         </div>
       </div>
       <div className="flex-1 flex flex-col gap-3 min-h-0">
-        <div className="flex items-center gap-2 shrink-0">
-          <Store size={16} className="text-gaf-orange" />
-          <p className={`text-[14px] font-heading tracking-[.3em] ${th.sub} uppercase`}>Store Readiness, Checked 29 July</p>
+        <div className="rounded-lg overflow-hidden shrink-0 border border-gaf-orange/20">
+          <img src="assets/rep-altitude-banner.jpg" alt="New REP Altitude" className="w-full h-auto object-cover" />
         </div>
-        <div className="grid grid-cols-2 gap-3 flex-1 stagger min-h-0">
-          {repReadiness.map((r, i) => {
+        <div className="grid grid-cols-4 gap-3 flex-1 stagger min-h-0">
+          {stockReality.map((r, i) => {
             const s = stateStyle[r.state];
             return (
-            <div key={i} className={`${s.cls} border rounded-lg p-4 flex flex-col justify-center gap-2`}>
-              <p className={`text-[16px] font-heading font-bold ${th.text} leading-tight`}>{r.name}</p>
-              <p className={`text-[14px] font-body ${th.sub} leading-snug`}>{r.detail}</p>
-              <p className={`text-[13px] font-heading font-bold tracking-[.15em] uppercase ${s.txt} mt-0.5`}>{r.label}</p>
+            <div key={i} className={`${s.cls} border rounded-lg p-3.5 flex flex-col justify-center gap-1.5`}>
+              <p className={`text-[15px] font-heading font-bold ${th.text} leading-tight`}>{r.name}</p>
+              <p className={`text-[13px] font-body ${th.sub} leading-snug`}>{r.detail}</p>
+              <p className={`text-[12px] font-heading font-bold tracking-[.15em] uppercase ${s.txt} mt-0.5`}>{r.label}</p>
             </div>
             );
           })}
-        </div>
-        <div className={`${th.redBg} border ${th.redBorder} rounded-lg p-3 shrink-0 flex items-start gap-3`}>
-          <Warn size={16} className={`${th.red} shrink-0 mt-0.5`} />
-          <p className={`text-[13px] font-body ${th.sub} leading-snug`}><span className={`font-semibold ${th.text}`}>The blocker:</span> two of the four REP heroes cannot be bought today. Altitude has no listing on the site at all, and the PR-5000 is sitting in draft with 7 units behind it. Spend pointed at REP before those are live will land on pages that cannot convert.</p>
         </div>
       </div>
     </div>
@@ -428,15 +416,15 @@ const RepSlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="Hero Campaign · Runs to 31 August" title="REP + ALTITUDE" sub="The Altitude Series is the lead REP story for the month. Listing revamp modelled on the M10, supported by a dedicated content shoot and homepage placement. The Altitude milestone lands 5 August." />
+    <SectionTitle pre="Hero Campaign · Runs to 31 August" title="REP + ALTITUDE" sub="The Altitude Series is the lead REP story for the month. Listing revamp modelled on the M10, with homepage placement behind it. Listing goes live end of day and the Altitude milestone lands 5 August." />
     <div className="flex gap-5 flex-1 min-h-0">
       <div className="flex-1 flex flex-col gap-3 min-h-0">
         <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-5 flex-1 flex flex-col min-h-0`}>
-          <p className={`text-[11px] font-heading tracking-[.25em] text-gaf-orange uppercase mb-3`}>Why REP, Why Now</p>
+          <p className={`text-[11px] font-heading tracking-[.25em] text-gaf-orange uppercase mb-3`}>Why Altitude, Why Now</p>
           <div className="space-y-3">
             {[["We are low on All-in-Ones","The category that normally carries GP is short, so the load has to move somewhere."],
-              ["We are long on REP stock","There is depth in the REP range and a commitment to push it."],
-              ["Altitude is the sharpest story","A rack range with a real content angle, not just a price cut."]].map(([a,b],i)=>(
+              ["Altitude is the stock we have","We are not heavy in REP overall and we are under on Ares. Altitude is the range with stock landing."],
+              ["It is a real story, not a price cut","A customisable rack range. Rack, Smith and cables, built to the customer's setup."]].map(([a,b],i)=>(
               <div key={i} className="flex gap-3 items-start">
                 <div className="w-7 h-7 rounded-full bg-gaf-orange/10 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-[13px] font-heading font-bold text-gaf-orange">{i+1}</span>
@@ -455,19 +443,6 @@ const RepSlide = ({ n, t }) => {
         </div>
       </div>
       <div className="w-[380px] shrink-0 flex flex-col gap-3 min-h-0">
-        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4`}>
-          <p className={`text-[11px] font-heading tracking-[.25em] text-gaf-orange uppercase mb-3`}>Altitude · What's Outstanding</p>
-          <div className="space-y-2">
-            {altitudeWork.map((w, i) => (
-              <div key={i} className={`flex items-center gap-3 ${th.bg3} rounded-lg px-3 py-2.5`}>
-                {w.status === 'done'
-                  ? <Check size={17} className={th.green} />
-                  : <div className={`w-[17px] h-[17px] rounded-full border-2 ${th.amber} border-current shrink-0`}></div>}
-                <p className={`text-[14px] font-body ${w.status==='done' ? th.muted : th.text} leading-snug`}>{w.task}</p>
-              </div>
-            ))}
-          </div>
-        </div>
         <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex-1`}>
           <p className={`text-[11px] font-heading tracking-[.25em] ${th.sub} uppercase mb-3`}>Live REP Range Today</p>
           <div className="space-y-2">
@@ -483,8 +458,8 @@ const RepSlide = ({ n, t }) => {
           </div>
         </div>
         <div className="bg-gaf-orange/5 border border-gaf-orange/20 rounded-lg p-3 flex items-start gap-2.5">
-          <Film size={15} className="text-gaf-orange shrink-0 mt-0.5" />
-          <p className={`text-[13px] font-body ${th.sub} leading-snug`}>Altitude content shoot is briefed as an A-tier creative campaign. Homepage banners follow the shoot.</p>
+          <Store size={15} className="text-gaf-orange shrink-0 mt-0.5" />
+          <p className={`text-[13px] font-body ${th.sub} leading-snug`}>Homepage banners are built and ready to go with the Altitude listing.</p>
         </div>
       </div>
     </div>
@@ -593,7 +568,7 @@ const AlsoSlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="On the Calendar" title="ALSO RUNNING" sub="Live in August alongside the two hero campaigns, plus what is landing early in September." />
+    <SectionTitle pre="On the Calendar" title="ALSO RUNNING" sub="Live in August alongside the two hero campaigns, plus what is coming next." />
     <div className="flex-1 flex flex-col gap-5 min-h-0 justify-center">
       <div className="grid grid-cols-3 gap-4 stagger">
         {alsoRunning.map((a, i) => (
@@ -608,7 +583,7 @@ const AlsoSlide = ({ n, t }) => {
         ))}
       </div>
       <div className={`${th.bg3} rounded-lg p-5`}>
-        <p className={`text-[12px] font-heading tracking-[.3em] ${th.sub} uppercase mb-4`}>Straight After · Early September</p>
+        <p className={`text-[12px] font-heading tracking-[.3em] ${th.sub} uppercase mb-4`}>Straight After</p>
         <div className="grid grid-cols-3 gap-4">
           {forwardLook.map((f, i) => (
             <div key={i} className={`flex items-center justify-between ${th.cardBg} border ${th.cardBorder} rounded-lg px-4 py-3`}>
@@ -620,7 +595,7 @@ const AlsoSlide = ({ n, t }) => {
       </div>
       <div className="bg-gaf-orange/5 border border-gaf-orange/20 rounded-lg p-3.5 flex items-start gap-3">
         <Cal size={18} className="text-gaf-orange shrink-0 mt-0.5" />
-        <p className={`text-[14px] font-body ${th.sub} leading-snug`}>The Experience Centre launch on 12 September is the next big set piece. Anything we want shot, listed or merchandised for it needs to be moving during August.</p>
+        <p className={`text-[14px] font-body ${th.sub} leading-snug`}>The Experience Centre launch is the next big set piece, now looking like October rather than September. Anything we want shot, listed or merchandised for it still needs to start moving during August.</p>
       </div>
     </div>
   </Slide>
