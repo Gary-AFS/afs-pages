@@ -142,6 +142,7 @@ const IMG = {
   hg100:   "https://cdn.shopify.com/s/files/1/1950/1891/products/0008_HG100HERO.jpg",
   arcadia: "https://cdn.shopify.com/s/files/1/1950/1891/files/01_HERO_12ae8f46-0e39-4be7-ada2-e8e4ce353da1.jpg",
   glide:   "https://cdn.shopify.com/s/files/1/1950/1891/files/01_HERO_9b91017f-2c18-4b7e-a133-b6648129f34d.jpg",
+  altitude: "assets/rep-altitude-banner.jpg",
   g20:     "https://cdn.shopify.com/s/files/1/1950/1891/files/0017_4_5d87452f-55d7-42ba-9b15-f8069828d19e.jpg",
   pr4000:  "https://cdn.shopify.com/s/files/1/1950/1891/products/01_HERO_131addf7-71dd-4de4-8326-8c4c3128f3b8.jpg",
   pr5000:  "https://cdn.shopify.com/s/files/1/1950/1891/files/01_HERO_1_45038f44-5a9e-43cc-b952-669ccd8f3540.jpg",
@@ -209,10 +210,22 @@ const julySupport = [
 ];
 
 const offerRoster = [
-  { name: "Force USA HG100 Home Gym", sku: "F-HG100", cat: "Home Gym", price: "$849", was: "", img: IMG.hg100, stock: 14, note: "New to the offer list" },
+  { name: "REP Altitude", sku: "Rack + Cables + Smith", cat: "Rack", price: "$6,999", was: "", img: IMG.altitude, cover: true, stock: null, note: "New range, listing live today" },
+  { name: "Force USA HG100 Home Gym", sku: "F-HG100", cat: "Home Gym", price: "$699", was: "$849", img: IMG.hg100, stock: 14, note: "New to the offer list" },
+  { name: "REP Arcadia Functional Trainer", sku: "FT-3500", cat: "Functional", price: "$3,999", was: "$4,199", img: IMG.arcadia, stock: 2, note: "Only 2 units on hand" },
   { name: "Force USA Glide Treadmill", sku: "F-GLIDE-T2", cat: "Cardio", price: "$1,899", was: "$2,499", img: IMG.glide, stock: 78, note: "Continue through" },
   { name: "Force USA G20 Pro", sku: "F-G20-V2", cat: "All-In-One", price: "$5,999", was: "$8,499", img: IMG.g20, stock: 31, note: "Continue through" },
-  { name: "REP Arcadia Functional Trainer", sku: "FT-3500", cat: "Functional", price: "$4,199", was: "", img: IMG.arcadia, stock: 2, note: "Only 2 units on hand" },
+];
+
+const tbcItems = [
+  { name: "Vortex Pulse Spin Bike", sku: "V-PULSE", price: "$349", was: "$499", who: "AC" },
+  { name: "Force USA Ski Trainer + Stand", sku: "F-SKI-TRAINER", price: "$1,149", was: "$1,499", who: "AC" },
+  { name: "Centr FID5 Bench", sku: "FID5", price: "$599", was: "$799", who: "AC" },
+  { name: "Force USA R3 Air Rower", sku: "F-R3", price: "$1,099", was: "$1,299", who: "AC" },
+  { name: "Centr 1 Functional Trainer", sku: "CENTR-1", price: "$1,399", was: "", who: "TG" },
+  { name: "Centr 2 Functional Trainer", sku: "CENTR2-IG", price: "$2,699", was: "$2,799", who: "TG" },
+  { name: "Torque USA Anker 3", sku: "ANKER-3-001-150LB", price: "$1,899", was: "$2,499", who: "TG" },
+  { name: "Torque USA F9 Fold-Away", sku: "F9-003-225LB", price: "$5,499", was: "$6,999", who: "TG" },
 ];
 
 const stockReality = [
@@ -265,7 +278,7 @@ const TitleSlide = () => {
     <div className="px-16 pb-8 z-10">
       <p className={`text-[14px] font-heading tracking-[.5em] ${th.muted} uppercase`}>Confidential Internal Use · For the August Sales Meeting</p>
     </div>
-    <footer className="h-1 bg-gradient-to-r from-gaf-orange via-gaf-orange to-transparent z-10 shrink-0" style={{width:'12.5%'}}></footer>
+    <footer className="h-1 bg-gradient-to-r from-gaf-orange via-gaf-orange to-transparent z-10 shrink-0" style={{width:'11%'}}></footer>
   </div>
   );
 };
@@ -425,16 +438,20 @@ const OffersSlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="The Offer Roster · 1 to 31 August" title="AUGUST PRODUCT OFFERS" sub="What the sales team is leading with this month. Prices and stock verified against the store on 29 July." />
-    <div className="flex gap-5 flex-1 min-h-0">
-      <div className="flex-1 grid grid-cols-4 gap-3 stagger min-h-0">
+    <SectionTitle pre="The Offer Roster · 1 to 31 August" title="AUGUST PRODUCT OFFERS" sub="The locked list up top. Everything below it is still TBC on pricing and sign-off, so do not quote those yet." />
+    <div className="flex flex-col gap-3 flex-1 min-h-0">
+      <div className="grid grid-cols-5 gap-3 flex-1 stagger min-h-0">
         {offerRoster.map((p, i) => (
           <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-3 flex flex-col`}>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2 gap-1">
               <span className={`text-[10px] font-heading tracking-[.2em] uppercase ${th.muted}`}>{p.cat}</span>
-              <span className={`text-[10px] font-heading font-bold tracking-[.1em] uppercase px-1.5 py-0.5 rounded ${p.stock <= 5 ? `${th.amberBg} ${th.amber}` : 'text-gaf-orange bg-gaf-orange/10'}`}>{p.stock} in stock</span>
+              {p.stock === null
+                ? <span className="text-[10px] font-heading font-bold tracking-[.1em] uppercase px-1.5 py-0.5 rounded text-white bg-gaf-orange">Incoming</span>
+                : <span className={`text-[10px] font-heading font-bold tracking-[.1em] uppercase px-1.5 py-0.5 rounded ${p.stock <= 5 ? `${th.amberBg} ${th.amber}` : 'text-gaf-orange bg-gaf-orange/10'}`}>{p.stock} in stock</span>}
             </div>
-            <ProdImg src={p.img} alt={p.name} className="flex-1 min-h-[120px] mb-2" />
+            <div className={`bg-white rounded-md overflow-hidden flex items-center justify-center flex-1 min-h-[110px] mb-2`}>
+              <img src={p.img} alt={p.name} className={`w-full h-full ${p.cover ? 'object-cover object-right' : 'object-contain'}`} loading="lazy" />
+            </div>
             <p className={`text-[14px] font-heading font-semibold ${th.text} leading-tight`}>{p.name}</p>
             <p className={`text-[12px] ${th.muted} font-body mt-0.5`}>{p.sku}</p>
             <div className="mt-auto pt-2">
@@ -447,21 +464,25 @@ const OffersSlide = ({ n, t }) => {
           </div>
         ))}
       </div>
-      <div className="w-[280px] shrink-0 flex flex-col gap-3">
-        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex-1`}>
-          <p className={`text-[11px] font-heading tracking-[.25em] ${th.sub} uppercase mb-3`}>Under Consideration</p>
-          <p className={`text-[13px] font-body ${th.muted} mb-3 leading-snug`}>Flagged but not locked into the offer list yet.</p>
-          <div className="space-y-2">
-            {["V-PULSE","F-SKI-TRAINER and Stand","FID5","F-R3"].map((s,i)=>(
-              <div key={i} className={`${th.bg3} rounded-lg px-3 py-2`}>
-                <p className={`text-[14px] font-heading font-semibold ${th.text}`}>{s}</p>
-              </div>
-            ))}
-          </div>
+      <div className={`${th.bg3} rounded-lg p-4 shrink-0`}>
+        <div className="flex items-center gap-3 mb-3">
+          <span className={`text-[12px] font-heading font-bold tracking-[.2em] uppercase px-2 py-0.5 rounded ${th.amberBg} ${th.amber}`}>TBC</span>
+          <p className={`text-[12px] font-heading tracking-[.3em] ${th.sub} uppercase`}>Proposed, Not Yet Signed Off</p>
+          <p className={`text-[13px] font-body ${th.muted}`}>Pricing pass still to come. Not for quoting.</p>
         </div>
-        <div className="bg-gaf-orange/5 border border-gaf-orange/20 rounded-lg p-3 flex items-start gap-2.5">
-          <Pkg size={15} className="text-gaf-orange shrink-0 mt-0.5" />
-          <p className={`text-[13px] font-body ${th.sub} leading-snug`}>Arcadia has 2 units on hand. Worth a stock check before it goes anywhere near paid spend.</p>
+        <div className="grid grid-cols-4 gap-2.5">
+          {tbcItems.map((p, i) => (
+            <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg px-3 py-2 flex items-center justify-between gap-2`}>
+              <div className="min-w-0">
+                <p className={`text-[13px] font-heading font-semibold ${th.text} leading-tight truncate`}>{p.name}</p>
+                <p className={`text-[11px] ${th.muted} font-body truncate`}>{p.sku}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className={`text-[15px] font-heading font-bold ${th.sub} leading-none`}>{p.price}</p>
+                {p.was && <p className={`text-[11px] font-body line-through ${th.muted} mt-0.5`}>{p.was}</p>}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -516,7 +537,70 @@ const WgaSlide = ({ n, t }) => {
   );
 };
 
-// ===== SLIDE 7: ALSO RUNNING =====
+// ===== SLIDE 7: GAF COMMERCIAL SITE =====
+const CommercialSlide = ({ n, t }) => {
+  const th = useTheme();
+  const nav = ["Strength","Free Weights","Hyrox / Functional","Cardio","Flooring","Recovery","Storage","Fitouts","Contact"];
+  return (
+  <Slide num={n} total={t}>
+    <SectionTitle pre="New Asset" title="GAF COMMERCIAL" sub="A dedicated commercial storefront, separate from the retail site. Built quote-led rather than checkout-led, which is how commercial buyers actually purchase." />
+    <div className="flex gap-5 flex-1 min-h-0">
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg overflow-hidden flex-1 flex flex-col min-h-0`}>
+          <div className={`${th.bg3} px-4 py-2.5 flex items-center gap-3 shrink-0 border-b ${th.cardBorder}`}>
+            <div className="flex gap-1.5">
+              {["#ff5f57","#febc2e","#28c840"].map((c,i)=>(<div key={i} className="w-2.5 h-2.5 rounded-full" style={{background:c}}></div>))}
+            </div>
+            <div className={`flex-1 ${th.cardBg} rounded px-3 py-1`}>
+              <p className={`text-[13px] font-body ${th.sub}`}>commercial.gymandfitness.com.au</p>
+            </div>
+          </div>
+          <div className="flex-1 flex items-center justify-center p-6 min-h-0">
+            <div className="text-center">
+              <p className={`font-display text-4xl tracking-wide ${th.text} leading-none`}>GYM <span className={th.sub}>and</span> FITNESS</p>
+              <p className="text-[15px] font-heading font-bold tracking-[.55em] text-gaf-orange uppercase mt-2 ml-2">Commercial</p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center mt-6 max-w-[520px]">
+                {nav.map((s,i)=>(
+                  <span key={i} className={`text-[13px] font-heading font-semibold tracking-[.12em] uppercase ${th.sub}`}>{s}</span>
+                ))}
+              </div>
+              <p className={`text-[13px] font-body ${th.muted} mt-6`}>Screenshot to drop in here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="w-[400px] shrink-0 flex flex-col gap-3 min-h-0">
+        <div className="bg-gaf-orange rounded-lg p-5 text-white relative overflow-hidden shrink-0">
+          <div className="absolute -right-4 -top-4 opacity-10"><Store size={130} /></div>
+          <p className="text-[13px] font-heading tracking-[.3em] uppercase opacity-90 mb-2 relative z-10">Why It Matters</p>
+          <h3 className="font-display text-[1.75rem] tracking-wide leading-[1.05] relative z-10">QUOTE FIRST,<br/>NOT CHECKOUT</h3>
+          <p className="text-[14px] font-body opacity-95 leading-snug relative z-10 mt-3">Commercial buyers spec a room, not a product. The site is built to start that conversation and route it to us.</p>
+        </div>
+        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex-1`}>
+          <p className={`text-[11px] font-heading tracking-[.25em] text-gaf-orange uppercase mb-3`}>What's On It</p>
+          <div className="space-y-2">
+            {[["Add to Quote","Builds a quote cart instead of a checkout"],
+              ["Call a Product Expert","Straight to 1800 614 491"],
+              ["Fitouts","Whole-room offer, not single SKUs"],
+              ["Finance Available","Surfaced on every product"]].map(([a,b],i)=>(
+              <div key={i} className={`${th.bg3} rounded-lg px-3 py-2`}>
+                <p className={`text-[14px] font-heading font-semibold ${th.text} leading-tight`}>{a}</p>
+                <p className={`text-[13px] ${th.sub} font-body mt-0.5 leading-snug`}>{b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className={`${th.amberBg} border ${th.amberBorder} rounded-lg p-3 flex items-start gap-2.5 shrink-0`}>
+          <Warn size={15} className={`${th.amber} shrink-0 mt-0.5`} />
+          <p className={`text-[13px] font-body ${th.sub} leading-snug`}>Site is built and ready. Still behind a password gate as at 29 July, so hold the URL until it is opened up.</p>
+        </div>
+      </div>
+    </div>
+  </Slide>
+  );
+};
+
+// ===== SLIDE 8: ALSO RUNNING =====
 const AlsoSlide = ({ n, t }) => {
   const th = useTheme();
   return (
@@ -576,7 +660,7 @@ const QSlide = ({ n, t }) => {
   );
 };
 
-const SLIDES = [TitleSlide, JulySlide, TargetsSlide, PlaySlide, OffersSlide, WgaSlide, AlsoSlide, QSlide];
+const SLIDES = [TitleSlide, JulySlide, TargetsSlide, PlaySlide, OffersSlide, WgaSlide, CommercialSlide, AlsoSlide, QSlide];
 
 function App() {
   const [idx, setIdx] = useState(0);
