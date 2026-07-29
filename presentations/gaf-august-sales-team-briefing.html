@@ -275,20 +275,24 @@ const JulySlide = ({ n, t }) => {
   const th = useTheme();
   return (
   <Slide num={n} total={t}>
-    <SectionTitle pre="Look Back" title="HOW JULY LANDED" sub="July finished ahead of budget on every line. Figures cover 1 to 28 July, the last days entered in the GAF data sheet, so the full month will read slightly higher again." />
+    <SectionTitle pre="Look Back" title="HOW JULY LANDED" sub="Month to date, not the full month. Every figure below covers 1 to 28 July, the last days entered in the GAF data sheet, and each is compared against a budget cut to the same 28 days. The final month will land higher again." />
     <div className="flex-1 flex flex-col gap-4 min-h-0 justify-center">
       <div className="grid grid-cols-3 gap-5 stagger">
         {julyResults.map((m, i) => (
           <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-6 flex flex-col gap-3`}>
-            <div className="flex items-center justify-between">
-              <p className={`text-[13px] font-heading font-medium tracking-[.3em] uppercase ${th.sub}`}>{m.label}</p>
-              <div className="w-10 h-10 rounded-lg bg-gaf-orange/10 flex items-center justify-center"><m.IconComp size={20} className="text-gaf-orange" /></div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <p className={`text-[13px] font-heading font-medium tracking-[.3em] uppercase ${th.sub}`}>{m.label}</p>
+                <span className={`text-[11px] font-heading font-bold tracking-[.15em] uppercase px-1.5 py-0.5 rounded shrink-0 ${th.amberBg} ${th.amber}`}>MTD</span>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-gaf-orange/10 flex items-center justify-center shrink-0"><m.IconComp size={20} className="text-gaf-orange" /></div>
             </div>
             <p className={`font-display text-6xl tracking-wide leading-[0.9] ${th.text}`}>{m.actual}</p>
             <div className="flex items-baseline gap-3">
               <span className={`text-[15px] font-body ${th.sub}`}>Budget {m.budget}</span>
               <span className={`text-[16px] font-heading font-bold ${th.green}`}>{m.delta}</span>
             </div>
+            <p className={`text-[13px] font-body ${th.muted} leading-snug`}>1 to 28 July only. Budget day-matched to the same 28 days.</p>
           </div>
         ))}
       </div>
