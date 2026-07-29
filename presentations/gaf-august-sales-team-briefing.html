@@ -217,7 +217,6 @@ const offerRoster = [
 
 const stockReality = [
   { name: "Altitude Series", detail: "Stock landing this month. Listing goes live end of day, banners ready.", state: "ok", label: "This is the push" },
-  { name: "Ares Series", detail: "We are under, not over. Do not lead with it.", state: "thin", label: "Short" },
   { name: "PR-4000 Power Rack", detail: "Live at $1,529, 6 units on hand.", state: "ok", label: "Live and selling" },
   { name: "Arcadia FT-3500", detail: "Live at $4,199, only 2 units on hand.", state: "thin", label: "Stock thin" },
 ];
@@ -266,7 +265,7 @@ const TitleSlide = () => {
     <div className="px-16 pb-8 z-10">
       <p className={`text-[14px] font-heading tracking-[.5em] ${th.muted} uppercase`}>Confidential Internal Use · For the August Sales Meeting</p>
     </div>
-    <footer className="h-1 bg-gradient-to-r from-gaf-orange via-gaf-orange to-transparent z-10 shrink-0" style={{width:'11%'}}></footer>
+    <footer className="h-1 bg-gradient-to-r from-gaf-orange via-gaf-orange to-transparent z-10 shrink-0" style={{width:'12.5%'}}></footer>
   </div>
   );
 };
@@ -393,7 +392,7 @@ const PlaySlide = ({ n, t }) => {
         <div className="rounded-lg overflow-hidden shrink-0 border border-gaf-orange/20">
           <img src="assets/rep-altitude-banner.jpg" alt="New REP Altitude" className="w-full h-auto object-cover" />
         </div>
-        <div className="grid grid-cols-4 gap-3 flex-1 stagger min-h-0">
+        <div className="grid grid-cols-3 gap-3 flex-1 stagger min-h-0">
           {stockReality.map((r, i) => {
             const s = stateStyle[r.state];
             return (
@@ -411,63 +410,7 @@ const PlaySlide = ({ n, t }) => {
   );
 };
 
-// ===== SLIDE 5: REP + ALTITUDE =====
-const RepSlide = ({ n, t }) => {
-  const th = useTheme();
-  return (
-  <Slide num={n} total={t}>
-    <SectionTitle pre="Hero Campaign · Runs to 31 August" title="REP + ALTITUDE" sub="The Altitude Series is the lead REP story for the month. Listing revamp modelled on the M10, with homepage placement behind it. Listing goes live end of day and the Altitude milestone lands 5 August." />
-    <div className="flex gap-5 flex-1 min-h-0">
-      <div className="flex-1 flex flex-col gap-3 min-h-0">
-        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-5 flex-1 flex flex-col min-h-0`}>
-          <p className={`text-[11px] font-heading tracking-[.25em] text-gaf-orange uppercase mb-3`}>Why Altitude, Why Now</p>
-          <div className="space-y-3">
-            {[["We are low on All-in-Ones","The category that normally carries GP is short, so the load has to move somewhere."],
-              ["Altitude is the stock we have","We are not heavy in REP overall and we are under on Ares. Altitude is the range with stock landing."],
-              ["It is a real story, not a price cut","A customisable rack range. Rack, Smith and cables, built to the customer's setup."]].map(([a,b],i)=>(
-              <div key={i} className="flex gap-3 items-start">
-                <div className="w-7 h-7 rounded-full bg-gaf-orange/10 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-[13px] font-heading font-bold text-gaf-orange">{i+1}</span>
-                </div>
-                <div>
-                  <p className={`text-[15px] font-heading font-semibold ${th.text} leading-tight`}>{a}</p>
-                  <p className={`text-[14px] ${th.sub} font-body mt-0.5 leading-snug`}>{b}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-2 gap-3 flex-1 min-h-0 mt-4">
-            <ProdImg src={IMG.pr4000} alt="REP PR-4000" className="h-full min-h-[130px]" />
-            <ProdImg src={IMG.arcadia} alt="REP Arcadia" className="h-full min-h-[130px]" />
-          </div>
-        </div>
-      </div>
-      <div className="w-[380px] shrink-0 flex flex-col gap-3 min-h-0">
-        <div className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-4 flex-1`}>
-          <p className={`text-[11px] font-heading tracking-[.25em] ${th.sub} uppercase mb-3`}>Live REP Range Today</p>
-          <div className="space-y-2">
-            {[["PR-4000 Power Rack","$1,529","6 on hand"],["Arcadia Functional Trainer","$4,199","2 on hand"],["FB-5000 Flat Bench","$419","4 on hand"],["Arcadia Upgrade Kit","$499","3 on hand"]].map(([a,b,c],i)=>(
-              <div key={i} className={`flex items-center justify-between ${th.bg3} rounded-lg px-3 py-2`}>
-                <div>
-                  <p className={`text-[14px] font-heading font-semibold ${th.text} leading-tight`}>{a}</p>
-                  <p className={`text-[12px] ${th.muted} font-body`}>{c}</p>
-                </div>
-                <span className="text-[15px] font-heading font-bold text-gaf-orange">{b}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="bg-gaf-orange/5 border border-gaf-orange/20 rounded-lg p-3 flex items-start gap-2.5">
-          <Store size={15} className="text-gaf-orange shrink-0 mt-0.5" />
-          <p className={`text-[13px] font-body ${th.sub} leading-snug`}>Homepage banners are built and ready to go with the Altitude listing.</p>
-        </div>
-      </div>
-    </div>
-  </Slide>
-  );
-};
-
-// ===== SLIDE 6: AUGUST PRODUCT OFFERS =====
+// ===== SLIDE 5: AUGUST PRODUCT OFFERS =====
 const OffersSlide = ({ n, t }) => {
   const th = useTheme();
   return (
@@ -516,7 +459,7 @@ const OffersSlide = ({ n, t }) => {
   );
 };
 
-// ===== SLIDE 7: WGA CONFERENCE =====
+// ===== SLIDE 6: WGA CONFERENCE =====
 const WgaSlide = ({ n, t }) => {
   const th = useTheme();
   return (
@@ -563,7 +506,7 @@ const WgaSlide = ({ n, t }) => {
   );
 };
 
-// ===== SLIDE 8: ALSO RUNNING =====
+// ===== SLIDE 7: ALSO RUNNING =====
 const AlsoSlide = ({ n, t }) => {
   const th = useTheme();
   return (
@@ -602,7 +545,7 @@ const AlsoSlide = ({ n, t }) => {
   );
 };
 
-// ===== SLIDE 9: Q&A =====
+// ===== SLIDE 8: Q&A =====
 const QSlide = ({ n, t }) => {
   const th = useTheme();
   return (
@@ -623,7 +566,7 @@ const QSlide = ({ n, t }) => {
   );
 };
 
-const SLIDES = [TitleSlide, JulySlide, TargetsSlide, PlaySlide, RepSlide, OffersSlide, WgaSlide, AlsoSlide, QSlide];
+const SLIDES = [TitleSlide, JulySlide, TargetsSlide, PlaySlide, OffersSlide, WgaSlide, AlsoSlide, QSlide];
 
 function App() {
   const [idx, setIdx] = useState(0);
