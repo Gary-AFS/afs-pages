@@ -203,9 +203,9 @@ const julyResults = [
 ];
 
 const julySupport = [
-  { label: "Ad Spend", value: "$165,151" },
-  { label: "Abandoned Carts", value: "735" },
-  { label: "Inbound Calls", value: "192" },
+  { label: "Ad Spend", value: "$165,151", sub: "No target set" },
+  { label: "Abandoned Carts", value: "735", sub: "vs 828 implied", delta: "-11.2%", tone: "neutral" },
+  { label: "Inbound Calls", value: "192", sub: "vs 186 implied", delta: "+3.2%", tone: "up" },
 ];
 
 const offerRoster = [
@@ -294,15 +294,21 @@ const JulySlide = ({ n, t }) => {
       </div>
       <div className="grid grid-cols-3 gap-4 stagger">
         {julySupport.map((m, i) => (
-          <div key={i} className={`${th.bg3} rounded-lg p-4 flex items-center justify-between`}>
-            <p className={`text-[13px] font-heading font-medium tracking-[.25em] uppercase ${th.sub}`}>{m.label}</p>
-            <p className={`text-2xl font-heading font-bold ${th.text}`}>{m.value}</p>
+          <div key={i} className={`${th.bg3} rounded-lg p-4 flex items-center justify-between gap-3`}>
+            <div>
+              <p className={`text-[13px] font-heading font-medium tracking-[.25em] uppercase ${th.sub}`}>{m.label}</p>
+              <p className={`text-[13px] font-body ${th.muted} mt-1`}>{m.sub}</p>
+            </div>
+            <div className="text-right shrink-0">
+              <p className={`text-2xl font-heading font-bold ${th.text} leading-none`}>{m.value}</p>
+              {m.delta && <p className={`text-[15px] font-heading font-bold mt-1 ${m.tone === 'up' ? th.green : th.sub}`}>{m.delta}</p>}
+            </div>
           </div>
         ))}
       </div>
       <div className={`${th.greenBg} border ${th.greenBorder} rounded-lg p-3.5 flex items-start gap-3`}>
         <TrendUp size={18} className={`${th.green} shrink-0 mt-0.5`} />
-        <p className={`text-[14px] font-body ${th.sub} leading-snug`}>Fulfilled GP ran well ahead of created GP in July, which is the EOFY order book being invoiced out rather than new demand. The created line is the measure of how July actually traded, and it beat budget by 17.9%.</p>
+        <p className={`text-[14px] font-body ${th.sub} leading-snug`}>Fulfilled GP ran well ahead of created GP, which is the EOFY order book being invoiced out rather than new demand. The created line is the measure of how July actually traded, and it beat budget by 17.9%. Calls landed 3.2% above the implied target while carts came in 11.2% below it, so July turned fewer carts into more GP. That is the funnel converting better, not demand falling away. Carts and calls carry no budget line in the data sheet, so both implied targets are back-calculated from June's rate.</p>
       </div>
     </div>
   </Slide>
