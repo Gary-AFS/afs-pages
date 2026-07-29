@@ -210,7 +210,6 @@ const julySupport = [
 ];
 
 const offerRoster = [
-  { name: "REP Altitude", sku: "Rack + Cables + Smith", cat: "Rack", price: "$6,999", was: "", img: IMG.altitude, cover: true, stock: null, note: "New range, listing live today" },
   { name: "Force USA HG100 Home Gym", sku: "F-HG100", cat: "Home Gym", price: "$699", was: "$849", img: IMG.hg100, stock: 14, note: "New to the offer list" },
   { name: "REP Arcadia Functional Trainer", sku: "FT-3500", cat: "Functional", price: "$3,999", was: "$4,199", img: IMG.arcadia, stock: 2, note: "Only 2 units on hand" },
   { name: "Force USA Glide Treadmill", sku: "F-GLIDE-T2", cat: "Cardio", price: "$1,899", was: "$2,499", img: IMG.glide, stock: 78, note: "Continue through" },
@@ -440,7 +439,7 @@ const OffersSlide = ({ n, t }) => {
   <Slide num={n} total={t}>
     <SectionTitle pre="The Offer Roster · 1 to 31 August" title="AUGUST PRODUCT OFFERS" sub="The locked list up top. Everything below it is still TBC on pricing and sign-off, so do not quote those yet." />
     <div className="flex flex-col gap-3 flex-1 min-h-0">
-      <div className="grid grid-cols-5 gap-3 flex-1 stagger min-h-0">
+      <div className="grid grid-cols-4 gap-3 flex-1 stagger min-h-0">
         {offerRoster.map((p, i) => (
           <div key={i} className={`${th.cardBg} border ${th.cardBorder} rounded-lg p-3 flex flex-col`}>
             <div className="flex items-center justify-between mb-2 gap-1">
