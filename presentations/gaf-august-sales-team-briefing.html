@@ -540,7 +540,6 @@ const WgaSlide = ({ n, t }) => {
 // ===== SLIDE 7: GAF COMMERCIAL SITE =====
 const CommercialSlide = ({ n, t }) => {
   const th = useTheme();
-  const nav = ["Strength","Free Weights","Hyrox / Functional","Cardio","Flooring","Recovery","Storage","Fitouts","Contact"];
   return (
   <Slide num={n} total={t}>
     <SectionTitle pre="New Asset" title="GAF COMMERCIAL" sub="A dedicated commercial storefront, separate from the retail site. Built quote-led rather than checkout-led, which is how commercial buyers actually purchase." />
@@ -555,17 +554,8 @@ const CommercialSlide = ({ n, t }) => {
               <p className={`text-[13px] font-body ${th.sub}`}>commercial.gymandfitness.com.au</p>
             </div>
           </div>
-          <div className="flex-1 flex items-center justify-center p-6 min-h-0">
-            <div className="text-center">
-              <p className={`font-display text-4xl tracking-wide ${th.text} leading-none`}>GYM <span className={th.sub}>and</span> FITNESS</p>
-              <p className="text-[15px] font-heading font-bold tracking-[.55em] text-gaf-orange uppercase mt-2 ml-2">Commercial</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center mt-6 max-w-[520px]">
-                {nav.map((s,i)=>(
-                  <span key={i} className={`text-[13px] font-heading font-semibold tracking-[.12em] uppercase ${th.sub}`}>{s}</span>
-                ))}
-              </div>
-              <p className={`text-[13px] font-body ${th.muted} mt-6`}>Screenshot to drop in here</p>
-            </div>
+          <div className="flex-1 min-h-0 bg-white overflow-hidden">
+            <img src="assets/gaf-commercial-site.png" alt="GAF Commercial storefront" className="w-full h-full object-cover object-top" />
           </div>
         </div>
       </div>
